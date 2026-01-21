@@ -13,7 +13,7 @@ if TYPE_CHECKING:
     from collections.abc import Iterator
 
     from erdos.core.models import ChunkSource, ProblemRecord
-    from erdos.core.search_index import (
+    from erdos.core.search.types import (
         EmbeddingModelProtocol,
         SearchResult,
         SemanticSearchResult,

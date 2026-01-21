@@ -34,8 +34,8 @@ Fix architectural debt first, then implement new features.
 
 ### Debt Items (Ordered to unblock SPEC-022)
 
-- [ ] **DEBT-041**: `ports.py` leaks concrete `search_index` types (P3)
-  - Deck: `docs/debt/debt-041-ports-leak-search-index-types.md`
+- [x] **DEBT-041**: `ports.py` leaks concrete `search_index` types (P3)
+  - Deck: `docs/_archive/debt/debt-041-ports-leak-search-index-types.md`
   - Acceptance: Satisfy the deck acceptance criteria; `make ci` green.
 
 - [ ] **DEBT-039**: `erdos lean` command module is a god file (P2)
@@ -103,6 +103,20 @@ Fix architectural debt first, then implement new features.
 - `docs/INDEX.md` (updated)
 
 (entries added by Ralph loop as tasks complete)
+
+### DEBT-041: `ports.py` leaks concrete `search_index` types - FIXED
+
+**Commit:** 6d02ace
+
+Created `src/erdos/core/search/types.py` with contract types (`EmbeddingModelProtocol`, `SearchResult`, `SemanticSearchResult`). Updated `ports.py` to import from `search.types` instead of `search_index`. Updated `search_index.py` to import and re-export for backward compatibility.
+
+**Files added/modified:**
+- `src/erdos/core/search/__init__.py` (new)
+- `src/erdos/core/search/types.py` (new)
+- `src/erdos/core/ports.py` (updated imports)
+- `src/erdos/core/search_index.py` (updated imports, added re-exports)
+- `docs/debt/README.md` (moved to archived)
+- `docs/_archive/debt/debt-041-ports-leak-search-index-types.md` (archived)
 
 ---
 

@@ -7,69 +7,35 @@ import logging
 import os
 import sqlite3
 from contextlib import contextmanager
-from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Protocol
+from typing import TYPE_CHECKING
 
 from erdos.core.constants import PREVIEW_LENGTH
 from erdos.core.models import ChunkSource, ProblemRecord, TextChunk
+
+# Import contract types from search.types and re-export for backward compatibility
+from erdos.core.search.types import (
+    EmbeddingModelProtocol,
+    SearchResult,
+    SemanticSearchResult,
+)
 
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
 
-    from numpy.typing import NDArray
-
 
 logger = logging.getLogger(__name__)
 
-
-class EmbeddingModelProtocol(Protocol):
-    """Protocol for embedding models."""
-
-    @property
-    def model_name(self) -> str: ...
-
-    @property
-    def dimension(self) -> int: ...
-
-    def encode(self, text: str) -> NDArray[Any]: ...
-
-    def encode_batch(self, texts: list[str]) -> list[NDArray[Any]]: ...
-
-    def to_blob(self, embedding: NDArray[Any]) -> bytes: ...
-
-    def from_blob(self, blob: bytes) -> NDArray[Any]: ...
-
-
-@dataclass
-class SearchResult:
-    """A single search result with relevance score."""
-
-    chunk_id: str
-    text: str
-    snippet: str  # Highlighted excerpt
-    score: float  # BM25 score (higher = more relevant)
-    source_type: ChunkSource
-    problem_id: int | None
-    reference_doi: str | None
-
-
-@dataclass
-class SemanticSearchResult:
-    """A search result with semantic and/or hybrid scores."""
-
-    chunk_id: str
-    text: str
-    snippet: str
-    source_type: ChunkSource
-    problem_id: int | None
-    reference_doi: str | None
-    # Scores
-    bm25_score: float = 0.0
-    semantic_score: float = 0.0
-    hybrid_score: float = field(default=0.0)
+# Re-export for backward compatibility: `from erdos.core.search_index import SearchResult`
+__all__ = [
+    "EmbeddingModelProtocol",
+    "SearchIndex",
+    "SearchIndexError",
+    "SearchResult",
+    "SemanticSearchResult",
+]
 
 
 class SearchIndexError(Exception):
