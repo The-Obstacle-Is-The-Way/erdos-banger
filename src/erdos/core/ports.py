@@ -12,12 +12,60 @@ from typing import TYPE_CHECKING, Protocol
 if TYPE_CHECKING:
     from collections.abc import Iterator
 
-    from erdos.core.models import ChunkSource, ProblemRecord
+    from erdos.core.models import ChunkSource, ProblemRecord, ReferenceRecord
     from erdos.core.search.types import (
         EmbeddingModelProtocol,
         SearchResult,
         SemanticSearchResult,
     )
+
+
+class MetadataProvider(Protocol):
+    """Port for academic metadata sources (SPEC-022).
+
+    High-level ingest code depends on this abstraction, not concrete clients.
+    Implementations wrap existing clients (OpenAlexClient, crossref_client, etc.).
+    """
+
+    @property
+    def provider_name(self) -> str:
+        """Human-readable provider name for logging/debugging."""
+        ...
+
+    def get_by_doi(self, doi: str) -> ReferenceRecord | None:
+        """Fetch work metadata by DOI.
+
+        Returns:
+            ReferenceRecord if found, None if not found.
+
+        Raises:
+            requests.RequestException: On network/API errors (non-404).
+            ValueError: On invalid identifiers or irrecoverable parse errors.
+        """
+        ...
+
+    def get_by_arxiv(self, arxiv_id: str) -> ReferenceRecord | None:
+        """Fetch work metadata by arXiv ID.
+
+        Note: This fetches METADATA about the arXiv paper (title, authors, etc.),
+        not the source content. For content, use ArxivClient directly.
+
+        Returns:
+            ReferenceRecord if found, None if not found.
+
+        Raises:
+            requests.RequestException: On network/API errors (non-404).
+            ValueError: On invalid arXiv identifiers or irrecoverable parse errors.
+        """
+        ...
+
+    def search(self, query: str, *, limit: int = 25) -> list[ReferenceRecord]:
+        """Search works by title/abstract.
+
+        Returns:
+            List of matching ReferenceRecords, possibly empty.
+        """
+        ...
 
 
 class ProblemRepository(Protocol):

@@ -16,7 +16,7 @@ This directory contains technical-debt writeups: spec drift, missing fixtures, i
 
 | ID | Title | Priority | Status | Deck |
 |----|-------|----------|--------|------|
-| DEBT-038 | MetadataProvider abstraction missing | P2 | Spec'd | [debt-038-metadata-provider-abstraction.md](debt-038-metadata-provider-abstraction.md) → [SPEC-022](../specs/spec-022-metadata-provider-orchestration.md) |
+| (none) | | | | |
 
 ## Archived Debt
 
@@ -64,6 +64,7 @@ All debt below has been resolved and archived to `docs/_archive/debt/`.
 | DEBT-041 | `ports.py` leaks concrete `search_index` types | P3 | Fixed | e27e5a3 |
 | DEBT-040 | `src/erdos/core/` module sprawl (doc-only) | P3 | Fixed | 994b99c |
 | DEBT-036 | Marker device selection not exposed | P3 | Fixed | 7005b65 |
+| DEBT-038 | MetadataProvider abstraction missing | P2 | Resolved | SPEC-022 |
 
 **Next Debt ID:** DEBT-042
 
@@ -109,3 +110,4 @@ All debt below has been resolved and archived to `docs/_archive/debt/`.
 - `docs/_archive/debt/debt-041-ports-leak-search-index-types.md`
 - `docs/_archive/debt/debt-040-core-package-module-sprawl.md`
 - `docs/_archive/debt/debt-036-marker-mps-not-configured.md`
+- `docs/_archive/debt/debt-038-metadata-provider-abstraction.md`

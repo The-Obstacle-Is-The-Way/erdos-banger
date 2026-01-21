@@ -1,12 +1,14 @@
 """Reference fetching and download logic."""
 
+from __future__ import annotations
+
 import hashlib
 import logging
 import tarfile
 import time
 from datetime import UTC, datetime
 from enum import Enum
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 import defusedxml.ElementTree as ET
 import requests
@@ -36,6 +38,12 @@ from erdos.core.models import (
 )
 from erdos.core.openalex_client import OpenAlexClient, OpenAlexConfig
 from erdos.core.retry import fetch_with_retry
+
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    from erdos.core.ports import MetadataProvider
 
 
 logger = logging.getLogger(__name__)
@@ -304,6 +312,62 @@ def _fetch_openalex_by_arxiv(
     )
 
 
+def _fetch_with_provider(
+    ref: ReferenceEntry,
+    provider: MetadataProvider,
+    *,
+    repo_root: Path,
+    allow_download: bool,
+    timeout: float,
+) -> ManifestEntry:
+    """Fetch reference metadata using injected MetadataProvider (SPEC-022).
+
+    Args:
+        ref: Reference entry with DOI and/or arXiv ID.
+        provider: MetadataProvider for fetching metadata.
+        repo_root: Repository root directory.
+        allow_download: Whether to download arXiv source tarballs.
+        timeout: HTTP timeout in seconds.
+
+    Returns:
+        ManifestEntry with metadata and optional cache info.
+
+    Raises:
+        ValueError: If reference has no identifiers or not found.
+    """
+    # Try DOI first, then arXiv ID
+    reference: ReferenceRecord | None = None
+
+    if ref.doi:
+        reference = provider.get_by_doi(ref.doi)
+        if reference is not None and ref.arxiv_id and not reference.arxiv_id:
+            reference.arxiv_id = ref.arxiv_id
+
+    if reference is None and ref.arxiv_id:
+        reference = provider.get_by_arxiv(ref.arxiv_id)
+
+    if reference is None:
+        if not ref.doi and not ref.arxiv_id:
+            raise ValueError("Reference has no DOI or arXiv ID")
+        raise ValueError(
+            f"Reference not found in {provider.provider_name}: "
+            f"DOI={ref.doi}, arXiv={ref.arxiv_id}"
+        )
+
+    # Download arXiv source if we have an arXiv ID
+    arxiv_id = reference.arxiv_id or ref.arxiv_id
+    if arxiv_id:
+        return _build_manifest_entry_with_arxiv(
+            reference,
+            arxiv_id,
+            repo_root=repo_root,
+            allow_download=allow_download,
+            timeout=timeout,
+        )
+
+    return ManifestEntry(reference=reference, ingested_at=datetime.now(UTC))
+
+
 def fetch_reference_entry(
     ref: ReferenceEntry,
     *,
@@ -313,6 +377,7 @@ def fetch_reference_entry(
     timeout: float,
     mailto: str,
     source: MetadataSource = MetadataSource.OPENALEX,
+    provider: MetadataProvider | None = None,
 ) -> ManifestEntry:
     """Fetch metadata and optionally download content for a reference.
 
@@ -323,7 +388,9 @@ def fetch_reference_entry(
         allow_network: Whether network access is allowed.
         timeout: HTTP timeout in seconds.
         mailto: Contact email for API polite pools.
-        source: Metadata source to use (default: OpenAlex).
+        source: Metadata source to use (default: OpenAlex). Ignored if provider given.
+        provider: Optional MetadataProvider for dependency injection (SPEC-022).
+            When provided, source parameter is ignored.
 
     Returns:
         ManifestEntry with metadata and optional cache info.
@@ -335,6 +402,17 @@ def fetch_reference_entry(
     if not allow_network:
         raise RuntimeError("Network access disabled but required for fetching")
 
+    # SPEC-022: Use injected provider if available
+    if provider is not None:
+        return _fetch_with_provider(
+            ref,
+            provider,
+            repo_root=repo_root,
+            allow_download=allow_download,
+            timeout=timeout,
+        )
+
+    # Legacy behavior: use MetadataSource-based branching
     # Use OpenAlex as primary source (SPEC-020)
     if source == MetadataSource.OPENALEX:
         if ref.doi:
@@ -425,8 +503,25 @@ def process_single_reference(
     timeout: float,
     mailto: str,
     source: MetadataSource = MetadataSource.OPENALEX,
+    provider: MetadataProvider | None = None,
 ) -> ReferenceProcessResult:
-    """Process a single reference, reusing a cached manifest entry unless forced."""
+    """Process a single reference, reusing a cached manifest entry unless forced.
+
+    Args:
+        ref: Reference entry to process.
+        existing_manifest: Existing manifest for idempotence.
+        force: If True, ignore existing entries.
+        repo_root: Repository root directory.
+        allow_download: Whether to download arXiv tarballs.
+        allow_network: Whether network access is allowed.
+        timeout: HTTP timeout in seconds.
+        mailto: Contact email for API polite pools.
+        source: Metadata source to use (default: OpenAlex). Ignored if provider given.
+        provider: Optional MetadataProvider for dependency injection (SPEC-022).
+
+    Returns:
+        ReferenceProcessResult with entry and status.
+    """
     if existing_entry := _find_existing_manifest_entry(
         ref, existing_manifest, force=force
     ):
@@ -446,6 +541,7 @@ def process_single_reference(
             timeout=timeout,
             mailto=mailto,
             source=source,
+            provider=provider,
         )
         return _success_result(entry)
     except (requests.RequestException, RuntimeError) as e:
@@ -477,6 +573,7 @@ def process_all_references(
     mailto: str,
     delay: float,
     source: MetadataSource = MetadataSource.OPENALEX,
+    provider: MetadataProvider | None = None,
 ) -> ProcessAllReferencesResult:
     """Process all references for a problem.
 
@@ -490,7 +587,8 @@ def process_all_references(
         timeout: HTTP timeout in seconds.
         mailto: Contact email for API polite pools.
         delay: Rate limiting delay between requests.
-        source: Metadata source to use (default: OpenAlex).
+        source: Metadata source to use (default: OpenAlex). Ignored if provider given.
+        provider: Optional MetadataProvider for dependency injection (SPEC-022).
 
     Returns:
         ProcessAllReferencesResult with all entries and status.
@@ -519,6 +617,7 @@ def process_all_references(
             timeout=timeout,
             mailto=mailto,
             source=source,
+            provider=provider,
         )
 
         entries.append(result.entry)

@@ -1,6 +1,6 @@
 # ADR-001: Metadata Provider Orchestration (Ports + Provider Chain)
 
-**Status:** Proposed
+**Status:** Accepted
 **Date:** 2026-01-21
 **Related:** `docs/specs/spec-022-metadata-provider-orchestration.md`, `docs/debt/debt-038-metadata-provider-abstraction.md`, `docs/specs/master-qualifications.md#5-api-orchestration-strategy-rob-c-martin-principles`
 

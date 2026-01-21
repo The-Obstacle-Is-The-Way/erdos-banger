@@ -1,10 +1,11 @@
 # DEBT-038: MetadataProvider Abstraction Missing
 
-**Status:** Spec'd → [ADR-001](../adr/adr-001-metadata-provider-orchestration.md) → [SPEC-022](../specs/spec-022-metadata-provider-orchestration.md)
+**Status:** Resolved
+**Resolved In:** SPEC-022
 **Priority:** P2
 **Found:** 2026-01-21
 **Found By:** API orchestration architecture review
-**Resolution:** SPEC-022 defines the implementation plan
+**Resolution:** SPEC-022 implemented the MetadataProvider protocol and provider chain
 
 ---
 

@@ -11,6 +11,7 @@ v1.2 (DONE)     Iteration: Loop + logging + OpenAlex metadata
 v1.3 (DONE)     Enhancement: Vectors + batch ops
 v1.4 (DONE)     Integration: Formal conjectures + MCP
 v2.0 (DONE)     Expansion: PDF conversion (Marker + LLM)
+v2.1 (DONE)     Architecture: MetadataProvider abstraction
 ```
 
 ## Active Specs
@@ -19,9 +20,7 @@ Specs currently in progress or awaiting implementation.
 
 | ID | Title | Status | Target | Resolves |
 |----|-------|--------|--------|----------|
-| 022 | MetadataProvider Orchestration | Pending | v2.1 | DEBT-038 |
-
-- [SPEC-022: MetadataProvider Orchestration](./spec-022-metadata-provider-orchestration.md)
+| (none) | | | | |
 
 ## Design Documents
 
@@ -67,6 +66,7 @@ Completed specs that are fully implemented.
 | 015 | Batch Operations | [archive](../_archive/specs/spec-015-batch-operations.md) |
 | 017 | MCP Server | [archive](../_archive/specs/spec-017-mcp-server.md) |
 | 019 | PDF Conversion | [archive](../_archive/specs/spec-019-pdf-conversion.md) |
+| 022 | MetadataProvider Orchestration | [archive](../_archive/specs/spec-022-metadata-provider-orchestration.md) |
 
 **Next Spec ID:** SPEC-023
 
@@ -108,7 +108,7 @@ v1.4 Integration (DONE)
 v2.0 Expansion (DONE)
 └── 019 PDF Conversion ←── 010 Ingest (Marker + LLM enhancement)
 
-v2.1 Architecture (PENDING)
+v2.1 Architecture (DONE)
 └── 022 MetadataProvider Orchestration ←── Resolves DEBT-038, enables pluggable sources
 ```
 

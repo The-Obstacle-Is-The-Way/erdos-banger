@@ -1,6 +1,7 @@
 # SPEC-022: MetadataProvider Orchestration
 
-**Status:** Pending
+**Status:** Complete
+**Implemented In:** 4d8dea3
 **Priority:** P2
 **Created:** 2026-01-21
 **Resolves:** DEBT-038
@@ -130,14 +131,14 @@ elif source == MetadataSource.CROSSREF:
 
 ### In Scope
 
-- [ ] `MetadataProvider` protocol in `src/erdos/core/ports.py`
-- [ ] `OpenAlexProvider` wrapper in `src/erdos/core/providers/openalex.py`
-- [ ] `CrossrefProvider` wrapper in `src/erdos/core/providers/crossref.py`
-- [ ] `FallbackProvider` in `src/erdos/core/providers/fallback.py`
-- [ ] Add `build_metadata_provider(mailto, timeout)` in `src/erdos/core/context.py` (entrypoint composition helper)
-- [ ] Refactor `ingest/fetch.py` to accept `MetadataProvider` parameter
-- [ ] Unit tests with mock providers (no network calls)
-- [ ] Integration tests with real providers (marked `requires_network`)
+- [x] `MetadataProvider` protocol in `src/erdos/core/ports.py`
+- [x] `OpenAlexProvider` wrapper in `src/erdos/core/providers/openalex.py`
+- [x] `CrossrefProvider` wrapper in `src/erdos/core/providers/crossref.py`
+- [x] `FallbackProvider` in `src/erdos/core/providers/fallback.py`
+- [x] Add `build_metadata_provider(mailto, timeout)` in `src/erdos/core/context.py` (entrypoint composition helper)
+- [x] Refactor `ingest/fetch.py` to accept `MetadataProvider` parameter
+- [x] Unit tests with mock providers (no network calls)
+- [x] Integration tests with real providers (marked `requires_network`)
 
 ### Out of Scope
 
@@ -727,16 +728,16 @@ class TestFallbackProviderIntegration:
 
 ## Acceptance Criteria
 
-1. [ ] `MetadataProvider` protocol exists in `src/erdos/core/ports.py`
-2. [ ] `OpenAlexProvider` implements `MetadataProvider` and wraps `OpenAlexClient`
-3. [ ] `CrossrefProvider` implements `MetadataProvider` and wraps `crossref_client` functions
-4. [ ] `FallbackProvider` implements `MetadataProvider` and chains other providers
-5. [ ] `build_metadata_provider(mailto, timeout)` composes the default chain (OpenAlex → Crossref)
-6. [ ] `ingest/fetch.py` accepts `MetadataProvider` via dependency injection
-7. [ ] Unit tests use mock providers (no network calls)
-8. [ ] Integration tests verify real API behavior (marked `requires_network`)
-9. [ ] `make ci` passes with no coverage regression
-10. [ ] Adding a new source requires only: new provider class + registration in `build_metadata_provider(...)`
+1. [x] `MetadataProvider` protocol exists in `src/erdos/core/ports.py`
+2. [x] `OpenAlexProvider` implements `MetadataProvider` and wraps `OpenAlexClient`
+3. [x] `CrossrefProvider` implements `MetadataProvider` and wraps `crossref_client` functions
+4. [x] `FallbackProvider` implements `MetadataProvider` and chains other providers
+5. [x] `build_metadata_provider(mailto, timeout)` composes the default chain (OpenAlex → Crossref)
+6. [x] `ingest/fetch.py` accepts `MetadataProvider` via dependency injection
+7. [x] Unit tests use mock providers (no network calls)
+8. [x] Integration tests verify real API behavior (marked `requires_network`)
+9. [x] `make ci` passes with no coverage regression
+10. [x] Adding a new source requires only: new provider class + registration in `build_metadata_provider(...)`
 
 ---
 

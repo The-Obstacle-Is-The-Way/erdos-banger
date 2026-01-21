@@ -54,21 +54,12 @@ Fix architectural debt first, then implement new features.
 
 ### Spec Items (v2.1 Architecture)
 
-- [ ] **SPEC-022**: MetadataProvider Orchestration
-  - Spec: `docs/specs/spec-022-metadata-provider-orchestration.md`
+- [x] **SPEC-022**: MetadataProvider Orchestration
+  - Spec: `docs/_archive/specs/spec-022-metadata-provider-orchestration.md`
   - ADR: `docs/adr/adr-001-metadata-provider-orchestration.md`
   - Resolves: DEBT-038
   - Target: v2.1
   - Acceptance: All spec acceptance criteria met; `make ci` green.
-  - Note: This is a multi-step spec. Break into subtasks if needed:
-    - SPEC-022-A: Add MetadataProvider protocol to ports.py
-    - SPEC-022-B: Create providers/ package with OpenAlexProvider
-    - SPEC-022-C: Create CrossrefProvider wrapper
-    - SPEC-022-D: Create FallbackProvider
-    - SPEC-022-E: Add build_metadata_provider() to context.py
-    - SPEC-022-F: Refactor ingest/fetch.py to accept provider
-    - SPEC-022-G: Add unit tests for providers
-    - SPEC-022-H: Add integration tests (requires_network)
 
 ---
 
@@ -182,6 +173,40 @@ Added `--device` CLI option to `erdos convert` command for selecting torch devic
 - `tests/integration/test_pdf_convert.py` (added help output test)
 - `docs/debt/README.md` (moved DEBT-036 to archived)
 - `docs/_archive/debt/debt-036-marker-mps-not-configured.md` (archived)
+
+### SPEC-022: MetadataProvider Orchestration - COMPLETE
+
+**Commit:** 4d8dea3
+
+Implemented the MetadataProvider abstraction following ADR-001 (Ports + Provider Chain architecture). All acceptance criteria satisfied:
+
+1. `MetadataProvider` protocol in `src/erdos/core/ports.py` (lines 23-68)
+2. `OpenAlexProvider` wrapper in `src/erdos/core/providers/openalex.py`
+3. `CrossrefProvider` wrapper in `src/erdos/core/providers/crossref.py`
+4. `FallbackProvider` chain in `src/erdos/core/providers/fallback.py`
+5. `build_metadata_provider(mailto, timeout)` factory in `src/erdos/core/context.py`
+6. `ingest/fetch.py` accepts `MetadataProvider` via dependency injection (`provider` parameter)
+7. Unit tests with mock providers in `tests/unit/test_providers.py`
+8. Integration tests in `tests/integration/test_providers_network.py` (marked `requires_network`)
+
+**This resolves DEBT-038** - the ingest layer now depends on the `MetadataProvider` protocol, not concrete clients.
+
+**Files added/modified:**
+- `src/erdos/core/ports.py` (MetadataProvider protocol added)
+- `src/erdos/core/providers/__init__.py` (new package)
+- `src/erdos/core/providers/openalex.py` (new)
+- `src/erdos/core/providers/crossref.py` (new)
+- `src/erdos/core/providers/fallback.py` (new)
+- `src/erdos/core/context.py` (updated with build_metadata_provider)
+- `src/erdos/core/ingest/fetch.py` (accepts provider parameter)
+- `tests/unit/test_providers.py` (new)
+- `tests/integration/test_providers_network.py` (new)
+- `docs/specs/spec-022-metadata-provider-orchestration.md` (status → Complete)
+- `docs/adr/adr-001-metadata-provider-orchestration.md` (status → Accepted)
+- `docs/debt/debt-038-metadata-provider-abstraction.md` (status → Resolved)
+- `docs/specs/README.md` (updated)
+- `docs/debt/README.md` (updated)
+- `docs/adr/README.md` (updated)
 
 ---
 
