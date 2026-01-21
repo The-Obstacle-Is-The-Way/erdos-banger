@@ -63,7 +63,7 @@ All debt below has been resolved and archived to `docs/_archive/debt/`.
 | DEBT-039 | `erdos lean` command module is a god file | P2 | Fixed | 8540017 |
 | DEBT-041 | `ports.py` leaks concrete `search_index` types | P3 | Fixed | e27e5a3 |
 | DEBT-040 | `src/erdos/core/` module sprawl (doc-only) | P3 | Fixed | 994b99c |
-| DEBT-036 | Marker device selection not exposed | P3 | Fixed | 83e4194 |
+| DEBT-036 | Marker device selection not exposed | P3 | Fixed | 7005b65 |
 
 **Next Debt ID:** DEBT-042
 

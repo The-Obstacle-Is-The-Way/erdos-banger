@@ -4,7 +4,7 @@
 **Severity:** P3 (performance/DevX; not a correctness bug)
 **Found:** 2026-01-21
 **Found By:** Post-Ralph adversarial audit
-**Fixed In:** 83e4194
+**Fixed In:** 7005b65
 
 ---
 

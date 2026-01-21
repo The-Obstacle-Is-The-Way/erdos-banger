@@ -165,7 +165,7 @@ Documentation-only fix (Option A from the deck). Added "Core package boundaries"
 
 ### DEBT-036: Marker device selection not exposed - FIXED
 
-**Commit:** 83e4194
+**Commit:** 7005b65
 
 Added `--device` CLI option to `erdos convert` command for selecting torch device (cpu/cuda/mps) for Marker PDF conversions. The option sets `TORCH_DEVICE` env var which Marker uses for device selection.
 
