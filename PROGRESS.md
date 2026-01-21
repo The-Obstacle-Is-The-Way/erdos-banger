@@ -46,8 +46,8 @@ Fix architectural debt first, then implement new features.
   - Deck: `docs/_archive/debt/debt-040-core-package-module-sprawl.md`
   - Acceptance: Satisfy the deck acceptance criteria; `make ci` green.
 
-- [ ] **DEBT-036**: Marker device selection not exposed (P3)
-  - Deck: `docs/debt/debt-036-marker-mps-not-configured.md`
+- [x] **DEBT-036**: Marker device selection not exposed (P3)
+  - Deck: `docs/_archive/debt/debt-036-marker-mps-not-configured.md`
   - Acceptance: Satisfy the deck acceptance criteria; `make ci` green.
 
 ---
@@ -162,6 +162,26 @@ Documentation-only fix (Option A from the deck). Added "Core package boundaries"
 - `CLAUDE.md` (added "Core package boundaries" section)
 - `docs/debt/README.md` (updated: moved DEBT-040 to archived)
 - `docs/_archive/debt/debt-040-core-package-module-sprawl.md` (archived with acceptance criteria checked)
+
+### DEBT-036: Marker device selection not exposed - FIXED
+
+**Commit:** 83e4194
+
+Added `--device` CLI option to `erdos convert` command for selecting torch device (cpu/cuda/mps) for Marker PDF conversions. The option sets `TORCH_DEVICE` env var which Marker uses for device selection.
+
+**Implementation:**
+- Added `torch_device: str | None` field to `PDFConversionConfig` dataclass
+- Added `--device` / `-d` option to `erdos convert` command with help text documenting supported devices
+- `convert_pdf()` sets `TORCH_DEVICE` env var when `torch_device` is specified
+- TDD approach: wrote failing tests first, then implemented
+
+**Files added/modified:**
+- `src/erdos/core/pdf_converter.py` (added torch_device field and env var wiring)
+- `src/erdos/commands/convert.py` (added --device option)
+- `tests/unit/test_pdf_converter.py` (added config and env var tests)
+- `tests/integration/test_pdf_convert.py` (added help output test)
+- `docs/debt/README.md` (moved DEBT-036 to archived)
+- `docs/_archive/debt/debt-036-marker-mps-not-configured.md` (archived)
 
 ---
 

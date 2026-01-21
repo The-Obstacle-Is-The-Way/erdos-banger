@@ -9,6 +9,7 @@ Fallback converter: pdfplumber (MIT, low quality for math)
 from __future__ import annotations
 
 import logging
+import os
 from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
@@ -52,6 +53,7 @@ class PDFConversionConfig:
     llm_service: LLMService | None = None
     force_ocr: bool = False
     timeout: float = 300.0
+    torch_device: str | None = None  # cpu, cuda, mps - sets TORCH_DEVICE env var
 
 
 @dataclass
@@ -316,6 +318,11 @@ def convert_pdf(
             converter=config.converter,
             error="No converter available. Install marker: uv sync --extra pdf",
         )
+
+    # Set TORCH_DEVICE env var if specified (Marker uses this for device selection)
+    if config.torch_device is not None:
+        os.environ["TORCH_DEVICE"] = config.torch_device
+        logger.debug("Set TORCH_DEVICE=%s for Marker conversion", config.torch_device)
 
     # Convert using selected converter
     if converter == PDFConverter.MARKER:

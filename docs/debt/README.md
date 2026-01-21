@@ -16,7 +16,6 @@ This directory contains technical-debt writeups: spec drift, missing fixtures, i
 
 | ID | Title | Priority | Status | Deck |
 |----|-------|----------|--------|------|
-| DEBT-036 | Marker device selection not exposed | P3 | Open | [debt-036-marker-mps-not-configured.md](debt-036-marker-mps-not-configured.md) |
 | DEBT-038 | MetadataProvider abstraction missing | P2 | Spec'd | [debt-038-metadata-provider-abstraction.md](debt-038-metadata-provider-abstraction.md) → [SPEC-022](../specs/spec-022-metadata-provider-orchestration.md) |
 
 ## Archived Debt
@@ -64,6 +63,7 @@ All debt below has been resolved and archived to `docs/_archive/debt/`.
 | DEBT-039 | `erdos lean` command module is a god file | P2 | Fixed | 8540017 |
 | DEBT-041 | `ports.py` leaks concrete `search_index` types | P3 | Fixed | e27e5a3 |
 | DEBT-040 | `src/erdos/core/` module sprawl (doc-only) | P3 | Fixed | 994b99c |
+| DEBT-036 | Marker device selection not exposed | P3 | Fixed | 83e4194 |
 
 **Next Debt ID:** DEBT-042
 
@@ -108,3 +108,4 @@ All debt below has been resolved and archived to `docs/_archive/debt/`.
 - `docs/_archive/debt/debt-039-lean-command-god-module.md`
 - `docs/_archive/debt/debt-041-ports-leak-search-index-types.md`
 - `docs/_archive/debt/debt-040-core-package-module-sprawl.md`
+- `docs/_archive/debt/debt-036-marker-mps-not-configured.md`

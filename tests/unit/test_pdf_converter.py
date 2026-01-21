@@ -100,6 +100,7 @@ class TestPDFConversionConfig:
         assert config.use_llm is False
         assert config.llm_service is None
         assert config.force_ocr is False
+        assert config.torch_device is None
 
     def test_config_custom_values(self) -> None:
         """PDFConversionConfig accepts custom values."""
@@ -115,6 +116,19 @@ class TestPDFConversionConfig:
         assert config.use_llm is True
         assert config.llm_service == LLMService.CLAUDE
         assert config.force_ocr is True
+
+    def test_config_torch_device(self) -> None:
+        """PDFConversionConfig accepts torch_device setting (DEBT-036)."""
+        from erdos.core.pdf_converter import PDFConversionConfig
+
+        config = PDFConversionConfig(torch_device="mps")
+        assert config.torch_device == "mps"
+
+        config_cuda = PDFConversionConfig(torch_device="cuda")
+        assert config_cuda.torch_device == "cuda"
+
+        config_cpu = PDFConversionConfig(torch_device="cpu")
+        assert config_cpu.torch_device == "cpu"
 
 
 class TestPDFConversionResult:
@@ -228,6 +242,98 @@ class TestConvertPDF:
         assert result.error is not None
         error_lower = result.error.lower()
         assert "no converter" in error_lower or "not available" in error_lower
+
+
+class TestTorchDeviceEnvVar:
+    """Tests for TORCH_DEVICE environment variable wiring (DEBT-036)."""
+
+    def test_convert_pdf_sets_torch_device_env_var(
+        self, monkeypatch, tmp_path: Path
+    ) -> None:
+        """convert_pdf sets TORCH_DEVICE env var when torch_device is configured."""
+        import os
+
+        from erdos.core.pdf_converter import PDFConversionConfig, convert_pdf
+
+        # Create a minimal PDF file
+        pdf_file = tmp_path / "test.pdf"
+        pdf_file.write_bytes(b"%PDF-1.4 test content")
+
+        # Track what TORCH_DEVICE was set to
+        captured_env: dict[str, str | None] = {}
+
+        def mock_environ_setitem(key: str, value: str) -> None:
+            if key == "TORCH_DEVICE":
+                captured_env["TORCH_DEVICE"] = value
+
+        # Patch os.environ to capture the set
+        original_setitem = os.environ.__class__.__setitem__
+
+        def patched_setitem(self, key: str, value: str) -> None:
+            mock_environ_setitem(key, value)
+            return original_setitem(self, key, value)
+
+        monkeypatch.setattr(os.environ.__class__, "__setitem__", patched_setitem)
+
+        # Mock convert_with_marker to avoid needing actual Marker
+        from erdos.core.pdf_converter import PDFConversionResult
+
+        monkeypatch.setattr(
+            "erdos.core.pdf_converter.convert_with_marker",
+            lambda *args, **kwargs: PDFConversionResult(
+                success=True, text="test", converter="marker"
+            ),
+        )
+        monkeypatch.setattr(
+            "erdos.core.pdf_converter.is_marker_available", lambda: True
+        )
+
+        # Run with torch_device set
+        config = PDFConversionConfig(torch_device="mps")
+        convert_pdf(pdf_file, config)
+
+        # Verify TORCH_DEVICE was set
+        assert captured_env.get("TORCH_DEVICE") == "mps"
+
+    def test_convert_pdf_does_not_set_torch_device_when_none(
+        self, monkeypatch, tmp_path: Path
+    ) -> None:
+        """convert_pdf does not set TORCH_DEVICE when torch_device is None."""
+        import os
+
+        from erdos.core.pdf_converter import PDFConversionConfig, convert_pdf
+
+        pdf_file = tmp_path / "test.pdf"
+        pdf_file.write_bytes(b"%PDF-1.4 test content")
+
+        captured_env: dict[str, str | None] = {}
+        original_setitem = os.environ.__class__.__setitem__
+
+        def patched_setitem(self, key: str, value: str) -> None:
+            if key == "TORCH_DEVICE":
+                captured_env["TORCH_DEVICE"] = value
+            return original_setitem(self, key, value)
+
+        monkeypatch.setattr(os.environ.__class__, "__setitem__", patched_setitem)
+
+        from erdos.core.pdf_converter import PDFConversionResult
+
+        monkeypatch.setattr(
+            "erdos.core.pdf_converter.convert_with_marker",
+            lambda *args, **kwargs: PDFConversionResult(
+                success=True, text="test", converter="marker"
+            ),
+        )
+        monkeypatch.setattr(
+            "erdos.core.pdf_converter.is_marker_available", lambda: True
+        )
+
+        # Run without torch_device
+        config = PDFConversionConfig()  # torch_device=None by default
+        convert_pdf(pdf_file, config)
+
+        # TORCH_DEVICE should not have been set
+        assert "TORCH_DEVICE" not in captured_env
 
 
 class TestSelectConverter:

@@ -225,6 +225,14 @@ def convert(
             help="Force OCR even if text is extractable (Marker only)",
         ),
     ] = False,
+    device: Annotated[
+        str | None,
+        typer.Option(
+            "--device",
+            "-d",
+            help="Torch device for Marker: cpu, cuda, mps (sets TORCH_DEVICE env var)",
+        ),
+    ] = None,
 ) -> None:
     """Convert a PDF file to markdown/text.
 
@@ -290,6 +298,7 @@ def convert(
         use_llm=use_llm,
         llm_service=llm_service_enum,
         force_ocr=force_ocr,
+        torch_device=device,
     )
 
     # Show progress

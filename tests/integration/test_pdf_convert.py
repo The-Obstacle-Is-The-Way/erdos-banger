@@ -27,6 +27,20 @@ class TestConvertCommandHelp:
         assert "--converter" in output
         assert "--use-llm" in output
 
+    def test_convert_help_shows_device_option(self, strip_ansi) -> None:
+        """Convert --help documents the --device option (DEBT-036)."""
+        result = runner.invoke(app, ["convert", "--help"])
+        assert result.exit_code == 0
+        output = strip_ansi(result.output)
+        # --device option must be documented
+        assert "--device" in output
+        # Help text should mention supported devices
+        assert (
+            "cpu" in output.lower()
+            or "cuda" in output.lower()
+            or "mps" in output.lower()
+        )
+
 
 class TestConvertCommandValidation:
     """Tests for convert command validation."""

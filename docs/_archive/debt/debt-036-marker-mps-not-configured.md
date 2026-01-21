@@ -1,9 +1,10 @@
 # DEBT-036: Marker PDF Converter Device Selection Not Exposed
 
-**Status:** Open
+**Status:** Fixed
 **Severity:** P3 (performance/DevX; not a correctness bug)
 **Found:** 2026-01-21
 **Found By:** Post-Ralph adversarial audit
+**Fixed In:** 83e4194
 
 ---
 
@@ -76,13 +77,13 @@ MPS support depends on your local PyTorch build and workload. Some operations ma
 
 ## Acceptance Criteria
 
-1. [ ] `erdos convert --help` documents a new `--device` option (examples included).
-2. [ ] `erdos convert --device <cpu|cuda|mps>` sets `TORCH_DEVICE=<...>` for Marker conversions.
-3. [ ] `PDFConversionConfig` carries the selected device (e.g., `torch_device: str | None`) and `convert_pdf()` honors it when using Marker.
-4. [ ] Tests:
-   - [ ] `tests/integration/test_pdf_convert.py` asserts `--device` appears in help output (via `strip_ansi`).
-   - [ ] `tests/unit/test_pdf_converter.py` verifies the env-var wiring via `monkeypatch` (no Marker install required).
-5. [ ] `make ci` passes.
+1. [x] `erdos convert --help` documents a new `--device` option (examples included).
+2. [x] `erdos convert --device <cpu|cuda|mps>` sets `TORCH_DEVICE=<...>` for Marker conversions.
+3. [x] `PDFConversionConfig` carries the selected device (e.g., `torch_device: str | None`) and `convert_pdf()` honors it when using Marker.
+4. [x] Tests:
+   - [x] `tests/integration/test_pdf_convert.py` asserts `--device` appears in help output (via `strip_ansi`).
+   - [x] `tests/unit/test_pdf_converter.py` verifies the env-var wiring via `monkeypatch` (no Marker install required).
+5. [x] `make ci` passes.
 
 ## Testing
 
