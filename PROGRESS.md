@@ -42,8 +42,8 @@ Fix architectural debt first, then implement new features.
   - Deck: `docs/_archive/debt/debt-039-lean-command-god-module.md`
   - Acceptance: Satisfy the deck acceptance criteria; `make ci` green.
 
-- [ ] **DEBT-040**: `src/erdos/core/` module sprawl (P3)
-  - Deck: `docs/debt/debt-040-core-package-module-sprawl.md`
+- [x] **DEBT-040**: `src/erdos/core/` module sprawl (P3)
+  - Deck: `docs/_archive/debt/debt-040-core-package-module-sprawl.md`
   - Acceptance: Satisfy the deck acceptance criteria; `make ci` green.
 
 - [ ] **DEBT-036**: Marker device selection not exposed (P3)
@@ -148,6 +148,20 @@ Created `src/erdos/core/search/types.py` with contract types (`EmbeddingModelPro
 - `src/erdos/core/search_index.py` (updated imports, added re-exports)
 - `docs/debt/README.md` (moved to archived)
 - `docs/_archive/debt/debt-041-ports-leak-search-index-types.md` (archived)
+
+### DEBT-040: `src/erdos/core/` module sprawl - FIXED
+
+**Commit:** e609bac
+
+Documentation-only fix (Option A from the deck). Added "Core package boundaries" section to CLAUDE.md documenting:
+- Existing bounded contexts: `ask/`, `ingest/`, `models/`, `search/`
+- Top-level modules (legacy exceptions)
+- Rules for new code: no new top-level modules, infra adapters go in `core/clients/` or `core/adapters/`
+
+**Files added/modified:**
+- `CLAUDE.md` (added "Core package boundaries" section)
+- `docs/debt/README.md` (updated: moved DEBT-040 to archived)
+- `docs/_archive/debt/debt-040-core-package-module-sprawl.md` (archived with acceptance criteria checked)
 
 ---
 

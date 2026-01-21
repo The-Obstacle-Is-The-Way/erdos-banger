@@ -1,9 +1,10 @@
 # DEBT-040: `src/erdos/core/` Module Sprawl (Bounded Contexts Needed)
 
-**Status:** Open
+**Status:** Fixed
 **Priority:** P3
 **Found:** 2026-01-21
 **Found By:** Clean Architecture / maintainability audit
+**Fixed In:** e609bac
 
 ---
 
@@ -78,12 +79,12 @@ Rationale:
 
 ## Acceptance Criteria
 
-1. [ ] `CLAUDE.md` has a short “Core package boundaries” section:
-   - [ ] Lists the current bounded contexts (`ask/`, `ingest/`, `models/`) plus key top-level modules that are exceptions.
-   - [ ] Defines the rule: **no new modules at `src/erdos/core/*.py`** without either (a) placing code into an existing subpackage or (b) creating a new subpackage for a new bounded context.
-   - [ ] States where infra adapters belong (e.g., `core/clients/` or `core/adapters/`) for future work.
-2. [ ] This debt deck is updated to reflect completion of Option A and archived per protocol.
-3. [ ] `make ci` passes (no behavior changes expected).
+1. [x] `CLAUDE.md` has a short "Core package boundaries" section:
+   - [x] Lists the current bounded contexts (`ask/`, `ingest/`, `models/`, `search/`) plus key top-level modules that are exceptions.
+   - [x] Defines the rule: **no new modules at `src/erdos/core/*.py`** without either (a) placing code into an existing subpackage or (b) creating a new subpackage for a new bounded context.
+   - [x] States where infra adapters belong (e.g., `core/clients/` or `core/adapters/`) for future work.
+2. [x] This debt deck is updated to reflect completion of Option A and archived per protocol.
+3. [x] `make ci` passes (no behavior changes expected).
 
 ---
 

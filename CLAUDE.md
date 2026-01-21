@@ -113,7 +113,30 @@ src/erdos/
 - ruff for linting/formatting (configured in pyproject.toml)
 - 80% minimum test coverage enforced
 - All CLI output through Rich console or `exit_with_result()`
-- Clean Code / SOLID: keep Typer callbacks thin, move orchestration into `src/erdos/core/`, and avoid growing new “god modules”. If a necessary refactor is too large for the current change, create a debt deck in `docs/debt/` with evidence + acceptance criteria.
+- Clean Code / SOLID: keep Typer callbacks thin, move orchestration into `src/erdos/core/`, and avoid growing new "god modules". If a necessary refactor is too large for the current change, create a debt deck in `docs/debt/` with evidence + acceptance criteria.
+
+## Core Package Boundaries
+
+`src/erdos/core/` uses **bounded contexts** (subpackages) to organize code by domain:
+
+**Existing subpackages:**
+- `ask/` - RAG Q&A logic (retrieval, prompt, LLM, service)
+- `ingest/` - Reference ingestion (fetch, manifest models, service)
+- `models/` - Pydantic domain models (ProblemRecord, ReferenceRecord, CLIOutput, etc.)
+- `search/` - Search contract types (EmbeddingModelProtocol, SearchResult, SemanticSearchResult)
+
+**Top-level modules (legacy exceptions):**
+- `ports.py` - Protocol "ports" for dependency inversion (stable contract)
+- `context.py` - AppContext composition root
+- `constants.py`, `timing.py`, `exit_codes.py` - Shared utilities
+- `problem_loader.py`, `search_index.py`, `index_builder.py` - Core data loading/search
+- `*_client.py` - HTTP clients (arxiv, crossref, openalex)
+- Domain modules: `loop.py`, `batch.py`, `lean_runner.py`, `embeddings.py`, etc.
+
+**Rules for new code:**
+1. **No new top-level modules** at `src/erdos/core/*.py`. Place new code in an existing subpackage or create a new one for a distinct bounded context.
+2. **Infrastructure adapters** (HTTP clients, external service wrappers) should live in `core/clients/` or `core/adapters/` when this subpackage is created.
+3. **If a domain grows to 3+ related modules**, extract into a subpackage (e.g., `core/loop/` for loop-related modules).
 
 ## Technical Debt Status
 
