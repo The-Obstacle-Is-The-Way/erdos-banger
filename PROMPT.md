@@ -131,6 +131,22 @@ If ANY check fails, fix it before proceeding.
 
 ---
 
+## Git Rules (CRITICAL)
+
+**NEVER use these commands:**
+- `git rebase` - FORBIDDEN (causes merge conflicts that derail the loop)
+- `git pull` - FORBIDDEN (use force-push instead if diverged)
+- `git merge` - FORBIDDEN (not needed on autonomous branch)
+
+**If `git push` fails with "branches have diverged":**
+```bash
+git push --force-with-lease
+```
+
+This is safe because the Ralph branch is autonomous - you are the only committer.
+
+---
+
 ## Atomic Commit Format
 
 ### For Debt:

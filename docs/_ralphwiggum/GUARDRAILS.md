@@ -33,6 +33,12 @@ This document is a **living record** of guardrails, failure patterns, and “got
 - Common cause: reorganizing docs without updating `docs/_ralphwiggum/**`.
 - Mitigation: treat `docs/_ralphwiggum/**` as “operational SSOT” and update it in the same PR whenever docs move.
 
+### FP-005: Git rebase derailment on push failure
+
+- Symptom: Ralph hits "branches have diverged" and attempts `git rebase` or `git pull --rebase`, causing merge conflicts that stall the loop.
+- Common cause: Multiple commits pushed in quick succession, or a race condition with the remote.
+- Mitigation: **NEVER use `git rebase` or `git pull`**. If `git push` fails due to divergence, use `git push --force-with-lease` (safe force push). The Ralph branch is autonomous - divergence means something unexpected happened, and force-push is the correct recovery.
+
 ### FP-004: Secrets accidentally end up in tracked logs
 
 - Symptom: API keys (or other secrets) are copied into tracked files during debugging or loop summaries.
@@ -45,4 +51,5 @@ This document is a **living record** of guardrails, failure patterns, and “got
 
 ## Guardrail Changes (Protocol/Prompt/CI)
 
+- 2026-01-21: Added FP-005 (git rebase derailment). Updated PROMPT.md and protocol.md to explicitly forbid `git rebase` and `git pull`, with `--force-with-lease` as the recovery for divergence.
 - 2026-01-19: Added iteration + total runtime timeouts and per-iteration logs (`logs/ralph/`) to the recommended loop commands.

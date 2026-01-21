@@ -250,6 +250,13 @@ After each atomic commit:
 git push
 ```
 
+**If push fails with "branches have diverged":**
+```bash
+git push --force-with-lease
+```
+
+This is safe because the Ralph branch is autonomous - you are the only committer. **NEVER use `git rebase` or `git pull`** - these cause merge conflicts that derail the loop.
+
 If pushing is blocked (auth/CI outage), stop the loop and request human intervention.
 
 ---
