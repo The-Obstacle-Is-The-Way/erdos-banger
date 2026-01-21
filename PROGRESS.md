@@ -176,7 +176,7 @@ Added `--device` CLI option to `erdos convert` command for selecting torch devic
 
 ### SPEC-022: MetadataProvider Orchestration - COMPLETE
 
-**Commit:** 4d8dea3
+**Commit:** 6e599a1
 
 Implemented the MetadataProvider abstraction following ADR-001 (Ports + Provider Chain architecture). All acceptance criteria satisfied:
 

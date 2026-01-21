@@ -1,7 +1,7 @@
 # SPEC-022: MetadataProvider Orchestration
 
 **Status:** Complete
-**Implemented In:** 4d8dea3
+**Implemented In:** 6e599a1
 **Priority:** P2
 **Created:** 2026-01-21
 **Resolves:** DEBT-038
