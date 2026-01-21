@@ -18,7 +18,6 @@ This directory contains technical-debt writeups: spec drift, missing fixtures, i
 |----|-------|----------|--------|------|
 | DEBT-036 | Marker device selection not exposed | P3 | Open | [debt-036-marker-mps-not-configured.md](debt-036-marker-mps-not-configured.md) |
 | DEBT-038 | MetadataProvider abstraction missing | P2 | Spec'd | [debt-038-metadata-provider-abstraction.md](debt-038-metadata-provider-abstraction.md) → [SPEC-022](../specs/spec-022-metadata-provider-orchestration.md) |
-| DEBT-039 | `erdos lean` command module is a god file | P2 | Open | [debt-039-lean-command-god-module.md](debt-039-lean-command-god-module.md) |
 | DEBT-040 | `src/erdos/core/` module sprawl | P3 | Open | [debt-040-core-package-module-sprawl.md](debt-040-core-package-module-sprawl.md) |
 
 ## Archived Debt
@@ -63,6 +62,7 @@ All debt below has been resolved and archived to `docs/_archive/debt/`.
 | DEBT-034 | Hardcoded MAX_SIZE constant | P3 | Fixed | 878aa7b |
 | DEBT-035 | type: ignore in all exit paths | P2 | Fixed | 86d3856 |
 | DEBT-037 | Placeholder semantic search tests | P2 | Fixed | b2dcdfe |
+| DEBT-039 | `erdos lean` command module is a god file | P2 | Fixed | 8540017 |
 | DEBT-041 | `ports.py` leaks concrete `search_index` types | P3 | Fixed | e27e5a3 |
 
 **Next Debt ID:** DEBT-042
@@ -105,4 +105,5 @@ All debt below has been resolved and archived to `docs/_archive/debt/`.
 - `docs/_archive/debt/debt-034-hardcoded-max-size.md`
 - `docs/_archive/debt/debt-035-type-ignore-exit-paths.md`
 - `docs/_archive/debt/debt-037-semantic-search-placeholder-tests.md`
+- `docs/_archive/debt/debt-039-lean-command-god-module.md`
 - `docs/_archive/debt/debt-041-ports-leak-search-index-types.md`

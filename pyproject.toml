@@ -114,6 +114,9 @@ ignore = [
 "src/erdos/commands/convert.py" = [
     "TC003",  # Path used at runtime for typer CLI argument types
 ]
+"src/erdos/commands/lean/*.py" = [
+    "TC003",  # Path used at runtime for typer CLI argument types
+]
 "src/erdos/core/pdf_converter.py" = [
     "TC003",  # Path used at runtime in function signatures
 ]

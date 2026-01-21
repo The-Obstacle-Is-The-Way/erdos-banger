@@ -1,6 +1,7 @@
 # DEBT-039: `erdos lean` Command Module Is a God File (SRP Violation)
 
-**Status:** Open
+**Status:** Fixed
+**Fixed In:** 8540017
 **Priority:** P2
 **Found:** 2026-01-21
 **Found By:** Clean Code / SRP audit
@@ -68,10 +69,12 @@ If/when feasible, move non-CLI orchestration into `src/erdos/core/…` (e.g., `c
 
 ## Acceptance Criteria
 
-1. [ ] No single `src/erdos/commands/lean/*.py` module exceeds **~300 LOC** without justification.
-2. [ ] `erdos lean --help` output and subcommand behavior remain unchanged.
-3. [ ] Unit tests cover the extracted “core logic” functions (no Typer runner required).
-4. [ ] `make ci` passes with no coverage regression.
+1. [x] No single `src/erdos/commands/lean/*.py` module exceeds **~300 LOC** without justification.
+   - Largest module: `import_cmd.py` at 316 LOC (justified: well-factored with multiple helper functions and thin CLI callback)
+   - `formalize_cmd.py` at 269 LOC (within limit after extracting batch logic to `batch_formalize.py`)
+2. [x] `erdos lean --help` output and subcommand behavior remain unchanged.
+3. [x] Unit tests cover the extracted "core logic" functions (no Typer runner required).
+4. [x] `make ci` passes with no coverage regression (82.17% coverage).
 
 ---
 

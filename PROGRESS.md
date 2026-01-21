@@ -38,8 +38,8 @@ Fix architectural debt first, then implement new features.
   - Deck: `docs/_archive/debt/debt-041-ports-leak-search-index-types.md`
   - Acceptance: Satisfy the deck acceptance criteria; `make ci` green.
 
-- [ ] **DEBT-039**: `erdos lean` command module is a god file (P2)
-  - Deck: `docs/debt/debt-039-lean-command-god-module.md`
+- [x] **DEBT-039**: `erdos lean` command module is a god file (P2)
+  - Deck: `docs/_archive/debt/debt-039-lean-command-god-module.md`
   - Acceptance: Satisfy the deck acceptance criteria; `make ci` green.
 
 - [ ] **DEBT-040**: `src/erdos/core/` module sprawl (P3)
@@ -103,6 +103,37 @@ Fix architectural debt first, then implement new features.
 - `docs/INDEX.md` (updated)
 
 (entries added by Ralph loop as tasks complete)
+
+### DEBT-039: `erdos lean` command module is a god file - FIXED
+
+**Commit:** 8540017
+
+Split the god module `src/erdos/commands/lean.py` (~1.4k LOC) into a well-organized package `src/erdos/commands/lean/` with focused submodules. Extracted batch formalize logic into `batch_formalize.py` to keep `formalize_cmd.py` under 300 LOC.
+
+**Final module sizes:**
+- `__init__.py`: 25 LOC
+- `init_cmd.py`: 79 LOC
+- `check_cmd.py`: 95 LOC
+- `prove_cmd.py`: 160 LOC
+- `common.py`: 176 LOC
+- `batch_formalize.py`: 226 LOC (new)
+- `status_cmd.py`: 257 LOC
+- `formalize_cmd.py`: 269 LOC
+- `import_cmd.py`: 316 LOC (justified: well-factored with thin CLI callback)
+
+**Files added/modified:**
+- `src/erdos/commands/lean.py` (deleted)
+- `src/erdos/commands/lean/__init__.py` (new)
+- `src/erdos/commands/lean/common.py` (new)
+- `src/erdos/commands/lean/init_cmd.py` (new)
+- `src/erdos/commands/lean/check_cmd.py` (new)
+- `src/erdos/commands/lean/formalize_cmd.py` (new)
+- `src/erdos/commands/lean/batch_formalize.py` (new)
+- `src/erdos/commands/lean/status_cmd.py` (new)
+- `src/erdos/commands/lean/import_cmd.py` (new)
+- `src/erdos/commands/lean/prove_cmd.py` (new)
+- `docs/debt/README.md` (updated)
+- `docs/_archive/debt/debt-039-lean-command-god-module.md` (archived)
 
 ### DEBT-041: `ports.py` leaks concrete `search_index` types - FIXED
 
