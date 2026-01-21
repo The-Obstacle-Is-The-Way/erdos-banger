@@ -63,7 +63,7 @@ All debt below has been resolved and archived to `docs/_archive/debt/`.
 | DEBT-034 | Hardcoded MAX_SIZE constant | P3 | Fixed | 878aa7b |
 | DEBT-035 | type: ignore in all exit paths | P2 | Fixed | 86d3856 |
 | DEBT-037 | Placeholder semantic search tests | P2 | Fixed | b2dcdfe |
-| DEBT-041 | `ports.py` leaks concrete `search_index` types | P3 | Fixed | 6d02ace |
+| DEBT-041 | `ports.py` leaks concrete `search_index` types | P3 | Fixed | e27e5a3 |
 
 **Next Debt ID:** DEBT-042
 

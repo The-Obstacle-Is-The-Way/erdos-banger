@@ -106,7 +106,7 @@ Fix architectural debt first, then implement new features.
 
 ### DEBT-041: `ports.py` leaks concrete `search_index` types - FIXED
 
-**Commit:** 6d02ace
+**Commit:** e27e5a3
 
 Created `src/erdos/core/search/types.py` with contract types (`EmbeddingModelProtocol`, `SearchResult`, `SemanticSearchResult`). Updated `ports.py` to import from `search.types` instead of `search_index`. Updated `search_index.py` to import and re-export for backward compatibility.
 

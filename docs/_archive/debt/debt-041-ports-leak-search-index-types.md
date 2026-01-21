@@ -1,7 +1,7 @@
 # DEBT-041: `ports.py` Leaks Concrete `search_index` Types (DIP Pressure)
 
 **Status:** Fixed
-**Fixed In:** 6d02ace
+**Fixed In:** e27e5a3
 **Priority:** P3
 **Found:** 2026-01-21
 **Found By:** Independent architecture review
