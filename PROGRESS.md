@@ -151,7 +151,7 @@ Created `src/erdos/core/search/types.py` with contract types (`EmbeddingModelPro
 
 ### DEBT-040: `src/erdos/core/` module sprawl - FIXED
 
-**Commit:** e609bac
+**Commit:** 994b99c
 
 Documentation-only fix (Option A from the deck). Added "Core package boundaries" section to CLAUDE.md documenting:
 - Existing bounded contexts: `ask/`, `ingest/`, `models/`, `search/`

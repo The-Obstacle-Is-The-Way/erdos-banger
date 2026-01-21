@@ -4,7 +4,7 @@
 **Priority:** P3
 **Found:** 2026-01-21
 **Found By:** Clean Architecture / maintainability audit
-**Fixed In:** e609bac
+**Fixed In:** 994b99c
 
 ---
 
