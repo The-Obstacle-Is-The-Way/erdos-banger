@@ -1,8 +1,16 @@
-"""Reference fetching and download logic."""
+"""Reference fetching orchestration (thin coordinator).
+
+This module orchestrates reference fetching by:
+- Converting MetadataSource enum to MetadataProvider instances
+- Delegating metadata resolution to providers
+- Delegating arXiv download/extraction to arxiv_download module
+- Building ManifestEntry results
+
+Follows SRP: orchestration only, no direct client usage.
+"""
 
 from __future__ import annotations
 
-import hashlib
 import logging
 import tarfile
 import time
@@ -13,22 +21,13 @@ from typing import TYPE_CHECKING
 import defusedxml.ElementTree as ET
 import requests
 
-from erdos.core.arxiv_client import (
-    extract_arxiv_text,
-    fetch_arxiv_atom,
-    parse_arxiv_atom,
-)
-from erdos.core.crossref_client import fetch_crossref_work, parse_crossref_work
+from erdos.core.ingest.arxiv_download import download_and_extract_arxiv
 from erdos.core.ingest.models import (
     ArxivDownloadResult,
     ProcessAllReferencesResult,
     ReferenceProcessResult,
 )
 from erdos.core.ingest.stable_key import get_stable_key
-from erdos.core.literature_paths import (
-    get_arxiv_cache_path,
-    get_arxiv_extract_path,
-)
 from erdos.core.models import (
     ManifestEntry,
     ProblemManifest,
@@ -36,8 +35,8 @@ from erdos.core.models import (
     ReferenceEntry,
     ReferenceRecord,
 )
-from erdos.core.openalex_client import OpenAlexClient, OpenAlexConfig
-from erdos.core.retry import fetch_with_retry
+from erdos.core.providers import ArxivProvider, CrossrefProvider, OpenAlexProvider
+from erdos.core.providers.fallback import FallbackProvider
 
 
 if TYPE_CHECKING:
@@ -48,6 +47,16 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger(__name__)
 
+# Re-export for backward compatibility
+__all__ = [
+    "ArxivDownloadResult",
+    "MetadataSource",
+    "download_and_extract_arxiv",
+    "fetch_reference_entry",
+    "process_all_references",
+    "process_single_reference",
+]
+
 
 class MetadataSource(str, Enum):
     """Metadata source for reference ingestion."""
@@ -57,82 +66,31 @@ class MetadataSource(str, Enum):
     CROSSREF = "crossref"
 
 
-def download_and_extract_arxiv(
-    arxiv_id: str,
-    repo_root: Path,
-    timeout: float,
-) -> ArxivDownloadResult:
-    """Download arXiv source tarball and extract text.
-
-    This is the single implementation used by both DOI+arXiv and arXiv-only paths.
+def _build_provider_from_source(
+    source: MetadataSource, *, mailto: str, timeout: float
+) -> MetadataProvider:
+    """Build a MetadataProvider from a MetadataSource enum.
 
     Args:
-        arxiv_id: arXiv identifier (e.g., "2203.00001").
-        repo_root: Repository root directory.
+        source: The metadata source to use.
+        mailto: Contact email for API polite pools.
         timeout: HTTP timeout in seconds.
 
     Returns:
-        ArxivDownloadResult with cache/extract paths or error.
+        A MetadataProvider instance for the specified source.
     """
-    cache_path = None
-    cache_hash = None
-    extract_path = None
-    extracted = False
-    error = None
-
-    try:
-        arxiv_cache_path = repo_root / get_arxiv_cache_path(arxiv_id)
-        arxiv_extract_path = repo_root / get_arxiv_extract_path(arxiv_id)
-
-        # Download source with retry for transient failures
-        source_url = f"https://arxiv.org/e-print/{arxiv_id}"
-        logger.debug("Downloading arXiv source: %s", source_url)
-        start_time = time.monotonic()
-        response = fetch_with_retry(source_url, timeout=timeout)
-        elapsed = time.monotonic() - start_time
-        logger.debug(
-            "arXiv download: %d bytes in %.2fs (status %d)",
-            len(response.content),
-            elapsed,
-            response.status_code,
+    if source == MetadataSource.OPENALEX:
+        # OpenAlex primary with Crossref fallback (standard config)
+        return FallbackProvider(
+            OpenAlexProvider.from_env(),
+            CrossrefProvider(mailto=mailto, timeout=timeout),
         )
-        tarball_bytes = response.content
-
-        # Write cache
-        arxiv_cache_path.parent.mkdir(parents=True, exist_ok=True)
-        arxiv_cache_path.write_bytes(tarball_bytes)
-        logger.debug("Cached arXiv source: %s", arxiv_cache_path)
-
-        # Compute hash (SHA256 for cache integrity, not crypto)
-        cache_hash = hashlib.sha256(tarball_bytes).hexdigest()
-        cache_path = get_arxiv_cache_path(arxiv_id)
-
-        # Extract text
-        try:
-            text_bytes = extract_arxiv_text(tarball_bytes)
-            text = text_bytes.decode("utf-8", errors="replace")
-            arxiv_extract_path.parent.mkdir(parents=True, exist_ok=True)
-            arxiv_extract_path.write_text(text, encoding="utf-8")
-            extract_path = get_arxiv_extract_path(arxiv_id)
-            extracted = True
-            logger.debug(
-                "Extracted arXiv text: %s (%d chars)", arxiv_extract_path, len(text)
-            )
-        except (OSError, ValueError, tarfile.TarError) as e:
-            logger.warning("arXiv extraction failed for %s: %s", arxiv_id, e)
-            error = f"Extraction failed: {e}"
-            extracted = False
-    except (OSError, requests.RequestException) as e:
-        logger.warning("arXiv download failed for %s: %s", arxiv_id, e)
-        error = f"Download failed: {e}"
-
-    return ArxivDownloadResult(
-        cache_path=cache_path,
-        cache_hash=cache_hash,
-        extract_path=extract_path,
-        extracted=extracted,
-        error=error,
-    )
+    if source == MetadataSource.ARXIV:
+        return ArxivProvider(timeout=timeout)
+    if source == MetadataSource.CROSSREF:
+        return CrossrefProvider(mailto=mailto, timeout=timeout)
+    # Unreachable but helps type checker
+    return CrossrefProvider(mailto=mailto, timeout=timeout)
 
 
 def _find_existing_manifest_entry(
@@ -208,110 +166,6 @@ def _build_manifest_entry_with_arxiv(
     )
 
 
-def _fetch_doi_with_arxiv(
-    doi: str,
-    arxiv_id: str,
-    *,
-    mailto: str,
-    timeout: float,
-    repo_root: Path,
-    allow_download: bool,
-) -> ManifestEntry:
-    """Fetch DOI metadata and optionally download arXiv source."""
-    crossref_data = fetch_crossref_work(doi, mailto=mailto, timeout=timeout)
-    reference = parse_crossref_work(crossref_data, doi=doi)
-    reference.arxiv_id = arxiv_id
-    return _build_manifest_entry_with_arxiv(
-        reference,
-        arxiv_id,
-        repo_root=repo_root,
-        allow_download=allow_download,
-        timeout=timeout,
-    )
-
-
-def _fetch_doi_only(doi: str, *, mailto: str, timeout: float) -> ManifestEntry:
-    """Fetch DOI metadata without arXiv download."""
-    crossref_data = fetch_crossref_work(doi, mailto=mailto, timeout=timeout)
-    reference = parse_crossref_work(crossref_data, doi=doi)
-    return ManifestEntry(reference=reference, ingested_at=datetime.now(UTC))
-
-
-def _fetch_arxiv_only(
-    arxiv_id: str,
-    *,
-    timeout: float,
-    repo_root: Path,
-    allow_download: bool,
-) -> ManifestEntry:
-    """Fetch arXiv metadata and optionally download source."""
-    arxiv_atom = fetch_arxiv_atom(arxiv_id, timeout=timeout)
-    reference = parse_arxiv_atom(arxiv_atom)
-    return _build_manifest_entry_with_arxiv(
-        reference,
-        arxiv_id,
-        repo_root=repo_root,
-        allow_download=allow_download,
-        timeout=timeout,
-    )
-
-
-def _fetch_openalex_by_doi(
-    doi: str,
-    arxiv_id: str | None,
-    *,
-    mailto: str,
-    timeout: float,
-    repo_root: Path,
-    allow_download: bool,
-) -> ManifestEntry:
-    """Fetch metadata via OpenAlex for a DOI, optionally download arXiv source."""
-    config = OpenAlexConfig(email=mailto, timeout=timeout)
-    client = OpenAlexClient(config)
-    reference = client.get_by_doi(doi)
-
-    # If we have an arXiv ID, download the source
-    if arxiv_id:
-        # Ensure arXiv ID is set on reference (OpenAlex may have found it too)
-        if not reference.arxiv_id:
-            reference.arxiv_id = arxiv_id
-        return _build_manifest_entry_with_arxiv(
-            reference,
-            arxiv_id,
-            repo_root=repo_root,
-            allow_download=allow_download,
-            timeout=timeout,
-        )
-
-    return ManifestEntry(reference=reference, ingested_at=datetime.now(UTC))
-
-
-def _fetch_openalex_by_arxiv(
-    arxiv_id: str,
-    *,
-    mailto: str,
-    timeout: float,
-    repo_root: Path,
-    allow_download: bool,
-) -> ManifestEntry:
-    """Fetch metadata via OpenAlex for an arXiv ID, optionally download source."""
-    config = OpenAlexConfig(email=mailto, timeout=timeout)
-    client = OpenAlexClient(config)
-    reference = client.get_by_arxiv(arxiv_id)
-
-    # Ensure arXiv ID is set on reference
-    if not reference.arxiv_id:
-        reference.arxiv_id = arxiv_id
-
-    return _build_manifest_entry_with_arxiv(
-        reference,
-        arxiv_id,
-        repo_root=repo_root,
-        allow_download=allow_download,
-        timeout=timeout,
-    )
-
-
 def _fetch_with_provider(
     ref: ReferenceEntry,
     provider: MetadataProvider,
@@ -320,7 +174,7 @@ def _fetch_with_provider(
     allow_download: bool,
     timeout: float,
 ) -> ManifestEntry:
-    """Fetch reference metadata using injected MetadataProvider (SPEC-022).
+    """Fetch reference metadata using MetadataProvider (SPEC-022).
 
     Args:
         ref: Reference entry with DOI and/or arXiv ID.
@@ -355,7 +209,9 @@ def _fetch_with_provider(
         )
 
     # Download arXiv source if we have an arXiv ID
-    arxiv_id = reference.arxiv_id or ref.arxiv_id
+    # Prefer ref.arxiv_id (original input without version suffix) for download URL,
+    # falling back to reference.arxiv_id (metadata may include version suffix)
+    arxiv_id = ref.arxiv_id or reference.arxiv_id
     if arxiv_id:
         return _build_manifest_entry_with_arxiv(
             reference,
@@ -402,61 +258,18 @@ def fetch_reference_entry(
     if not allow_network:
         raise RuntimeError("Network access disabled but required for fetching")
 
-    # SPEC-022: Use injected provider if available
-    if provider is not None:
-        return _fetch_with_provider(
-            ref,
-            provider,
-            repo_root=repo_root,
-            allow_download=allow_download,
-            timeout=timeout,
-        )
+    # Use injected provider or build from source enum
+    actual_provider = provider or _build_provider_from_source(
+        source, mailto=mailto, timeout=timeout
+    )
 
-    # Legacy behavior: use MetadataSource-based branching
-    # Use OpenAlex as primary source (SPEC-020)
-    if source == MetadataSource.OPENALEX:
-        if ref.doi:
-            return _fetch_openalex_by_doi(
-                ref.doi,
-                ref.arxiv_id,
-                mailto=mailto,
-                timeout=timeout,
-                repo_root=repo_root,
-                allow_download=allow_download,
-            )
-        if ref.arxiv_id:
-            return _fetch_openalex_by_arxiv(
-                ref.arxiv_id,
-                mailto=mailto,
-                timeout=timeout,
-                repo_root=repo_root,
-                allow_download=allow_download,
-            )
-        raise ValueError("Reference has no DOI or arXiv ID")
-
-    # Legacy behavior: use arXiv/Crossref directly
-    if ref.doi and ref.arxiv_id:
-        return _fetch_doi_with_arxiv(
-            ref.doi,
-            ref.arxiv_id,
-            mailto=mailto,
-            timeout=timeout,
-            repo_root=repo_root,
-            allow_download=allow_download,
-        )
-
-    if ref.doi:
-        return _fetch_doi_only(ref.doi, mailto=mailto, timeout=timeout)
-
-    if ref.arxiv_id:
-        return _fetch_arxiv_only(
-            ref.arxiv_id,
-            timeout=timeout,
-            repo_root=repo_root,
-            allow_download=allow_download,
-        )
-
-    raise ValueError("Reference has no DOI or arXiv ID")
+    return _fetch_with_provider(
+        ref,
+        actual_provider,
+        repo_root=repo_root,
+        allow_download=allow_download,
+        timeout=timeout,
+    )
 
 
 def _error_result(

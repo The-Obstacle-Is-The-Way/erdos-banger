@@ -5,6 +5,7 @@ clients and provide dependency inversion for the ingest layer.
 
 Usage:
     from erdos.core.providers import (
+        ArxivProvider,
         OpenAlexProvider,
         CrossrefProvider,
         FallbackProvider,
@@ -20,6 +21,7 @@ Usage:
     record = provider.get_by_doi("10.1038/nature12373")
 """
 
+from erdos.core.providers.arxiv import ArxivProvider
 from erdos.core.providers.crossref import CrossrefProvider
 
 # FallbackProvider must be imported last to maintain sorted order
@@ -28,6 +30,7 @@ from erdos.core.providers.openalex import OpenAlexProvider
 
 
 __all__ = [
+    "ArxivProvider",
     "CrossrefProvider",
     "FallbackProvider",
     "OpenAlexProvider",

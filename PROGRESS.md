@@ -57,8 +57,8 @@ Work strictly top-to-bottom unless blocked by dependencies.
   Deck: `docs/_archive/debt/debt-054-run-logger-ocp-violation.md`
 - [x] **DEBT-053**: `core/formal_conjectures.py` monolith
   Deck: `docs/_archive/debt/debt-053-formal-conjectures-module-monolith.md`
-- [ ] **DEBT-051**: `core/batch.py` SRP split
-  Deck: `docs/debt/debt-051-batch-module-srp.md`
+- [x] **DEBT-051**: `core/batch.py` SRP split
+  Deck: `docs/_archive/debt/debt-051-batch-module-srp.md`
 - [ ] **DEBT-048**: MCP server module size + CI coverage gap
   Deck: `docs/debt/debt-048-mcp-server-god-module-and-ci-coverage.md`
 - [ ] **DEBT-055**: Scattered env-based configuration (hidden dependencies)
@@ -218,3 +218,15 @@ Work strictly top-to-bottom unless blocked by dependencies.
 - Network fetch logic now isolated from provenance IO (fetch.py vs provenance.py)
 - 37 existing unit tests pass covering has_sorry(), provenance roundtrip, URL/path construction
 - `make ci` passes (920 tests, 83.56% coverage)
+
+### 2026-01-22: DEBT-051 Fixed
+- Extracted `batch.py` (571 LOC) into bounded-context package `src/erdos/core/batch/`:
+  - `models.py`: BatchFilters, BatchState, BatchProgress, BatchResult, filter_problem_ids (235 LOC)
+  - `persistence.py`: generate_batch_id, save/load_batch_state, save/load_latest_batch_id (87 LOC)
+  - `runner.py`: BatchRunner class with orchestration logic (291 LOC)
+  - `__init__.py`: re-exports for backward compatibility (49 LOC)
+- Shim `batch.py` is now 42 LOC (well under 200 LOC threshold)
+- State persistence isolated from execution logic in separate modules
+- Public API stable: all imports via `from erdos.core.batch import ...` work
+- Added TC003 exemption in pyproject.toml for Path runtime usage
+- `make ci` passes (920 tests, 83.66% coverage)
