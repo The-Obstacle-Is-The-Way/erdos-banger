@@ -55,8 +55,8 @@ Work strictly top-to-bottom unless blocked by dependencies.
   Deck: `docs/_archive/debt/debt-050-ingest-fetch-srp.md`
 - [x] **DEBT-054**: Run logger OCP violation (central `if command == ...` chain)
   Deck: `docs/_archive/debt/debt-054-run-logger-ocp-violation.md`
-- [ ] **DEBT-053**: `core/formal_conjectures.py` monolith
-  Deck: `docs/debt/debt-053-formal-conjectures-module-monolith.md`
+- [x] **DEBT-053**: `core/formal_conjectures.py` monolith
+  Deck: `docs/_archive/debt/debt-053-formal-conjectures-module-monolith.md`
 - [ ] **DEBT-051**: `core/batch.py` SRP split
   Deck: `docs/debt/debt-051-batch-module-srp.md`
 - [ ] **DEBT-048**: MCP server module size + CI coverage gap
@@ -203,4 +203,18 @@ Work strictly top-to-bottom unless blocked by dependencies.
 - Refactored `RunLogEntry._extract_result_for_command()` to delegate to registry
 - Added 29 tests covering all summarizers, default behavior, and end-to-end integration
 - `run_logger.py` reduced from 485 LOC to 453 LOC (32 LOC extracted)
+- `make ci` passes (920 tests, 83.56% coverage)
+
+### 2026-01-22: DEBT-053 Fixed
+- Extracted `formal_conjectures.py` (482 LOC) into bounded-context package `src/erdos/core/formal_conjectures/`:
+  - `config.py`: constants + error class (19 LOC)
+  - `paths.py`: URL building + cache/local path helpers (59 LOC)
+  - `upstream.py`: parse upstream formalization metadata (106 LOC)
+  - `fetch.py`: network fetch + cache logic (106 LOC)
+  - `local.py`: sorry detection + SHA-256 hashing (93 LOC)
+  - `provenance.py`: ProvenanceFile model + YAML IO (110 LOC)
+  - `__init__.py`: re-exports for backward compatibility (63 LOC)
+- Public API unchanged: all imports via `from erdos.core.formal_conjectures import ...` work
+- Network fetch logic now isolated from provenance IO (fetch.py vs provenance.py)
+- 37 existing unit tests pass covering has_sorry(), provenance roundtrip, URL/path construction
 - `make ci` passes (920 tests, 83.56% coverage)

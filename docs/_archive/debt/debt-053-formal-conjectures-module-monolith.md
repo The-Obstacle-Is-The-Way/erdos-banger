@@ -1,15 +1,16 @@
 # DEBT-053: `core/formal_conjectures.py` Is a Monolith (Parsing + Networking + Caching + Provenance)
 
-**Status:** Open
+**Status:** Fixed
 **Priority:** P3
 **Found:** 2026-01-22
 **Found By:** SRP / cohesion audit
+**Fixed In:** 1da90e7
 
 ---
 
 ## Summary
 
-`src/erdos/core/formal_conjectures.py` is a large “integration module” that currently owns multiple responsibilities:
+`src/erdos/core/formal_conjectures.py` is a large "integration module" that currently owns multiple responsibilities:
 
 - parsing upstream metadata from `teorth/erdosproblems`
 - constructing remote URLs and local paths
@@ -18,7 +19,7 @@
 - detecting `sorry`/`admit` in Lean files
 - tracking provenance in YAML (schema + IO)
 
-All of this is related to “formal conjectures integration”, but it still violates SRP at the module level: there are many unrelated reasons to change (schema changes, network policy changes, path layout changes, provenance format changes).
+All of this is related to "formal conjectures integration", but it still violates SRP at the module level: there are many unrelated reasons to change (schema changes, network policy changes, path layout changes, provenance format changes).
 
 ---
 
@@ -36,7 +37,7 @@ All of this is related to “formal conjectures integration”, but it still vio
 
 - **SRP:** a change to provenance YAML format should not require touching HTTP fetch logic.
 - **DIP:** the module depends directly on `requests` and filesystem layout; swapping fetch/caching policy is hard to test.
-- **Testability:** deterministic unit tests become “integration-ish” because concerns are interleaved.
+- **Testability:** deterministic unit tests become "integration-ish" because concerns are interleaved.
 
 ---
 
@@ -63,13 +64,35 @@ Optional improvement (future): abstract HTTP + filesystem behind ports so tests 
 
 ## Acceptance Criteria
 
-1. [ ] Public imports remain stable (shim allowed).
-2. [ ] Network fetch logic is isolated from provenance IO.
-3. [ ] Unit tests exist for:
+1. [x] Public imports remain stable (shim allowed).
+2. [x] Network fetch logic is isolated from provenance IO.
+3. [x] Unit tests exist for:
    - `has_sorry()` detection (comments + edge cases)
    - provenance load/save roundtrip
    - URL/path construction
-4. [ ] `make ci` passes.
+4. [x] `make ci` passes.
+
+---
+
+## Resolution
+
+Extracted `formal_conjectures.py` (482 LOC) into bounded-context package `src/erdos/core/formal_conjectures/`:
+
+| Module | LOC | Responsibility |
+|--------|-----|---------------|
+| `config.py` | 19 | Constants + error class |
+| `paths.py` | 59 | URL building + cache/local path helpers |
+| `upstream.py` | 106 | Parse upstream formalization metadata |
+| `fetch.py` | 106 | Network fetch + cache logic |
+| `local.py` | 93 | Sorry detection + SHA-256 hashing |
+| `provenance.py` | 110 | ProvenanceFile model + YAML IO |
+| `__init__.py` | 63 | Re-exports for backward compatibility |
+
+**Total: 556 LOC** (across 7 files vs 482 LOC in 1 file)
+
+Public API unchanged - all imports via `from erdos.core.formal_conjectures import ...` work identically.
+
+37 existing unit tests pass, covering all acceptance criteria.
 
 ---
 
