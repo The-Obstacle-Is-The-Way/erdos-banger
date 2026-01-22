@@ -120,6 +120,9 @@ ignore = [
 "src/erdos/core/pdf_converter.py" = [
     "TC003",  # Path used at runtime in function signatures
 ]
+"src/erdos/core/pdf/*.py" = [
+    "TC003",  # Path used at runtime in function signatures
+]
 "src/erdos/core/batch/*.py" = [
     "TC003",  # Path used at runtime in function signatures
 ]

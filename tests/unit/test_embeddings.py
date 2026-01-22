@@ -109,13 +109,13 @@ class TestEmbeddingModel:
 
     def test_init_when_unavailable(self) -> None:
         """Test that EmbeddingModel raises when sentence-transformers unavailable."""
-        with patch("erdos.core.embeddings.EMBEDDING_AVAILABLE", False):
+        with patch("erdos.core.search.embeddings.EMBEDDING_AVAILABLE", False):
             with pytest.raises(EmbeddingNotAvailableError) as exc_info:
                 EmbeddingModel()
             assert "embeddings" in str(exc_info.value)
 
-    @patch("erdos.core.embeddings.EMBEDDING_AVAILABLE", True)
-    @patch("erdos.core.embeddings.SentenceTransformer")
+    @patch("erdos.core.search.embeddings.EMBEDDING_AVAILABLE", True)
+    @patch("erdos.core.search.embeddings.SentenceTransformer")
     def test_init_loads_model(self, mock_st_class: MagicMock) -> None:
         """Test that init loads the sentence transformer model."""
         mock_model = MagicMock()
@@ -128,8 +128,8 @@ class TestEmbeddingModel:
         assert em.dimension == 384
         assert em.model_name == "sentence-transformers/all-MiniLM-L6-v2"
 
-    @patch("erdos.core.embeddings.EMBEDDING_AVAILABLE", True)
-    @patch("erdos.core.embeddings.SentenceTransformer")
+    @patch("erdos.core.search.embeddings.EMBEDDING_AVAILABLE", True)
+    @patch("erdos.core.search.embeddings.SentenceTransformer")
     def test_init_custom_model(self, mock_st_class: MagicMock) -> None:
         """Test initialization with custom model name."""
         mock_model = MagicMock()
@@ -144,8 +144,8 @@ class TestEmbeddingModel:
         assert em.dimension == 768
 
     @pytest.mark.skipif(not NUMPY_AVAILABLE, reason="numpy not installed")
-    @patch("erdos.core.embeddings.EMBEDDING_AVAILABLE", True)
-    @patch("erdos.core.embeddings.SentenceTransformer")
+    @patch("erdos.core.search.embeddings.EMBEDDING_AVAILABLE", True)
+    @patch("erdos.core.search.embeddings.SentenceTransformer")
     def test_encode_single_text(
         self, mock_st_class: MagicMock, fake_embedding_model: MagicMock
     ) -> None:
@@ -162,8 +162,8 @@ class TestEmbeddingModel:
         assert result[2] == 0.0  # count of 'i'
 
     @pytest.mark.skipif(not NUMPY_AVAILABLE, reason="numpy not installed")
-    @patch("erdos.core.embeddings.EMBEDDING_AVAILABLE", True)
-    @patch("erdos.core.embeddings.SentenceTransformer")
+    @patch("erdos.core.search.embeddings.EMBEDDING_AVAILABLE", True)
+    @patch("erdos.core.search.embeddings.SentenceTransformer")
     def test_encode_batch(
         self, mock_st_class: MagicMock, fake_embedding_model: MagicMock
     ) -> None:
@@ -184,8 +184,8 @@ class TestEmbeddingModel:
         assert results[1][2] == 1.0
 
     @pytest.mark.skipif(not NUMPY_AVAILABLE, reason="numpy not installed")
-    @patch("erdos.core.embeddings.EMBEDDING_AVAILABLE", True)
-    @patch("erdos.core.embeddings.SentenceTransformer")
+    @patch("erdos.core.search.embeddings.EMBEDDING_AVAILABLE", True)
+    @patch("erdos.core.search.embeddings.SentenceTransformer")
     def test_to_blob_and_from_blob_roundtrip(
         self, mock_st_class: MagicMock, fake_embedding_model: MagicMock
     ) -> None:
@@ -312,7 +312,7 @@ class TestBlobSerialization:
 class TestGetEmbeddingModel:
     """Tests for the singleton/cache function."""
 
-    @patch("erdos.core.embeddings.EMBEDDING_AVAILABLE", False)
+    @patch("erdos.core.search.embeddings.EMBEDDING_AVAILABLE", False)
     def test_returns_none_when_unavailable(self) -> None:
         """Test that get_embedding_model returns None when deps missing."""
         # Clear cache first
@@ -320,8 +320,8 @@ class TestGetEmbeddingModel:
         result = get_embedding_model()
         assert result is None
 
-    @patch("erdos.core.embeddings.EMBEDDING_AVAILABLE", True)
-    @patch("erdos.core.embeddings.SentenceTransformer")
+    @patch("erdos.core.search.embeddings.EMBEDDING_AVAILABLE", True)
+    @patch("erdos.core.search.embeddings.SentenceTransformer")
     def test_caches_model(self, mock_st_class: MagicMock) -> None:
         """Test that get_embedding_model caches the model instance."""
         mock_model = MagicMock()
@@ -344,8 +344,8 @@ class TestGetEmbeddingModel:
 class TestDimensionValidation:
     """Tests for embedding dimension validation."""
 
-    @patch("erdos.core.embeddings.EMBEDDING_AVAILABLE", True)
-    @patch("erdos.core.embeddings.SentenceTransformer")
+    @patch("erdos.core.search.embeddings.EMBEDDING_AVAILABLE", True)
+    @patch("erdos.core.search.embeddings.SentenceTransformer")
     def test_dimension_mismatch_warning(self, mock_st_class: MagicMock) -> None:
         """Test that dimension mismatch raises ValueError."""
         mock_model = MagicMock()

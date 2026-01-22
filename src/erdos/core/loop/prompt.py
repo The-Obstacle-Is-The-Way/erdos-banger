@@ -13,7 +13,7 @@ from jinja2 import Environment, PackageLoader, select_autoescape
 if TYPE_CHECKING:
     from pathlib import Path
 
-    from erdos.core.loop_config import LoopConfig
+    from erdos.core.loop.config import LoopConfig
     from erdos.core.models import LeanCheckResult, LeanError, ProblemRecord
 
 

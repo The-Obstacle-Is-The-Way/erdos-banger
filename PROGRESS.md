@@ -63,8 +63,8 @@ Work strictly top-to-bottom unless blocked by dependencies.
   Deck: `docs/_archive/debt/debt-048-mcp-server-god-module-and-ci-coverage.md`
 - [x] **DEBT-055**: Scattered env-based configuration (hidden dependencies)
   Deck: `docs/_archive/debt/debt-055-configuration-scattered-env-deps.md`
-- [ ] **DEBT-044**: `core/` bounded-context refactor (reduce sprawl)
-  Deck: `docs/debt/debt-044-core-bounded-context-refactor.md`
+- [x] **DEBT-044**: `core/` bounded-context refactor (reduce sprawl)
+  Deck: `docs/_archive/debt/debt-044-core-bounded-context-refactor.md`
 
 ---
 
@@ -257,3 +257,12 @@ Work strictly top-to-bottom unless blocked by dependencies.
 - Added 10 unit tests for `AppConfig` covering defaults, env reading, and testability
 - Extracted `_resolve_path()` and `_find_default_paths()` helpers in ProblemLoader to reduce complexity
 - `make ci` passes (928 tests, 81.53% coverage)
+
+### 2026-01-22: DEBT-044 Fixed
+- Validated bounded-context refactor is complete from prior commits (DEBT-042 through DEBT-055)
+- 10 bounded-context subpackages exist: ask/, batch/, clients/, formal_conjectures/, ingest/, loop/, models/, pdf/, providers/, search/
+- 11 backward-compatible shim modules re-export from subpackages (arxiv_client, crossref_client, openalex_client, embeddings, index_builder, search_index, batch, loop_config, loop_verifier, patch_validator, pdf_converter)
+- 16 top-level modules remain as stable contracts & utilities (documented in CLAUDE.md)
+- Updated CLAUDE.md "Core Package Boundaries" section to include missing modules (aristotle.py, literature_paths.py, repositories.py) and correct shim documentation
+- Fixed test patches in test_embeddings.py and test_pdf_converter.py to target actual module paths (erdos.core.search.embeddings, erdos.core.pdf.converter) instead of shim modules
+- `make ci` passes (928 tests, 80.91% coverage)

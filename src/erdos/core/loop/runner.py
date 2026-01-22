@@ -11,20 +11,20 @@ from typing import TYPE_CHECKING, Any
 
 from erdos.core.ask.llm import execute_llm
 from erdos.core.loop.logging import LoopLogger, file_hash, generate_run_id
+from erdos.core.loop.patch_validator import PatchStatus, validate_patch
 from erdos.core.loop.prompt import build_loop_prompt
 from erdos.core.loop.result import IterationRecord, LoopResult, LoopStatus
-from erdos.core.loop_verifier import (
+from erdos.core.loop.verifier import (
     LoopExitCondition,
     LoopVerification,
     count_admits,
     count_sorries,
 )
-from erdos.core.patch_validator import PatchStatus, validate_patch
 
 
 if TYPE_CHECKING:
     from erdos.core.lean_runner import LeanRunner
-    from erdos.core.loop_config import LoopConfig
+    from erdos.core.loop.config import LoopConfig
     from erdos.core.models import LeanCheckResult, ProblemRecord
 
 

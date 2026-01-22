@@ -1,7 +1,7 @@
-"""Backward-compatible shim for pdf_converter.
+"""PDF conversion utilities.
 
-This module has been moved to erdos.core.pdf.converter.
-This shim exists for backward compatibility and will be removed in a future version.
+This package provides PDF-to-text conversion with math preservation:
+- converter.py: PDF conversion backends (Marker, pdfplumber)
 """
 
 from erdos.core.pdf.converter import (

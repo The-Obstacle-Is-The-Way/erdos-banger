@@ -185,7 +185,7 @@ class TestPdfplumberConversion:
 class TestMarkerConversion:
     """Tests for Marker converter (mocked since GPL dependency is optional)."""
 
-    @patch("erdos.core.pdf_converter.is_marker_available")
+    @patch("erdos.core.pdf.converter.is_marker_available")
     def test_convert_with_marker_not_available(self, mock_available: MagicMock) -> None:
         """convert_with_marker returns error when not available."""
         mock_available.return_value = False
@@ -223,8 +223,8 @@ class TestConvertPDF:
         assert result.error is not None
         assert "pdf" in result.error.lower()
 
-    @patch("erdos.core.pdf_converter.is_marker_available")
-    @patch("erdos.core.pdf_converter.is_pdfplumber_available")
+    @patch("erdos.core.pdf.converter.is_marker_available")
+    @patch("erdos.core.pdf.converter.is_pdfplumber_available")
     def test_convert_pdf_no_converters_available(
         self, mock_pdfplumber: MagicMock, mock_marker: MagicMock, tmp_path: Path
     ) -> None:
@@ -279,13 +279,13 @@ class TestTorchDeviceEnvVar:
         from erdos.core.pdf_converter import PDFConversionResult
 
         monkeypatch.setattr(
-            "erdos.core.pdf_converter.convert_with_marker",
-            lambda *args, **kwargs: PDFConversionResult(
+            "erdos.core.pdf.converter.convert_with_marker",
+            lambda *_args, **_kwargs: PDFConversionResult(
                 success=True, text="test", converter="marker"
             ),
         )
         monkeypatch.setattr(
-            "erdos.core.pdf_converter.is_marker_available", lambda: True
+            "erdos.core.pdf.converter.is_marker_available", lambda: True
         )
 
         # Run with torch_device set
@@ -319,13 +319,13 @@ class TestTorchDeviceEnvVar:
         from erdos.core.pdf_converter import PDFConversionResult
 
         monkeypatch.setattr(
-            "erdos.core.pdf_converter.convert_with_marker",
-            lambda *args, **kwargs: PDFConversionResult(
+            "erdos.core.pdf.converter.convert_with_marker",
+            lambda *_args, **_kwargs: PDFConversionResult(
                 success=True, text="test", converter="marker"
             ),
         )
         monkeypatch.setattr(
-            "erdos.core.pdf_converter.is_marker_available", lambda: True
+            "erdos.core.pdf.converter.is_marker_available", lambda: True
         )
 
         # Run without torch_device
@@ -339,7 +339,7 @@ class TestTorchDeviceEnvVar:
 class TestSelectConverter:
     """Tests for select_converter function."""
 
-    @patch("erdos.core.pdf_converter.is_marker_available")
+    @patch("erdos.core.pdf.converter.is_marker_available")
     def test_select_converter_marker_preferred(self, mock_available: MagicMock) -> None:
         """select_converter prefers Marker when available."""
         mock_available.return_value = True
@@ -348,8 +348,8 @@ class TestSelectConverter:
         result = select_converter()
         assert result == PDFConverter.MARKER
 
-    @patch("erdos.core.pdf_converter.is_marker_available")
-    @patch("erdos.core.pdf_converter.is_pdfplumber_available")
+    @patch("erdos.core.pdf.converter.is_marker_available")
+    @patch("erdos.core.pdf.converter.is_pdfplumber_available")
     def test_select_converter_falls_back_to_pdfplumber(
         self, mock_pdfplumber: MagicMock, mock_marker: MagicMock
     ) -> None:
@@ -361,8 +361,8 @@ class TestSelectConverter:
         result = select_converter()
         assert result == PDFConverter.PDFPLUMBER
 
-    @patch("erdos.core.pdf_converter.is_marker_available")
-    @patch("erdos.core.pdf_converter.is_pdfplumber_available")
+    @patch("erdos.core.pdf.converter.is_marker_available")
+    @patch("erdos.core.pdf.converter.is_pdfplumber_available")
     def test_select_converter_none_available(
         self, mock_pdfplumber: MagicMock, mock_marker: MagicMock
     ) -> None:
@@ -374,7 +374,7 @@ class TestSelectConverter:
         result = select_converter()
         assert result is None
 
-    @patch("erdos.core.pdf_converter.is_marker_available")
+    @patch("erdos.core.pdf.converter.is_marker_available")
     def test_select_converter_explicit_choice(self, mock_available: MagicMock) -> None:
         """select_converter respects explicit converter choice."""
         mock_available.return_value = True
@@ -383,7 +383,7 @@ class TestSelectConverter:
         result = select_converter(preferred=PDFConverter.MARKER)
         assert result == PDFConverter.MARKER
 
-    @patch("erdos.core.pdf_converter.is_marker_available")
+    @patch("erdos.core.pdf.converter.is_marker_available")
     def test_select_converter_explicit_unavailable(
         self, mock_available: MagicMock
     ) -> None:

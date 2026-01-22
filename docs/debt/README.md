@@ -16,7 +16,6 @@ This directory contains technical-debt writeups: spec drift, missing fixtures, i
 
 | ID | Title | Priority | Status | Deck |
 |----|-------|----------|--------|------|
-| DEBT-044 | `core/` bounded-context refactor (reduce sprawl) | P2 | Open | `debt-044-core-bounded-context-refactor.md` |
 | DEBT-060 | Formalize command long Typer callback | P4 | Open | `debt-060-formalize-cmd-long-callback.md` |
 
 ## Archived Debt
@@ -82,7 +81,8 @@ All debt below has been resolved and archived to `docs/_archive/debt/`.
 | DEBT-053 | Formal conjectures module monolith (SRP split) | P3 | Fixed | 1da90e7 |
 | DEBT-051 | Batch module SRP split | P3 | Fixed | 8cb7794 |
 | DEBT-048 | MCP server CI coverage gap | P3 | Fixed | c756f4e |
-| DEBT-055 | Scattered env-based configuration (centralized AppConfig) | P2 | Fixed | (pending) |
+| DEBT-055 | Scattered env-based configuration (centralized AppConfig) | P2 | Fixed | b3b5730 |
+| DEBT-044 | `core/` bounded-context refactor (reduce sprawl) | P2 | Fixed | b3b5730 (+ prior) |
 
 **Next Debt ID:** DEBT-061
 
@@ -146,3 +146,4 @@ All debt below has been resolved and archived to `docs/_archive/debt/`.
 - `docs/_archive/debt/debt-051-batch-module-srp.md`
 - `docs/_archive/debt/debt-048-mcp-server-god-module-and-ci-coverage.md`
 - `docs/_archive/debt/debt-055-configuration-scattered-env-deps.md`
+- `docs/_archive/debt/debt-044-core-bounded-context-refactor.md`

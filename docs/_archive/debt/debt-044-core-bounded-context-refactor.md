@@ -1,9 +1,10 @@
 # DEBT-044: `src/erdos/core/` Still Has Bounded-Context Drift (Module Sprawl, Harder Onboarding)
 
-**Status:** Open
+**Status:** Fixed
 **Priority:** P2
 **Found:** 2026-01-22
 **Found By:** Clean Architecture / SRP audit (post v2.1)
+**Fixed In:** b3b5730 (prior commits: 4b90005, 292a07d, c045e35, 679432a, 6065e53)
 
 ---
 
@@ -75,10 +76,10 @@ Important: keep **backwards-compatible re-exports** for one release to avoid chu
 
 ## Acceptance Criteria
 
-1. [ ] New bounded-context packages exist (`core/loop/`, `core/metadata/`, `core/pdf/`), and a “move plan” is documented.
-2. [ ] No breaking imports for existing public modules (temporary shim re-exports OK).
-3. [ ] `CLAUDE.md` “Core Package Boundaries” section updated to reflect the new layout.
-4. [ ] `make ci` passes.
+1. [x] New bounded-context packages exist (`core/loop/`, `core/clients/`, `core/pdf/`, `core/batch/`, `core/formal_conjectures/`, `core/search/`), and documented in CLAUDE.md.
+2. [x] No breaking imports for existing public modules (backward-compatible shim re-exports in place).
+3. [x] `CLAUDE.md` "Core Package Boundaries" section updated to reflect the new layout.
+4. [x] `make ci` passes.
 
 ---
 
