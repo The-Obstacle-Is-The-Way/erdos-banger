@@ -186,7 +186,7 @@ Required `event` values:
 - `llm_response` (includes the raw model output)
 - `patch_applied` (includes file hash before/after)
 - `lean_check` (includes `LeanCheckResult` summary)
-- `user_decision` (`yes`/`no`/`skip`/`quit`, omitted in `--yes` mode)
+- `user_decision` (`yes`/`no`/`skip`/`quit`, omitted when no user prompt is shown, e.g., `--no-apply`)
 
 ---
 

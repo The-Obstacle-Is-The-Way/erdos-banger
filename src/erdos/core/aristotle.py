@@ -220,6 +220,8 @@ def run_aristotle_prove_from_file(
     Args:
         input_file: Path to the input Lean file
         output_file: Path for the output Lean file (must differ from input)
+        api_key: Explicit API key (falls back to ARISTOTLE_API_KEY env var)
+        command: Explicit command path (falls back to ERDOS_ARISTOTLE_COMMAND env var)
         timeout: Maximum seconds to wait for completion (default: 600)
         informal: Pass --informal flag to Aristotle
         formal_input_context: Pass --formal-input-context flag to Aristotle

@@ -140,12 +140,13 @@ def check_module_exemption(path_str: str, content: str) -> tuple[bool, str | Non
         return True, EXEMPTED_MODULES[path_str]
 
     # Check for inline exemption marker: # exempt: DEBT-XXX
+    marker = "# exempt:"
     for line in content.splitlines()[:50]:  # Check first 50 lines
-        if "# exempt:" in line.lower():
-            # Extract debt ID if present
-            parts = line.split("# exempt:")
-            if len(parts) > 1:
-                debt_id = parts[1].strip().split()[0].upper()
+        lower = line.lower()
+        if marker in lower:
+            remainder = line[lower.index(marker) + len(marker) :]
+            if remainder.strip():
+                debt_id = remainder.strip().split()[0].upper()
                 if debt_id.startswith("DEBT-"):
                     return True, debt_id
             return True, None
@@ -203,7 +204,7 @@ def audit_modules(base_path: Path) -> list[ModuleViolation]:
 
             lines = len(content.splitlines()) if content else 0
             if lines > threshold:
-                path_str = str(path.relative_to(base_path))
+                path_str = path.relative_to(base_path).as_posix()
                 exempted, debt_id = check_module_exemption(path_str, content)
                 violations.append(
                     ModuleViolation(
@@ -232,7 +233,7 @@ def audit_functions(base_path: Path) -> list[FunctionViolation]:
             if path.name == "__init__.py":
                 continue
 
-            path_str = str(path.relative_to(base_path))
+            path_str = path.relative_to(base_path).as_posix()
             for func_name, lineno, lines, node in get_functions(path):
                 if lines > FUNCTION_LOC_THRESHOLD:
                     exempted, debt_id = check_function_exemption(
