@@ -318,7 +318,7 @@ class TestRunLoop:
         assert result.status == LoopStatus.LLM_REQUIRED
         assert result.iterations_completed == 0
 
-    @patch("erdos.core.loop.execute_llm")
+    @patch("erdos.core.loop.runner.execute_llm")
     def test_applies_patch_and_checks(
         self,
         mock_execute_llm: MagicMock,
@@ -364,7 +364,7 @@ by trivial
         assert result.iterations_completed == 1
         assert "by trivial" in lean_file.read_text()
 
-    @patch("erdos.core.loop.execute_llm")
+    @patch("erdos.core.loop.runner.execute_llm")
     def test_no_apply_mode_does_not_write(
         self,
         mock_execute_llm: MagicMock,
@@ -418,7 +418,7 @@ by trivial
         assert lean_file.read_text() == original_content
         assert result.no_apply is True
 
-    @patch("erdos.core.loop.execute_llm")
+    @patch("erdos.core.loop.runner.execute_llm")
     def test_max_iterations_reached(
         self,
         mock_execute_llm: MagicMock,

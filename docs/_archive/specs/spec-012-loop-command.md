@@ -245,8 +245,34 @@ When implemented, the following tests are required:
 
 ---
 
+## Implementation Deviations (SSOT: Code)
+
+The following intentional deviations from this spec exist in the implementation. The code is SSOT:
+
+### 1. CLI Shape: `erdos loop run` subcommand
+
+**Spec:** `erdos loop PROBLEM_ID [OPTIONS]`
+**Implementation:** `erdos loop run PROBLEM_ID [OPTIONS]`
+
+**Rationale:** Modern CLI style with `run` subcommand enables future subcommands (e.g., `erdos loop status`, `erdos loop resume`).
+
+### 2. `--yes/-y` flag removed (auto-apply by default)
+
+**Spec:** `--yes, -y` for non-interactive mode with explicit confirmation
+**Implementation:** Patches apply automatically when not in `--no-apply` mode; `--yes` flag removed
+
+**Rationale:** Simpler UX for automation pipelines. Use `--no-apply` for explicit human review. The original `--yes` flag was redundant with the absence of `--no-apply`.
+
+### 3. JSON success semantics enforced
+
+**Spec:** `CLIOutput.success=true` only on proof completion
+**Implementation:** Aligned. Non-success statuses (`max_iterations`, `llm_required`, `no_fix_possible`, etc.) now return `CLIOutput.success=false` with loop data embedded in the error object.
+
+---
+
 ## Changelog
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 0.3.0 | 2026-01-22 | Document implementation deviations; align JSON success semantics with spec |
 | 0.2.0 | 2026-01-18 | Rewrite: align with v1 `src/erdos/core` structure and Spec 011 external LLM approach |

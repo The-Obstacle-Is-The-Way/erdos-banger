@@ -109,6 +109,94 @@ class TestLoopRunCommand:
         assert result.exit_code == 0
 
 
+class TestLoopJSONContract:
+    """Test loop JSON contract semantics per spec-012.
+
+    Per spec-012: CLIOutput.success=true ONLY when proof is complete.
+    All other statuses return success=false with loop data in error object.
+    """
+
+    def test_json_llm_required_returns_failure(self, tmp_path: Path) -> None:
+        """LLM_REQUIRED status returns success=false with error object."""
+        # Create minimal Lean file structure with sorry
+        erdos_dir = tmp_path / "formal" / "lean" / "Erdos"
+        erdos_dir.mkdir(parents=True)
+        lean_file = erdos_dir / "Problem006.lean"
+        lean_file.write_text("theorem foo : True := sorry\n", encoding="utf-8")
+
+        result = runner.invoke(
+            app,
+            [
+                "--json",
+                "loop",
+                "run",
+                "6",
+                "--no-apply",
+                "--path",
+                str(tmp_path / "formal" / "lean"),
+            ],
+        )
+
+        output = json.loads(result.stdout)
+        # Per spec-012: LLM_REQUIRED is a failure (success=false)
+        assert output["success"] is False
+        assert output["error"] is not None
+        assert output["error"]["type"] == "LLMRequired"
+        assert "status" in output["error"]
+        assert output["error"]["status"] == "llm_required"
+
+    def test_json_not_found_returns_failure(self) -> None:
+        """NotFound error returns success=false with proper error structure."""
+        result = runner.invoke(
+            app,
+            [
+                "--json",
+                "loop",
+                "run",
+                "99999",  # Non-existent problem
+                "--no-apply",
+            ],
+        )
+
+        assert result.exit_code != 0
+        output = json.loads(result.stdout)
+        assert output["success"] is False
+        assert output["error"] is not None
+        assert output["error"]["type"] == "NotFound"
+        assert "code" in output["error"]
+
+    def test_json_error_structure_includes_required_keys(self, tmp_path: Path) -> None:
+        """Error object includes required keys: type, message, code."""
+        erdos_dir = tmp_path / "formal" / "lean" / "Erdos"
+        erdos_dir.mkdir(parents=True)
+        lean_file = erdos_dir / "Problem006.lean"
+        lean_file.write_text("theorem foo : True := sorry\n", encoding="utf-8")
+
+        result = runner.invoke(
+            app,
+            [
+                "--json",
+                "loop",
+                "run",
+                "6",
+                "--no-apply",
+                "--path",
+                str(tmp_path / "formal" / "lean"),
+            ],
+        )
+
+        output = json.loads(result.stdout)
+        assert output["success"] is False
+        error = output["error"]
+        # Per CLIOutput invariants: error must have type, message, code
+        assert "type" in error
+        assert "message" in error
+        assert "code" in error
+        assert isinstance(error["type"], str)
+        assert isinstance(error["message"], str)
+        assert isinstance(error["code"], int)
+
+
 class TestLoopHelpCommand:
     """Test erdos loop help."""
 

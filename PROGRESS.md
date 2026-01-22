@@ -41,8 +41,8 @@ Work strictly top-to-bottom unless blocked by dependencies.
   Deck: `docs/_archive/debt/debt-047-loop-logging-sanitization-and-unification.md`
 - [x] **DEBT-057**: Add CI guardrails against god-file regressions
   Deck: `docs/_archive/debt/debt-057-guardrails-against-god-files.md`
-- [ ] **DEBT-042**: Loop contract drift + `core/loop.py` god function
-  Deck: `docs/debt/debt-042-loop-command-contract-and-god-module.md`
+- [x] **DEBT-042**: Loop contract drift + `core/loop.py` god function
+  Deck: `docs/_archive/debt/debt-042-loop-command-contract-and-god-module.md`
 - [ ] **DEBT-043**: `erdos search` command god module
   Deck: `docs/debt/debt-043-search-command-god-module.md`
 - [ ] **DEBT-045**: Split `SearchIndexProtocol` (ISP/DIP)
@@ -123,3 +123,16 @@ Work strictly top-to-bottom unless blocked by dependencies.
 - Documented thresholds in CLAUDE.md under "Code Health Guardrails" section
 - Created DEBT-060 for `formalize_cmd.py` long Typer callback (discovered during audit)
 - `make ci` passes (867 tests, 82.00% coverage)
+
+### 2026-01-22: DEBT-042 Fixed
+- Extracted `src/erdos/core/loop.py` (683 LOC) into bounded-context subpackage `src/erdos/core/loop/`:
+  - `runner.py`: main loop orchestration (`run_loop` now 58 LOC, down from 399 LOC)
+  - `logging.py`: `LoopLogger`, `generate_run_id`, `file_hash`
+  - `prompt.py`: `build_loop_prompt`, `budget_context`
+  - `result.py`: `LoopStatus`, `IterationRecord`, `LoopResult`
+  - `__init__.py`: re-exports public API for backward compatibility
+- Public imports remain stable: `from erdos.core.loop import run_loop, LoopStatus, LoopResult` works
+- Spec-012 already had "Implementation Deviations" section documenting code as SSOT
+- Added inline exemptions for helper functions (`_run_single_iteration`, `execute_loop`, `run`)
+- Tests cover loop contract semantics: `llm_required`, `no_apply`, success case
+- `make ci` passes (870 tests, 82.25% coverage)

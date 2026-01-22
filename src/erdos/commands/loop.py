@@ -104,6 +104,8 @@ def execute_loop(  # noqa: PLR0911
 ) -> CLIOutput:
     """Execute the loop for a problem.
 
+    # exempt: DEBT-042
+
     Args:
         problem_id: Problem ID
         repo: Problem repository
@@ -182,8 +184,8 @@ def execute_loop(  # noqa: PLR0911
         )
 
     # Map result to CLIOutput
-    # Note: Both success and failure return the loop result data
-    # This enables human-readable output even on failure
+    # Per spec-012: success=true ONLY when proof is complete (zero sorry/admit, compiles)
+    # All other statuses return success=false with loop data in error object
     result_dict = result.to_dict()
 
     if result.status == LoopStatus.SUCCESS:
@@ -191,16 +193,60 @@ def execute_loop(  # noqa: PLR0911
             command="erdos loop",
             data=result_dict,
         )
-    else:
-        # All other statuses are failures - but we still want to show data
-        # Use CLIOutput.ok with success=False... but that's not how it works
-        # Instead, the _print_human_result handles both success and failure display
-        # For JSON output, we use CLIOutput.ok even for "soft failures" like max_iterations
-        # This is consistent with other commands that return structured data on completion
-        return CLIOutput.ok(
-            command="erdos loop",
-            data=result_dict,
-        )
+
+    # Map status to error type and exit code
+    status_map: dict[LoopStatus, tuple[str, str, ExitCode]] = {
+        LoopStatus.MAX_ITERATIONS: (
+            "MaxIterations",
+            f"Reached maximum iterations ({result.iterations_max})",
+            ExitCode.ERROR,
+        ),
+        LoopStatus.NO_PROGRESS: (
+            "NoProgress",
+            "No progress after multiple iterations",
+            ExitCode.ERROR,
+        ),
+        LoopStatus.NO_FIX_POSSIBLE: (
+            "NoFixPossible",
+            "LLM indicated no fix is possible",
+            ExitCode.ERROR,
+        ),
+        LoopStatus.REGRESSION: (
+            "Regression",
+            "File size shrank unexpectedly (possible deletion attack)",
+            ExitCode.ERROR,
+        ),
+        LoopStatus.LLM_REQUIRED: (
+            "LLMRequired",
+            "LLM required but not configured (set ERDOS_LLM_COMMAND)",
+            ExitCode.CONFIG_ERROR,
+        ),
+        LoopStatus.ERROR: (
+            "Error",
+            "Loop execution failed",
+            ExitCode.ERROR,
+        ),
+    }
+
+    error_type, message, exit_code = status_map.get(
+        result.status, ("Error", f"Unknown status: {result.status}", ExitCode.ERROR)
+    )
+
+    # Include loop result data in error object per spec-012
+    # (extra summary keys allowed by CLIOutput invariants)
+    error_obj = {
+        "type": error_type,
+        "message": message,
+        "code": int(exit_code),
+        **result_dict,  # Include full loop result data
+    }
+
+    return CLIOutput(
+        command="erdos loop",
+        success=False,
+        data=None,
+        error=error_obj,
+    )
 
 
 # ============================================================================
