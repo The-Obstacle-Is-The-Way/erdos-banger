@@ -8,6 +8,7 @@ from __future__ import annotations
 import hashlib
 import json
 import logging
+import secrets
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from enum import Enum
@@ -247,14 +248,14 @@ def _generate_run_id() -> str:
     """Generate a unique run ID."""
     now = datetime.now(UTC)
     timestamp = now.strftime("%Y%m%d_%H%M%S")
-    random_suffix = hashlib.md5(str(now.timestamp()).encode()).hexdigest()[:6]  # noqa: S324
+    random_suffix = secrets.token_hex(3)  # 6 hex chars, cryptographically secure
     return f"run_{timestamp}_{random_suffix}"
 
 
 def _file_hash(path: Path) -> str:
-    """Compute MD5 hash of file content."""
+    """Compute SHA-256 hash of file content for logging/cache purposes."""
     content = path.read_text(encoding="utf-8")
-    return hashlib.md5(content.encode()).hexdigest()  # noqa: S324
+    return hashlib.sha256(content.encode()).hexdigest()
 
 
 class LoopLogger:

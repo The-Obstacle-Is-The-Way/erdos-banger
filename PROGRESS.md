@@ -35,8 +35,8 @@ Work strictly top-to-bottom unless blocked by dependencies.
   Deck: `docs/_archive/debt/debt-046-clioutput-success-vs-exitcode.md`
 - [x] **DEBT-056**: FallbackProvider catches `Exception` broadly (may hide provider bugs)
   Deck: `docs/_archive/debt/debt-056-fallback-provider-broad-exceptions.md`
-- [ ] **DEBT-058**: MD5 `# noqa: S324` in loop module (justify or replace)
-  Deck: `docs/debt/debt-058-md5-noqa-in-loop.md`
+- [x] **DEBT-058**: MD5 `# noqa: S324` in loop module (justify or replace)
+  Deck: `docs/_archive/debt/debt-058-md5-noqa-in-loop.md`
 - [ ] **DEBT-047**: Loop run logs are unsanitized/duplicated (LoopLogger vs RunLogger)
   Deck: `docs/debt/debt-047-loop-logging-sanitization-and-unification.md`
 - [ ] **DEBT-057**: Add CI guardrails against god-file regressions
@@ -99,3 +99,10 @@ Work strictly top-to-bottom unless blocked by dependencies.
 - Unknown exceptions (RuntimeError, TypeError, AttributeError, etc.) now propagate for fail-fast debugging
 - Added 4 tests: `test_propagates_unexpected_exceptions`, `test_propagates_unexpected_exceptions_arxiv`, `test_propagates_unexpected_exceptions_search`, `test_falls_back_on_value_error`
 - `make ci` passes (856 tests, 81.89% coverage)
+
+### 2026-01-22: DEBT-058 Fixed
+- Replaced insecure MD5 usage in loop.py with safe primitives (Option A from deck)
+- `_generate_run_id()`: replaced `hashlib.md5()` with `secrets.token_hex(3)` (consistent with run_logger.py)
+- `_file_hash()`: replaced `hashlib.md5()` with `hashlib.sha256()` for file content hashing
+- Removed all `# noqa: S324` suppressions from the file
+- `make ci` passes (856 tests, 81.90% coverage)

@@ -1,9 +1,10 @@
 # DEBT-058: `core/loop.py` Uses MD5 With `# noqa: S324` (Needs Justification or Safer Hash)
 
-**Status:** Open
+**Status:** Fixed
 **Priority:** P3
 **Found:** 2026-01-22
 **Found By:** Security lint / Clean Code audit
+**Fixed In:** 3891aeb
 
 ---
 
@@ -14,7 +15,7 @@
 - generating a run id suffix
 - hashing file content
 
-Even if this is “non-security” use, the suppression is a red flag for reviewers and contradicts the repo’s stated preference: **either remove the suppression by using a safer primitive, or document the threat model explicitly**.
+Even if this is "non-security" use, the suppression is a red flag for reviewers and contradicts the repo's stated preference: **either remove the suppression by using a safer primitive, or document the threat model explicitly**.
 
 ---
 
@@ -30,7 +31,7 @@ Even if this is “non-security” use, the suppression is a red flag for review
 ## Why This Matters
 
 - **Security posture:** `# noqa: S324` requires every reviewer to re-justify why MD5 is acceptable here.
-- **Clean Code:** “noisy exceptions” become precedent; the next contributor copies the pattern for a worse use case.
+- **Clean Code:** "noisy exceptions" become precedent; the next contributor copies the pattern for a worse use case.
 - **Consistency:** elsewhere (`run_logger.generate_run_id`) we already use `secrets.token_hex`, which avoids this entire class of issue.
 
 ---
@@ -52,9 +53,19 @@ If MD5 is kept for performance:
 
 ## Acceptance Criteria
 
-1. [ ] There is no `# noqa: S324` in `src/erdos/core/loop.py` without an explicit justification comment.
-2. [ ] Run ids remain stable-format and unique enough for log filenames.
-3. [ ] `make ci` passes.
+1. [x] There is no `# noqa: S324` in `src/erdos/core/loop.py` without an explicit justification comment.
+2. [x] Run ids remain stable-format and unique enough for log filenames.
+3. [x] `make ci` passes.
+
+---
+
+## Resolution
+
+Applied Option A (Recommended):
+- Replaced `hashlib.md5(str(now.timestamp()).encode()).hexdigest()[:6]` with `secrets.token_hex(3)` in `_generate_run_id()`
+- Replaced `hashlib.md5(content.encode()).hexdigest()` with `hashlib.sha256(content.encode()).hexdigest()` in `_file_hash()`
+- Added `import secrets` to module imports
+- No more `# noqa: S324` suppressions in the file
 
 ---
 
