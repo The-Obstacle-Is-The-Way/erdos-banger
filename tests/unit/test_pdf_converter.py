@@ -11,7 +11,7 @@ class TestConverterDetection:
 
     def test_is_marker_available_when_installed(self) -> None:
         """is_marker_available() returns True when marker is installed."""
-        from erdos.core.pdf_converter import is_marker_available
+        from erdos.core.pdf.converter import is_marker_available
 
         # Can only test if marker is actually installed
         # This test documents expected behavior
@@ -20,14 +20,14 @@ class TestConverterDetection:
 
     def test_is_pdfplumber_available_when_installed(self) -> None:
         """is_pdfplumber_available() returns True when pdfplumber is installed."""
-        from erdos.core.pdf_converter import is_pdfplumber_available
+        from erdos.core.pdf.converter import is_pdfplumber_available
 
         result = is_pdfplumber_available()
         assert isinstance(result, bool)
 
     def test_get_available_converters_returns_list(self) -> None:
         """get_available_converters() returns list of available converter names."""
-        from erdos.core.pdf_converter import get_available_converters
+        from erdos.core.pdf.converter import get_available_converters
 
         result = get_available_converters()
         assert isinstance(result, list)
@@ -41,14 +41,14 @@ class TestConverterEnum:
 
     def test_pdf_converter_enum_values(self) -> None:
         """PDFConverter enum has expected values."""
-        from erdos.core.pdf_converter import PDFConverter
+        from erdos.core.pdf.converter import PDFConverter
 
         assert PDFConverter.MARKER.value == "marker"
         assert PDFConverter.PDFPLUMBER.value == "pdfplumber"
 
     def test_pdf_converter_from_string(self) -> None:
         """PDFConverter can be created from string."""
-        from erdos.core.pdf_converter import PDFConverter
+        from erdos.core.pdf.converter import PDFConverter
 
         assert PDFConverter("marker") == PDFConverter.MARKER
         assert PDFConverter("pdfplumber") == PDFConverter.PDFPLUMBER
@@ -59,7 +59,7 @@ class TestLLMService:
 
     def test_llm_service_enum_values(self) -> None:
         """LLMService enum has expected values."""
-        from erdos.core.pdf_converter import LLMService
+        from erdos.core.pdf.converter import LLMService
 
         assert LLMService.GEMINI.value == "gemini"
         assert LLMService.CLAUDE.value == "claude"
@@ -68,7 +68,7 @@ class TestLLMService:
 
     def test_llm_service_get_marker_class(self) -> None:
         """LLMService.get_marker_class() returns correct class path."""
-        from erdos.core.pdf_converter import LLMService
+        from erdos.core.pdf.converter import LLMService
 
         assert (
             LLMService.GEMINI.get_marker_class()
@@ -93,7 +93,7 @@ class TestPDFConversionConfig:
 
     def test_config_defaults(self) -> None:
         """PDFConversionConfig has sensible defaults."""
-        from erdos.core.pdf_converter import PDFConversionConfig
+        from erdos.core.pdf.converter import PDFConversionConfig
 
         config = PDFConversionConfig()
         assert config.converter == "marker"
@@ -104,7 +104,7 @@ class TestPDFConversionConfig:
 
     def test_config_custom_values(self) -> None:
         """PDFConversionConfig accepts custom values."""
-        from erdos.core.pdf_converter import LLMService, PDFConversionConfig
+        from erdos.core.pdf.converter import LLMService, PDFConversionConfig
 
         config = PDFConversionConfig(
             converter="pdfplumber",
@@ -119,7 +119,7 @@ class TestPDFConversionConfig:
 
     def test_config_torch_device(self) -> None:
         """PDFConversionConfig accepts torch_device setting (DEBT-036)."""
-        from erdos.core.pdf_converter import PDFConversionConfig
+        from erdos.core.pdf.converter import PDFConversionConfig
 
         config = PDFConversionConfig(torch_device="mps")
         assert config.torch_device == "mps"
@@ -136,7 +136,7 @@ class TestPDFConversionResult:
 
     def test_result_success(self) -> None:
         """PDFConversionResult for successful conversion."""
-        from erdos.core.pdf_converter import PDFConversionResult
+        from erdos.core.pdf.converter import PDFConversionResult
 
         result = PDFConversionResult(
             success=True,
@@ -151,7 +151,7 @@ class TestPDFConversionResult:
 
     def test_result_failure(self) -> None:
         """PDFConversionResult for failed conversion."""
-        from erdos.core.pdf_converter import PDFConversionResult
+        from erdos.core.pdf.converter import PDFConversionResult
 
         result = PDFConversionResult(
             success=False,
@@ -169,7 +169,7 @@ class TestPdfplumberConversion:
 
     def test_convert_pdfplumber_file_not_found(self) -> None:
         """convert_with_pdfplumber returns error for nonexistent file."""
-        from erdos.core.pdf_converter import convert_with_pdfplumber
+        from erdos.core.pdf.converter import convert_with_pdfplumber
 
         # Test with non-existent file
         result = convert_with_pdfplumber(Path("/nonexistent.pdf"))
@@ -189,7 +189,7 @@ class TestMarkerConversion:
     def test_convert_with_marker_not_available(self, mock_available: MagicMock) -> None:
         """convert_with_marker returns error when not available."""
         mock_available.return_value = False
-        from erdos.core.pdf_converter import convert_with_marker
+        from erdos.core.pdf.converter import convert_with_marker
 
         result = convert_with_marker(Path("/some/file.pdf"))
         assert result.success is False
@@ -203,7 +203,7 @@ class TestConvertPDF:
 
     def test_convert_pdf_with_nonexistent_file(self) -> None:
         """convert_pdf returns error for nonexistent file."""
-        from erdos.core.pdf_converter import PDFConversionConfig, convert_pdf
+        from erdos.core.pdf.converter import PDFConversionConfig, convert_pdf
 
         result = convert_pdf(Path("/nonexistent.pdf"), PDFConversionConfig())
         assert result.success is False
@@ -213,7 +213,7 @@ class TestConvertPDF:
 
     def test_convert_pdf_with_invalid_extension(self, tmp_path: Path) -> None:
         """convert_pdf returns error for non-PDF file."""
-        from erdos.core.pdf_converter import PDFConversionConfig, convert_pdf
+        from erdos.core.pdf.converter import PDFConversionConfig, convert_pdf
 
         txt_file = tmp_path / "file.txt"
         txt_file.write_text("hello")
@@ -232,7 +232,7 @@ class TestConvertPDF:
         mock_marker.return_value = False
         mock_pdfplumber.return_value = False
 
-        from erdos.core.pdf_converter import PDFConversionConfig, convert_pdf
+        from erdos.core.pdf.converter import PDFConversionConfig, convert_pdf
 
         pdf_file = tmp_path / "test.pdf"
         pdf_file.write_bytes(b"%PDF-1.4 test")  # Minimal PDF-like content
@@ -253,7 +253,7 @@ class TestTorchDeviceEnvVar:
         """convert_pdf sets TORCH_DEVICE env var when torch_device is configured."""
         import os
 
-        from erdos.core.pdf_converter import PDFConversionConfig, convert_pdf
+        from erdos.core.pdf.converter import PDFConversionConfig, convert_pdf
 
         # Create a minimal PDF file
         pdf_file = tmp_path / "test.pdf"
@@ -276,7 +276,7 @@ class TestTorchDeviceEnvVar:
         monkeypatch.setattr(os.environ.__class__, "__setitem__", patched_setitem)
 
         # Mock convert_with_marker to avoid needing actual Marker
-        from erdos.core.pdf_converter import PDFConversionResult
+        from erdos.core.pdf.converter import PDFConversionResult
 
         monkeypatch.setattr(
             "erdos.core.pdf.converter.convert_with_marker",
@@ -301,7 +301,7 @@ class TestTorchDeviceEnvVar:
         """convert_pdf does not set TORCH_DEVICE when torch_device is None."""
         import os
 
-        from erdos.core.pdf_converter import PDFConversionConfig, convert_pdf
+        from erdos.core.pdf.converter import PDFConversionConfig, convert_pdf
 
         pdf_file = tmp_path / "test.pdf"
         pdf_file.write_bytes(b"%PDF-1.4 test content")
@@ -316,7 +316,7 @@ class TestTorchDeviceEnvVar:
 
         monkeypatch.setattr(os.environ.__class__, "__setitem__", patched_setitem)
 
-        from erdos.core.pdf_converter import PDFConversionResult
+        from erdos.core.pdf.converter import PDFConversionResult
 
         monkeypatch.setattr(
             "erdos.core.pdf.converter.convert_with_marker",
@@ -343,7 +343,7 @@ class TestSelectConverter:
     def test_select_converter_marker_preferred(self, mock_available: MagicMock) -> None:
         """select_converter prefers Marker when available."""
         mock_available.return_value = True
-        from erdos.core.pdf_converter import PDFConverter, select_converter
+        from erdos.core.pdf.converter import PDFConverter, select_converter
 
         result = select_converter()
         assert result == PDFConverter.MARKER
@@ -356,7 +356,7 @@ class TestSelectConverter:
         """select_converter falls back to pdfplumber when Marker unavailable."""
         mock_marker.return_value = False
         mock_pdfplumber.return_value = True
-        from erdos.core.pdf_converter import PDFConverter, select_converter
+        from erdos.core.pdf.converter import PDFConverter, select_converter
 
         result = select_converter()
         assert result == PDFConverter.PDFPLUMBER
@@ -369,7 +369,7 @@ class TestSelectConverter:
         """select_converter returns None when no converters available."""
         mock_marker.return_value = False
         mock_pdfplumber.return_value = False
-        from erdos.core.pdf_converter import select_converter
+        from erdos.core.pdf.converter import select_converter
 
         result = select_converter()
         assert result is None
@@ -378,7 +378,7 @@ class TestSelectConverter:
     def test_select_converter_explicit_choice(self, mock_available: MagicMock) -> None:
         """select_converter respects explicit converter choice."""
         mock_available.return_value = True
-        from erdos.core.pdf_converter import PDFConverter, select_converter
+        from erdos.core.pdf.converter import PDFConverter, select_converter
 
         result = select_converter(preferred=PDFConverter.MARKER)
         assert result == PDFConverter.MARKER
@@ -389,7 +389,7 @@ class TestSelectConverter:
     ) -> None:
         """select_converter returns None for explicit but unavailable converter."""
         mock_available.return_value = False
-        from erdos.core.pdf_converter import PDFConverter, select_converter
+        from erdos.core.pdf.converter import PDFConverter, select_converter
 
         result = select_converter(preferred=PDFConverter.MARKER)
         assert result is None

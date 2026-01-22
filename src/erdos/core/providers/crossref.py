@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING
 
 import requests
 
-from erdos.core.crossref_client import fetch_crossref_work, parse_crossref_work
+from erdos.core.clients.crossref import fetch_crossref_work, parse_crossref_work
 
 
 if TYPE_CHECKING:

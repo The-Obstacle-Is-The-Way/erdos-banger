@@ -29,8 +29,8 @@
 
 Work strictly top-to-bottom unless blocked by dependencies.
 
-- [ ] **DEBT-061**: Remove core backward-compatibility shims
-  Deck: `docs/debt/debt-061-remove-core-compatibility-shims.md`
+- [x] **DEBT-061**: Remove core backward-compatibility shims
+  Deck: `docs/_archive/debt/debt-061-remove-core-compatibility-shims.md`
 - [ ] **DEBT-060**: Formalize command long Typer callback
   Deck: `docs/debt/debt-060-formalize-cmd-long-callback.md`
 
@@ -38,4 +38,4 @@ Work strictly top-to-bottom unless blocked by dependencies.
 
 ## Work Log
 
-(Ralph appends a short entry per completed task.)
+- **2026-01-22 (DEBT-061)**: Removed 10 backward-compatibility shim files from `src/erdos/core/` and updated all imports to use bounded-context modules directly. Added regression guard tests in `test_dependencies.py`. `make ci` passes.

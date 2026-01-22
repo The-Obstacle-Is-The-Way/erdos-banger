@@ -2,7 +2,7 @@
 
 from erdos.core.ask import build_prompt
 from erdos.core.models import ChunkSource, ProblemRecord, ProblemStatus
-from erdos.core.search_index import SearchResult
+from erdos.core.search.types import SearchResult
 
 
 def test_prompt_includes_problem_statement():

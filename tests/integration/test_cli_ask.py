@@ -10,9 +10,9 @@ from typer.testing import CliRunner
 
 from erdos.cli import app
 from erdos.core.exit_codes import ExitCode
-from erdos.core.index_builder import build_index
 from erdos.core.problem_loader import ProblemLoader
-from erdos.core.search_index import SearchIndex
+from erdos.core.search.facade import SearchIndex
+from erdos.core.search.index_builder import build_index
 
 
 if TYPE_CHECKING:

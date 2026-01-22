@@ -1,7 +1,7 @@
 """Prompt construction for RAG Q&A."""
 
 from erdos.core.models import ProblemRecord
-from erdos.core.search_index import SearchResult
+from erdos.core.search.types import SearchResult
 
 
 def build_prompt(

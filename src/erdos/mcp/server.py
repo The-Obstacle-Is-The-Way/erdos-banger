@@ -29,7 +29,7 @@ from erdos.core.models import CLIOutput
 from erdos.core.problem_loader import ProblemLoader
 from erdos.core.run_logger import RunLogger
 from erdos.core.search import search_basic, search_fts
-from erdos.core.search_index import SearchIndex
+from erdos.core.search.facade import SearchIndex
 
 
 if TYPE_CHECKING:

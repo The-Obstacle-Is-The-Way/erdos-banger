@@ -7,7 +7,7 @@ import pytest
 import requests
 import responses
 
-from erdos.core.arxiv_client import fetch_arxiv_atom, parse_arxiv_atom
+from erdos.core.clients.arxiv import fetch_arxiv_atom, parse_arxiv_atom
 from erdos.core.models import OpenAccessStatus, ReferenceRecord
 
 

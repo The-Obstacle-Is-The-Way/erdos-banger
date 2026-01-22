@@ -15,8 +15,7 @@ from erdos.commands.presenter import exit_with_result
 from erdos.core.exit_codes import ExitCode
 from erdos.core.formalizer import generate_skeleton
 from erdos.core.lean_runner import LeanRunner, LeanRunnerError
-from erdos.core.loop import LoopStatus, run_loop
-from erdos.core.loop_config import LoopConfig
+from erdos.core.loop import LoopConfig, LoopStatus, run_loop
 from erdos.core.models import CLIOutput
 from erdos.core.timing import measure_time_ms
 

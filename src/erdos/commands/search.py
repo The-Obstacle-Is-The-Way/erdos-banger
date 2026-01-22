@@ -22,7 +22,7 @@ from erdos.core.search import (
     build_search_index,
     execute_search,
 )
-from erdos.core.search_index import SearchIndexError
+from erdos.core.search.db import SearchIndexError
 from erdos.core.timing import measure_time_ms
 
 

@@ -78,8 +78,8 @@ class TestConvertCommandOutput:
         pdf_file.write_bytes(b"%PDF-1.4 test content")
 
         # Mock the converter to avoid needing actual marker
-        with patch("erdos.core.pdf_converter.convert_pdf") as mock_convert:
-            from erdos.core.pdf_converter import PDFConversionResult
+        with patch("erdos.core.pdf.converter.convert_pdf") as mock_convert:
+            from erdos.core.pdf.converter import PDFConversionResult
 
             mock_convert.return_value = PDFConversionResult(
                 success=True,
@@ -108,7 +108,7 @@ class TestConvertCommandOutput:
             ),
             patch("erdos.commands.convert.convert_pdf") as mock_convert,
         ):
-            from erdos.core.pdf_converter import PDFConversionResult
+            from erdos.core.pdf.converter import PDFConversionResult
 
             mock_convert.return_value = PDFConversionResult(
                 success=True,
@@ -138,7 +138,7 @@ class TestConvertCommandOutput:
             ),
             patch("erdos.commands.convert.convert_pdf") as mock_convert,
         ):
-            from erdos.core.pdf_converter import PDFConversionResult
+            from erdos.core.pdf.converter import PDFConversionResult
 
             mock_convert.return_value = PDFConversionResult(
                 success=True,

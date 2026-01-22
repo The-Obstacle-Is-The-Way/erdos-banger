@@ -9,8 +9,7 @@ import pytest
 import requests
 import responses
 
-from erdos.core.models import OpenAccessStatus
-from erdos.core.openalex_client import (
+from erdos.core.clients.openalex import (
     OpenAlexClient,
     OpenAlexConfig,
     _map_oa_status,
@@ -19,6 +18,7 @@ from erdos.core.openalex_client import (
     openalex_to_reference,
     reconstruct_abstract,
 )
+from erdos.core.models import OpenAccessStatus
 
 
 # Test data fixtures

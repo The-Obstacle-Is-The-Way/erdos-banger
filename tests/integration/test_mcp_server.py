@@ -115,7 +115,7 @@ class TestMCPToolFunctions:
 
         # Build a search index
         from erdos.core.problem_loader import ProblemLoader
-        from erdos.core.search_index import SearchIndex
+        from erdos.core.search.facade import SearchIndex
 
         loader = ProblemLoader(sample_problems_path)
         index_path = tmp_path / "test.db"

@@ -18,7 +18,7 @@ from typing import TYPE_CHECKING
 
 import requests
 
-from erdos.core.arxiv_client import extract_arxiv_text
+from erdos.core.clients.arxiv import extract_arxiv_text
 from erdos.core.ingest.models import ArxivDownloadResult
 from erdos.core.literature_paths import (
     get_arxiv_cache_path,

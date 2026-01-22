@@ -14,7 +14,7 @@ from rich.console import Console
 from erdos.commands.presenter import exit_with_result
 from erdos.core.exit_codes import ExitCode
 from erdos.core.models import CLIOutput
-from erdos.core.pdf_converter import (
+from erdos.core.pdf.converter import (
     LLMService,
     PDFConversionConfig,
     convert_pdf,

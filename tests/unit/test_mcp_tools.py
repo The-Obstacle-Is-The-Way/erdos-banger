@@ -42,7 +42,7 @@ def search_index(
     tmp_path: Path, problem_repo: ProblemRepository
 ) -> SearchIndexProtocol:
     """Create a search index populated with test data."""
-    from erdos.core.search_index import SearchIndex
+    from erdos.core.search.facade import SearchIndex
 
     db_path = tmp_path / "test_index.db"
     index = SearchIndex(db_path)

@@ -4,8 +4,8 @@ from pathlib import Path
 
 import pytest
 
-from erdos.core.loop_config import LoopConfig
-from erdos.core.patch_validator import (
+from erdos.core.loop.config import LoopConfig
+from erdos.core.loop.patch_validator import (
     MatchStatus,
     PatchResult,
     PatchStatus,

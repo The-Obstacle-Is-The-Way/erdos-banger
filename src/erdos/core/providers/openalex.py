@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Any
 
 import requests
 
-from erdos.core.openalex_client import OpenAlexClient, OpenAlexConfig
+from erdos.core.clients.openalex import OpenAlexClient, OpenAlexConfig
 
 
 if TYPE_CHECKING:

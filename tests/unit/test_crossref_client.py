@@ -7,7 +7,7 @@ import pytest
 import requests
 import responses
 
-from erdos.core.crossref_client import fetch_crossref_work, parse_crossref_work
+from erdos.core.clients.crossref import fetch_crossref_work, parse_crossref_work
 from erdos.core.models import ReferenceRecord
 
 

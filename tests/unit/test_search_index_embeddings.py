@@ -9,7 +9,8 @@ from unittest.mock import MagicMock
 import pytest
 
 from erdos.core.models import ProblemRecord, ProblemStatus
-from erdos.core.search_index import SearchIndex, SearchIndexError
+from erdos.core.search.db import SearchIndexError
+from erdos.core.search.facade import SearchIndex
 
 
 # Check if numpy is available for embedding tests

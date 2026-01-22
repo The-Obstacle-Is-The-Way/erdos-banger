@@ -179,7 +179,7 @@ class EmbeddingsStore:
         """
         # Import cosine_similarity lazily to avoid import errors when
         # embeddings deps are not installed
-        from erdos.core.embeddings import cosine_similarity  # noqa: PLC0415
+        from erdos.core.search.embeddings import cosine_similarity  # noqa: PLC0415
 
         self.validate_embedder(embedder)
 

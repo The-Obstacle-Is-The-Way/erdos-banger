@@ -4,9 +4,10 @@ from pathlib import Path
 
 import pytest
 
-from erdos.core.index_builder import build_index
 from erdos.core.problem_loader import ProblemLoader
-from erdos.core.search_index import SearchIndex, SearchResult
+from erdos.core.search.facade import SearchIndex
+from erdos.core.search.index_builder import build_index
+from erdos.core.search.types import SearchResult
 
 
 @pytest.fixture

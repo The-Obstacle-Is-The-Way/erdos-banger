@@ -4,7 +4,8 @@ from unittest.mock import MagicMock
 
 from erdos.core.ask import perform_retrieval, retrieve_sources
 from erdos.core.models import ChunkSource, ProblemRecord, ProblemStatus
-from erdos.core.search_index import SearchIndex, SearchResult
+from erdos.core.search.facade import SearchIndex
+from erdos.core.search.types import SearchResult
 
 
 def test_retrieval_calls_search_index():

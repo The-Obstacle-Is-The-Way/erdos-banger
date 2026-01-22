@@ -12,7 +12,7 @@ from erdos.core.context import AppContext
 from erdos.core.exit_codes import ExitCode
 from erdos.core.models import CLIOutput
 from erdos.core.problem_loader import ProblemLoaderError
-from erdos.core.search_index import SearchIndexError
+from erdos.core.search.db import SearchIndexError
 
 
 def get_app_context(

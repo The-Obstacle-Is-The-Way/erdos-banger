@@ -66,7 +66,7 @@ class HybridSearch:
         Raises:
             SearchIndexError: If embeddings haven't been built or model mismatch.
         """
-        from erdos.core.embeddings import cosine_similarity  # noqa: PLC0415
+        from erdos.core.search.embeddings import cosine_similarity  # noqa: PLC0415
 
         # Validate alpha bounds
         if not 0.0 <= alpha <= 1.0:

@@ -253,7 +253,7 @@ class TestEmbeddingDependency:
         self, temp_data_dir: Path, temp_index_path: Path
     ) -> None:
         """Test error message when embeddings deps not installed."""
-        with patch("erdos.core.embeddings.EMBEDDING_AVAILABLE", False):
+        with patch("erdos.core.search.embeddings.EMBEDDING_AVAILABLE", False):
             result = runner.invoke(
                 app,
                 ["search", "prime", "--semantic", "--build-index"],
@@ -271,7 +271,7 @@ class TestEmbeddingDependency:
         self, temp_data_dir: Path, temp_index_path: Path
     ) -> None:
         """Test error when trying to build embeddings without deps."""
-        with patch("erdos.core.embeddings.EMBEDDING_AVAILABLE", False):
+        with patch("erdos.core.search.embeddings.EMBEDDING_AVAILABLE", False):
             result = runner.invoke(
                 app,
                 ["search", "prime", "--build-embeddings", "--build-index"],

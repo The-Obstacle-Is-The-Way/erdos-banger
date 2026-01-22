@@ -5,7 +5,9 @@ from pathlib import Path
 import pytest
 
 from erdos.core.models import ChunkSource, ProblemRecord, ProblemStatus, TextChunk
-from erdos.core.search_index import SearchIndex, SearchIndexError, SearchResult
+from erdos.core.search.db import SearchIndexError
+from erdos.core.search.facade import SearchIndex
+from erdos.core.search.types import SearchResult
 
 
 @pytest.fixture

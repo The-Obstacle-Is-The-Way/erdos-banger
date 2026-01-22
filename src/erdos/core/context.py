@@ -9,11 +9,11 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
 
+from erdos.core.clients.openalex import OpenAlexConfig
 from erdos.core.config import AppConfig
-from erdos.core.openalex_client import OpenAlexConfig
 from erdos.core.problem_loader import ProblemLoader
 from erdos.core.providers import CrossrefProvider, FallbackProvider, OpenAlexProvider
-from erdos.core.search_index import SearchIndex
+from erdos.core.search.facade import SearchIndex
 
 
 if TYPE_CHECKING:

@@ -13,7 +13,7 @@ from erdos.core.search import (
     search_fts,
     search_with_fallback,
 )
-from erdos.core.search_index import SearchIndexError
+from erdos.core.search.db import SearchIndexError
 
 
 class TestSearchOptions:

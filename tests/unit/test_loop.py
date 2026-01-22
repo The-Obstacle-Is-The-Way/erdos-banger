@@ -7,6 +7,7 @@ import pytest
 
 from erdos.core.loop import (
     IterationRecord,
+    LoopConfig,
     LoopResult,
     LoopStatus,
     apply_patch,
@@ -14,7 +15,6 @@ from erdos.core.loop import (
     build_loop_prompt,
     run_loop,
 )
-from erdos.core.loop_config import LoopConfig
 from erdos.core.models import LeanCheckResult, LeanError, ProblemRecord
 from erdos.core.models.problem import ProblemStatus
 

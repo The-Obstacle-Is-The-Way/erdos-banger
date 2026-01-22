@@ -11,7 +11,7 @@ from typing import TYPE_CHECKING
 
 import defusedxml.ElementTree as ET
 
-from erdos.core.arxiv_client import fetch_arxiv_atom, parse_arxiv_atom
+from erdos.core.clients.arxiv import fetch_arxiv_atom, parse_arxiv_atom
 
 
 if TYPE_CHECKING:

@@ -5,7 +5,7 @@ import re
 from erdos.core.constants import PREVIEW_LENGTH
 from erdos.core.models import ChunkSource, ProblemRecord
 from erdos.core.ports import SearchIndexReadPort
-from erdos.core.search_index import SearchResult
+from erdos.core.search.types import SearchResult
 
 
 def perform_retrieval(

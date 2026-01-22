@@ -5,7 +5,7 @@ import tarfile
 
 import pytest
 
-from erdos.core.arxiv_client import extract_arxiv_text
+from erdos.core.clients.arxiv import extract_arxiv_text
 
 
 def test_extract_arxiv_text_largest_tex_wins():

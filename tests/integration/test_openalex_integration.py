@@ -8,8 +8,8 @@ from __future__ import annotations
 
 import pytest
 
+from erdos.core.clients.openalex import OpenAlexClient, OpenAlexConfig
 from erdos.core.models import OpenAccessStatus
-from erdos.core.openalex_client import OpenAlexClient, OpenAlexConfig
 
 
 @pytest.mark.requires_network

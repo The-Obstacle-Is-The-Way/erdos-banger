@@ -1,6 +1,6 @@
 """Tests for loop verification."""
 
-from erdos.core.loop_verifier import (
+from erdos.core.loop.verifier import (
     LoopExitCondition,
     LoopVerification,
     count_admits,

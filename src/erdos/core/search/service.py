@@ -17,44 +17,30 @@ from typing import TYPE_CHECKING
 
 from erdos.core.constants import PREVIEW_LENGTH
 from erdos.core.exit_codes import ExitCode
-from erdos.core.index_builder import build_index
 from erdos.core.models import CLIOutput, ProblemRecord
 from erdos.core.problem_loader import ProblemLoaderError
+from erdos.core.search.db import SearchIndexError
+from erdos.core.search.facade import SearchIndex
+from erdos.core.search.index_builder import build_index
 
 
 if TYPE_CHECKING:
-    from erdos.core.embeddings import EmbeddingModel
     from erdos.core.ports import (
         ProblemRepository,
         SearchIndexProtocol,
         SearchIndexReadPort,
     )
-
-
-# Lazy imports to avoid circular import with search_index.py
-# These are resolved at first use
-_SearchIndex: type | None = None
-_SearchIndexError: type[Exception] | None = None
+    from erdos.core.search.embeddings import EmbeddingModel
 
 
 def _get_search_index_class() -> type:
-    """Lazy import to avoid circular import."""
-    global _SearchIndex  # noqa: PLW0603
-    if _SearchIndex is None:
-        from erdos.core.search_index import SearchIndex  # noqa: PLC0415
-
-        _SearchIndex = SearchIndex
-    return _SearchIndex
+    """Return the SearchIndex class."""
+    return SearchIndex
 
 
 def _get_search_index_error() -> type[Exception]:
-    """Get SearchIndexError class (lazy import)."""
-    global _SearchIndexError  # noqa: PLW0603
-    if _SearchIndexError is None:
-        from erdos.core.search_index import SearchIndexError  # noqa: PLC0415
-
-        _SearchIndexError = SearchIndexError
-    return _SearchIndexError
+    """Return the SearchIndexError class."""
+    return SearchIndexError
 
 
 logger = logging.getLogger(__name__)
@@ -318,7 +304,7 @@ def get_embedding_model(
         Tuple of (model, error) - one will be None
     """
     # Local import to avoid import errors when embeddings deps not installed
-    from erdos.core.embeddings import (  # noqa: PLC0415
+    from erdos.core.search.embeddings import (  # noqa: PLC0415
         EMBEDDING_AVAILABLE,
         EmbeddingConfig,
         EmbeddingModel,

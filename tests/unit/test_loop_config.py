@@ -2,7 +2,7 @@
 
 import pytest
 
-from erdos.core.loop_config import LoopConfig
+from erdos.core.loop.config import LoopConfig
 
 
 class TestLoopConfigDefaults:
