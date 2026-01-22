@@ -9,6 +9,7 @@ API Reference: https://docs.openalex.org/
 
 from __future__ import annotations
 
+import json
 import logging
 import os
 import re
@@ -76,6 +77,12 @@ def reconstruct_abstract(inverted_index: dict[str, list[int]] | None) -> str | N
 
 _ARXIV_ABS_PREFIX = "https://arxiv.org/abs/"
 _ARXIV_DOI_PREFIX = "https://doi.org/10.48550/arxiv."
+_ARXIV_VERSION_SUFFIX_RE = re.compile(r"v\d+$")
+
+
+def _strip_arxiv_version(arxiv_id: str) -> str:
+    """Normalize arXiv IDs by removing a trailing version suffix (e.g. v2)."""
+    return _ARXIV_VERSION_SUFFIX_RE.sub("", arxiv_id)
 
 
 def extract_arxiv_id(ids: dict[str, Any]) -> str | None:
@@ -88,23 +95,23 @@ def extract_arxiv_id(ids: dict[str, Any]) -> str | None:
         arXiv ID (e.g., "2301.00001" or "math/0703001") or None if not present.
     """
     # Some OpenAlex payloads may include an explicit arXiv URL (defensive support).
-    arxiv_url = ids.get("arxiv")
+    arxiv_url: object = ids.get("arxiv")
     if isinstance(arxiv_url, str) and arxiv_url:
         if arxiv_url.startswith(_ARXIV_ABS_PREFIX):
-            return arxiv_url[len(_ARXIV_ABS_PREFIX) :]
+            return _strip_arxiv_version(arxiv_url[len(_ARXIV_ABS_PREFIX) :])
         if "/abs/" in arxiv_url:
-            return arxiv_url.split("/abs/")[-1]
-        return arxiv_url.rsplit("/", 1)[-1]
+            return _strip_arxiv_version(arxiv_url.split("/abs/")[-1])
+        return _strip_arxiv_version(arxiv_url.rsplit("/", 1)[-1])
 
     # OpenAlex commonly exposes arXiv via the arXiv DataCite DOI in ids.doi:
     #   https://doi.org/10.48550/arxiv.<arxiv_id>
-    doi_url = ids.get("doi")
+    doi_url: object = ids.get("doi")
     if (
         isinstance(doi_url, str)
         and doi_url
         and doi_url.lower().startswith(_ARXIV_DOI_PREFIX)
     ):
-        return doi_url[len(_ARXIV_DOI_PREFIX) :]
+        return _strip_arxiv_version(doi_url[len(_ARXIV_DOI_PREFIX) :])
 
     return None
 
@@ -121,7 +128,7 @@ def _extract_arxiv_id_from_landing_page_url(url: str | None) -> str | None:
         return None
     if url.lower().startswith(_ARXIV_DOI_PREFIX):
         candidate = url[len(_ARXIV_DOI_PREFIX) :]
-        return re.sub(r"v\d+$", "", candidate)
+        return _strip_arxiv_version(candidate)
     match = re.search(r"arxiv\.org/abs/([^\s?#]+)", url)
     if not match:
         match = re.search(r"arxiv\.org/pdf/([^\s?#]+)", url)
@@ -130,9 +137,9 @@ def _extract_arxiv_id_from_landing_page_url(url: str | None) -> str | None:
         candidate = match.group(1)
         if candidate.lower().endswith(".pdf"):
             candidate = candidate[: -len(".pdf")]
-        return re.sub(r"v\d+$", "", candidate)
+        return _strip_arxiv_version(candidate)
     candidate = match.group(1)
-    return re.sub(r"v\d+$", "", candidate)
+    return _strip_arxiv_version(candidate)
 
 
 def extract_arxiv_id_from_work(work: dict[str, Any]) -> str | None:
@@ -179,15 +186,18 @@ def find_pdf_url(work: dict[str, Any]) -> str | None:
         PDF URL or None if not available.
     """
     # Check primary location first
-    primary: dict[str, Any] = work.get("primary_location", {}) or {}
-    pdf_url: str | None = primary.get("pdf_url")
-    if pdf_url:
-        return pdf_url
+    primary_loc = work.get("primary_location")
+    primary: dict[str, Any] = primary_loc if isinstance(primary_loc, dict) else {}
+    primary_pdf_url: object = primary.get("pdf_url")
+    if isinstance(primary_pdf_url, str) and primary_pdf_url:
+        return primary_pdf_url
 
     # Check alternate locations
     for loc in work.get("locations", []):
+        if not isinstance(loc, dict):
+            continue
         pdf_url = loc.get("pdf_url")
-        if pdf_url:
+        if isinstance(pdf_url, str) and pdf_url:
             return pdf_url
 
     return None
@@ -237,10 +247,14 @@ def openalex_to_reference(work: dict[str, Any]) -> ReferenceRecord:
 
     # Extract authors from authorships
     authors: list[str] = []
-    for authorship in work.get("authorships", []):
-        author = authorship.get("author", {})
-        if author.get("display_name"):
-            authors.append(author["display_name"])
+    authorships = work.get("authorships", [])
+    if isinstance(authorships, list):
+        for authorship in authorships:
+            if not isinstance(authorship, dict):
+                continue
+            author = authorship.get("author")
+            if isinstance(author, dict) and author.get("display_name"):
+                authors.append(author["display_name"])
 
     # Extract venue from primary location
     primary_loc = work.get("primary_location", {}) or {}
@@ -249,9 +263,13 @@ def openalex_to_reference(work: dict[str, Any]) -> ReferenceRecord:
 
     # Extract concepts (top 5)
     concepts: list[str] = []
-    for concept in work.get("concepts", [])[:5]:
-        if concept.get("display_name"):
-            concepts.append(concept["display_name"])
+    raw_concepts = work.get("concepts", [])
+    if isinstance(raw_concepts, list):
+        for concept in raw_concepts[:5]:
+            if not isinstance(concept, dict):
+                continue
+            if concept.get("display_name"):
+                concepts.append(concept["display_name"])
 
     # Map OA status
     oa = work.get("open_access", {})
@@ -313,6 +331,7 @@ class OpenAlexClient:
         Raises:
             requests.HTTPError: On non-retryable HTTP errors.
             requests.Timeout: After all retries exhausted.
+            json.JSONDecodeError: If response is not valid JSON.
         """
         logger.debug("Fetching OpenAlex: %s", url)
         start_time = time.monotonic()
@@ -331,7 +350,17 @@ class OpenAlexClient:
             response.status_code,
         )
 
-        return response.json()  # type: ignore[no-any-return]
+        try:
+            return response.json()  # type: ignore[no-any-return]
+        except (json.JSONDecodeError, requests.exceptions.JSONDecodeError):
+            snippet = response.text[:200].replace("\n", "\\n")
+            logger.error(
+                "OpenAlex invalid JSON for %s (status %d): %s",
+                url,
+                response.status_code,
+                snippet,
+            )
+            raise
 
     def get_by_doi(self, doi: str) -> ReferenceRecord:
         """Fetch work by DOI.

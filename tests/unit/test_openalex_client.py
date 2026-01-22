@@ -193,7 +193,7 @@ class TestExtractArxivId:
     def test_extract_from_explicit_arxiv_url(self) -> None:
         """Defensive support: extract arXiv ID from explicit ids['arxiv'] URL."""
         ids = {"arxiv": "https://arxiv.org/abs/2301.00001v2"}
-        assert extract_arxiv_id(ids) == "2301.00001v2"
+        assert extract_arxiv_id(ids) == "2301.00001"
 
     def test_extract_no_arxiv(self) -> None:
         """Returns None when no arXiv ID present."""

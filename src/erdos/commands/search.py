@@ -27,7 +27,7 @@ from erdos.core.timing import measure_time_ms
 
 
 if TYPE_CHECKING:
-    from erdos.core.ports import SearchIndexProtocol
+    from erdos.core.ports import ProblemRepository, SearchIndexProtocol
 
 
 app = typer.Typer(
@@ -96,7 +96,7 @@ def _print_human(result_data: dict[str, Any]) -> None:
 
 
 def _validate_mode_flags(
-    semantic: bool, hybrid: bool, bm25_only: bool, alpha: float
+    semantic: bool, hybrid: bool, bm25_only: bool, alpha: float | None
 ) -> CLIOutput | None:
     """Validate mutually exclusive mode flags.
 
@@ -110,7 +110,7 @@ def _validate_mode_flags(
             message="Flags --semantic, --hybrid, and --bm25-only are mutually exclusive",
             code=ExitCode.USAGE_ERROR,
         )
-    if alpha != 0.5 and not hybrid:
+    if alpha is not None and not hybrid:
         return CLIOutput.err(
             command="erdos search",
             error_type="UsageError",
@@ -134,7 +134,7 @@ def _handle_index_build(
     index: SearchIndexProtocol | None,
     progress_console: Console,
     *,
-    repo: Any,
+    repo: ProblemRepository,
 ) -> CLIOutput | None:
     """Handle index building if requested.
 
@@ -231,14 +231,15 @@ def search(
         typer.Option("--bm25-only", help="Force BM25-only search (no vectors)"),
     ] = False,
     alpha: Annotated[
-        float,
+        float | None,
         typer.Option(
             "--alpha",
             help="Hybrid weight (0.0=BM25 only, 1.0=semantic only, default: 0.5)",
             min=0.0,
             max=1.0,
+            show_default=False,
         ),
-    ] = 0.5,
+    ] = None,
     build_embeddings_flag: Annotated[
         bool,
         typer.Option(
@@ -278,6 +279,7 @@ def search(
     result: CLIOutput | None = None
 
     with measure_time_ms() as duration:
+        effective_alpha = 0.5 if alpha is None else alpha
         # Validate mode flags
         result = _validate_mode_flags(semantic, hybrid, bm25_only, alpha)
 
@@ -317,10 +319,10 @@ def search(
                         query=query,
                         limit=limit,
                         problem_id=problem_filter,
-                        build_index=build_index_flag,
-                        build_embeddings=build_embeddings_flag,
+                        build_index=False,
+                        build_embeddings=False,
                         mode=mode,
-                        alpha=alpha,
+                        alpha=effective_alpha,
                         embedding_model=embedding_model,
                     )
                     result = execute_search(
