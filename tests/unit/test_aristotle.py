@@ -73,6 +73,17 @@ class TestValidateAristotleConfig:
         assert "ARISTOTLE_API_KEY" in str(exc_info.value)
         assert exc_info.value.error_type == "ConfigError"
 
+    def test_empty_api_key_parameter_raises_error(
+        self, monkeypatch: MonkeyPatch
+    ) -> None:
+        """Empty api_key parameter raises AristotleError blaming the parameter."""
+        monkeypatch.setenv("ARISTOTLE_API_KEY", "env-key")
+        with pytest.raises(AristotleError) as exc_info:
+            validate_aristotle_config(api_key=" ")
+        assert "api_key" in str(exc_info.value)
+        assert "environment variable" not in str(exc_info.value)
+        assert exc_info.value.error_type == "ConfigError"
+
     def test_missing_command_raises_error(self, monkeypatch: MonkeyPatch) -> None:
         """Missing aristotle command on PATH raises AristotleError."""
         monkeypatch.setenv("ARISTOTLE_API_KEY", "test-key")
@@ -341,6 +352,29 @@ class TestRunAristotleProveFromFileExecution:
 
         call_kwargs = mock_run.call_args[1]
         assert call_kwargs["timeout"] == 300
+
+    def test_api_key_parameter_is_passed_to_subprocess_env(
+        self, tmp_path: Path, monkeypatch: MonkeyPatch
+    ) -> None:
+        """api_key parameter is passed to subprocess env."""
+        monkeypatch.delenv("ARISTOTLE_API_KEY", raising=False)
+        input_file = tmp_path / "input.lean"
+        input_file.write_text("-- test", encoding="utf-8")
+        output_file = tmp_path / "output.lean"
+
+        mock_result = MagicMock()
+        mock_result.returncode = 0
+        mock_result.stdout = ""
+        mock_result.stderr = ""
+
+        with (
+            patch("shutil.which", return_value="/usr/bin/aristotle"),
+            patch("subprocess.run", return_value=mock_result) as mock_run,
+        ):
+            run_aristotle_prove_from_file(input_file, output_file, api_key="test-key")
+
+        call_kwargs = mock_run.call_args[1]
+        assert call_kwargs["env"]["ARISTOTLE_API_KEY"] == "test-key"
 
     def test_informal_flag_passed_to_command(
         self, tmp_path: Path, monkeypatch: MonkeyPatch

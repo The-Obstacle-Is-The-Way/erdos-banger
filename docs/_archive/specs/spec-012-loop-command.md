@@ -242,7 +242,7 @@ When implemented, the following tests are required:
 
 ## Implementation Deviations (SSOT: Code)
 
-The following intentional deviations from this spec exist in the implementation. The code is SSOT:
+Historical deviations existed during prior iterations; the spec has since been aligned with the implementation and the code is the source of truth (SSOT):
 
 ### 1. CLI Shape: `erdos loop run` subcommand
 

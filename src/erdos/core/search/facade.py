@@ -81,20 +81,15 @@ class SearchIndex:
         """
         # 1. Explicit path from config (DIP-compliant)
         if index_path is not None:
-            index_path.parent.mkdir(parents=True, exist_ok=True)
             return cls(index_path)
 
         # 2. Environment variable (legacy fallback)
         env_path = os.environ.get("ERDOS_INDEX_PATH")
         if env_path:
-            env_path_obj = Path(env_path)
-            env_path_obj.parent.mkdir(parents=True, exist_ok=True)
-            return cls(env_path_obj)
+            return cls(Path(env_path))
 
         # 3. Default path
-        default_path = Path("index/erdos.sqlite")
-        default_path.parent.mkdir(parents=True, exist_ok=True)
-        return cls(default_path)
+        return cls(Path("index/erdos.sqlite"))
 
     @property
     def db_path(self) -> Path:
@@ -172,10 +167,9 @@ class SearchIndex:
 
     def get_stats(self) -> dict[str, object]:
         """Get index statistics."""
+        problems = self.problem_count()
+        chunks = self.chunk_count()
         with self._db.connect() as conn:
-            problems = conn.execute("SELECT COUNT(*) FROM problems").fetchone()[0]
-            chunks = conn.execute("SELECT COUNT(*) FROM chunks").fetchone()[0]
-
             # Count by source type
             by_source: dict[str, int] = {}
             cursor = conn.execute(

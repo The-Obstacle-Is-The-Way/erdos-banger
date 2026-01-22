@@ -28,6 +28,11 @@ def build_index(
     """
     Build or update the search index.
 
+    Individual problem indexing failures are logged and skipped. This may leave
+    the index in a partially-updated state. If you need atomic behavior, you
+    could implement a transactional rollback strategy (e.g. rebuild into a
+    temporary database and swap on success).
+
     Args:
         loader: Problem repository
         index: Search index
@@ -44,7 +49,16 @@ def build_index(
 
     problems_indexed = 0
     for problem in loader.iter_problems():
-        index.index_problem(problem)
+        try:
+            index.index_problem(problem)
+        except Exception as exc:
+            logger.error(
+                "Failed to index problem %s: %s",
+                getattr(problem, "id", "<unknown>"),
+                exc,
+                exc_info=True,
+            )
+            continue
         problems_indexed += 1
         if problems_indexed % 100 == 0:
             logger.debug("Indexed %d problems", problems_indexed)
