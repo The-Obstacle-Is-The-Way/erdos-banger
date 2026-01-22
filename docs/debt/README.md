@@ -14,7 +14,12 @@ This directory contains technical-debt writeups: spec drift, missing fixtures, i
 
 ## Active Debt
 
-*No active debt items.*
+| ID | Title | Priority | SOLID Violation |
+|----|-------|----------|-----------------|
+| DEBT-062 | `search/service.py` exceeds 500 LOC | P1 | SRP, OCP |
+| DEBT-063 | `MetadataProvider` protocol too broad | P2 | ISP |
+| DEBT-064 | `loop/runner.py` direct LLM coupling | P2 | DIP |
+| DEBT-065 | CLI callbacks too thick | P2 | SRP |
 
 ## Archived Debt
 
@@ -84,7 +89,7 @@ All debt below has been resolved and archived to `docs/_archive/debt/`.
 | DEBT-061 | Remove core backward-compatibility shims | P2 | Fixed | 4466340 |
 | DEBT-060 | Formalize command long Typer callback | P4 | Fixed | 7b871e5 |
 
-**Next Debt ID:** DEBT-062
+**Next Debt ID:** DEBT-066
 
 ### Archived Debt Decks
 
