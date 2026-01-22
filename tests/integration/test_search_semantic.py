@@ -334,7 +334,7 @@ class TestJsonOutput:
         import json
 
         with patch(
-            "erdos.commands.search._get_embedding_model",
+            "erdos.core.search.service.get_embedding_model",
             return_value=(fake_embedder, None),
         ):
             result = runner.invoke(
@@ -368,7 +368,7 @@ class TestJsonOutput:
         import json
 
         with patch(
-            "erdos.commands.search._get_embedding_model",
+            "erdos.core.search.service.get_embedding_model",
             return_value=(fake_embedder, None),
         ):
             result = runner.invoke(

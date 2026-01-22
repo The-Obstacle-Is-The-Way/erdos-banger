@@ -16,7 +16,6 @@ This directory contains technical-debt writeups: spec drift, missing fixtures, i
 
 | ID | Title | Priority | Status | Deck |
 |----|-------|----------|--------|------|
-| DEBT-043 | `erdos search` command god module (SRP pressure) | P2 | Open | `debt-043-search-command-god-module.md` |
 | DEBT-044 | `core/` bounded-context refactor (reduce sprawl) | P2 | Open | `debt-044-core-bounded-context-refactor.md` |
 | DEBT-045 | Split `SearchIndexProtocol` (ISP/DIP) | P2 | Open | `debt-045-searchindexprotocol-interface-segregation.md` |
 | DEBT-048 | MCP server module size + CI coverage gap | P3 | Open | `debt-048-mcp-server-god-module-and-ci-coverage.md` |
@@ -83,6 +82,7 @@ All debt below has been resolved and archived to `docs/_archive/debt/`.
 | DEBT-047 | Loop logging sanitization/unification | P3 | Fixed | c090fb3 |
 | DEBT-057 | Guardrails against god-file regressions | P3 | Fixed | 1f37f5c |
 | DEBT-042 | Loop contract drift + god function | P1 | Fixed | 4b90005 |
+| DEBT-043 | `erdos search` command god module (SRP pressure) | P2 | Fixed | 4f99202 |
 
 **Next Debt ID:** DEBT-061
 
@@ -136,3 +136,4 @@ All debt below has been resolved and archived to `docs/_archive/debt/`.
 - `docs/_archive/debt/debt-047-loop-logging-sanitization-and-unification.md`
 - `docs/_archive/debt/debt-057-guardrails-against-god-files.md`
 - `docs/_archive/debt/debt-042-loop-command-contract-and-god-module.md`
+- `docs/_archive/debt/debt-043-search-command-god-module.md`

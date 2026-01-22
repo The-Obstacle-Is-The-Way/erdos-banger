@@ -1,18 +1,18 @@
-"""Unit tests for erdos search command helpers (DEBT-017-D4)."""
+"""Unit tests for erdos search service (DEBT-017-D4, DEBT-043)."""
 
 from __future__ import annotations
 
 from unittest import mock
 
-from erdos.commands.search import (
-    SearchOptions,
-    _build_index_if_requested,
-    _search_with_fallback,
-    search_problems_fts,
-)
 from erdos.core.exit_codes import ExitCode
 from erdos.core.models import CLIOutput
 from erdos.core.problem_loader import ProblemLoaderError
+from erdos.core.search import (
+    SearchOptions,
+    build_search_index,
+    search_fts,
+    search_with_fallback,
+)
 from erdos.core.search_index import SearchIndexError
 
 
@@ -43,42 +43,29 @@ class TestSearchOptions:
         assert options.problem_id is None
 
 
-class TestBuildIndexIfRequested:
-    """Tests for _build_index_if_requested() helper."""
+class TestBuildSearchIndex:
+    """Tests for build_search_index() service function."""
 
-    def test_no_build_returns_none(self) -> None:
-        """Should return None when build_index is False."""
-        console = mock.Mock()
-        repo = mock.Mock()
-        index = mock.Mock()
-        result = _build_index_if_requested(False, console, repo=repo, index=index)
-        assert result is None
-        console.print.assert_not_called()
-
-    @mock.patch("erdos.commands.search.do_build_index")
+    @mock.patch("erdos.core.search.service.build_index")
     def test_successful_build(self, mock_build: mock.Mock) -> None:
-        """Should return None and print progress on successful build."""
+        """Should return None on successful build."""
         mock_build.return_value = {"problems_indexed": 100}
-        console = mock.Mock()
-
         repo = mock.Mock()
         index = mock.Mock()
-        result = _build_index_if_requested(True, console, repo=repo, index=index)
+
+        result = build_search_index(repo=repo, index=index)
 
         assert result is None
         mock_build.assert_called_once_with(loader=repo, index=index, rebuild=True)
-        assert console.print.call_count == 2
-        console.print.assert_any_call("Building search index...")
 
-    @mock.patch("erdos.commands.search.do_build_index")
+    @mock.patch("erdos.core.search.service.build_index")
     def test_loader_error(self, mock_build: mock.Mock) -> None:
         """Should return CLIOutput error on ProblemLoaderError."""
         mock_build.side_effect = ProblemLoaderError("Problems not found")
-        console = mock.Mock()
-
         repo = mock.Mock()
         index = mock.Mock()
-        result = _build_index_if_requested(True, console, repo=repo, index=index)
+
+        result = build_search_index(repo=repo, index=index)
 
         assert result is not None
         assert result.success is False
@@ -87,15 +74,14 @@ class TestBuildIndexIfRequested:
         assert "Problems not found" in result.error["message"]
         assert result.error["code"] == ExitCode.ERROR
 
-    @mock.patch("erdos.commands.search.do_build_index")
+    @mock.patch("erdos.core.search.service.build_index")
     def test_index_error(self, mock_build: mock.Mock) -> None:
         """Should return CLIOutput error on SearchIndexError."""
         mock_build.side_effect = SearchIndexError("Index corrupted")
-        console = mock.Mock()
-
         repo = mock.Mock()
         index = mock.Mock()
-        result = _build_index_if_requested(True, console, repo=repo, index=index)
+
+        result = build_search_index(repo=repo, index=index)
 
         assert result is not None
         assert result.success is False
@@ -106,9 +92,9 @@ class TestBuildIndexIfRequested:
 
 
 class TestSearchWithFallback:
-    """Tests for _search_with_fallback() helper."""
+    """Tests for search_with_fallback() service function."""
 
-    @mock.patch("erdos.commands.search.search_problems_fts")
+    @mock.patch("erdos.core.search.service.search_fts")
     def test_successful_fts_search(self, mock_fts: mock.Mock) -> None:
         """Should return FTS result when successful."""
         expected_result = CLIOutput.ok(
@@ -125,7 +111,7 @@ class TestSearchWithFallback:
         )
         repo = mock.Mock()
         index = mock.Mock()
-        result = _search_with_fallback(options, index=index, repo=repo)
+        result = search_with_fallback(options, index=index, repo=repo)
 
         assert result.success is True
         mock_fts.assert_called_once_with(
@@ -136,8 +122,8 @@ class TestSearchWithFallback:
             problem_id=None,
         )
 
-    @mock.patch("erdos.commands.search.search_problems_basic")
-    @mock.patch("erdos.commands.search.search_problems_fts")
+    @mock.patch("erdos.core.search.service.search_basic")
+    @mock.patch("erdos.core.search.service.search_fts")
     def test_fallback_to_basic_on_empty_index(
         self, mock_fts: mock.Mock, mock_basic: mock.Mock
     ) -> None:
@@ -158,7 +144,7 @@ class TestSearchWithFallback:
             problem_id=None,
             build_index=False,
         )
-        result = _search_with_fallback(options, index=index, repo=repo)
+        result = search_with_fallback(options, index=index, repo=repo)
 
         assert result.success is True
         assert result.data is not None
@@ -166,9 +152,13 @@ class TestSearchWithFallback:
         assert result.data.get("fallback_reason") == "index_empty"
         mock_basic.assert_called_once_with("prime", repo, 10, None)
 
-    @mock.patch("erdos.commands.search.search_problems_basic")
+    @mock.patch("erdos.core.search.service.search_basic")
     def test_index_unavailable_uses_basic(self, mock_basic: mock.Mock) -> None:
         """Should use basic search when index is unavailable."""
+        mock_basic.return_value = CLIOutput.ok(
+            "erdos search",
+            {"query": "prime", "count": 0, "results": [], "use_fts": False},
+        )
         repo = mock.Mock()
 
         options = SearchOptions(
@@ -177,10 +167,10 @@ class TestSearchWithFallback:
             problem_id=None,
             build_index=False,
         )
-        _search_with_fallback(options, index=None, repo=repo)
+        search_with_fallback(options, index=None, repo=repo)
         mock_basic.assert_called_once_with("prime", repo, 10, None)
 
-    @mock.patch("erdos.commands.search.search_problems_fts")
+    @mock.patch("erdos.core.search.service.search_fts")
     def test_other_fts_errors_not_fallback(self, mock_fts: mock.Mock) -> None:
         """Should not fall back for FTS errors (non-None results)."""
         mock_fts.return_value = CLIOutput.err(
@@ -198,13 +188,13 @@ class TestSearchWithFallback:
             problem_id=None,
             build_index=False,
         )
-        result = _search_with_fallback(options, index=index, repo=repo)
+        result = search_with_fallback(options, index=index, repo=repo)
 
         assert result.success is False
         assert result.error is not None
         assert result.error["type"] == "IndexError"
 
-    @mock.patch("erdos.commands.search.search_problems_fts")
+    @mock.patch("erdos.core.search.service.search_fts")
     def test_passes_problem_id_filter(self, mock_fts: mock.Mock) -> None:
         """Should pass problem_id filter to FTS search."""
         mock_fts.return_value = CLIOutput.ok(
@@ -220,7 +210,7 @@ class TestSearchWithFallback:
             problem_id=42,
             build_index=False,
         )
-        _search_with_fallback(options, index=index, repo=repo)
+        search_with_fallback(options, index=index, repo=repo)
 
         mock_fts.assert_called_once_with(
             "test",
@@ -231,13 +221,13 @@ class TestSearchWithFallback:
         )
 
 
-class TestSearchProblemsFts:
-    """Tests for search_problems_fts function."""
+class TestSearchFts:
+    """Tests for search_fts function."""
 
     def test_empty_query_returns_usage_error(self) -> None:
         """Should return UsageError for empty query."""
         index = mock.Mock()
-        result = search_problems_fts("", index=index)
+        result = search_fts("", index=index)
 
         assert result is not None
         assert result.success is False
@@ -249,7 +239,7 @@ class TestSearchProblemsFts:
     def test_whitespace_query_returns_usage_error(self) -> None:
         """Should return UsageError for whitespace-only query."""
         index = mock.Mock()
-        result = search_problems_fts("   ", index=index)
+        result = search_fts("   ", index=index)
 
         assert result is not None
         assert result.success is False
@@ -261,7 +251,7 @@ class TestSearchProblemsFts:
         """Should return None when index is empty (signals fallback needed)."""
         index = mock.Mock()
         index.problem_count.return_value = 0
-        result = search_problems_fts("prime", index=index)
+        result = search_fts("prime", index=index)
 
         assert result is None
         index.problem_count.assert_called_once()
@@ -272,7 +262,7 @@ class TestSearchProblemsFts:
         index.problem_count.return_value = 10
         index.search.return_value = []
 
-        result = search_problems_fts("prime", index=index)
+        result = search_fts("prime", index=index)
 
         assert result is not None
         assert result.success is True

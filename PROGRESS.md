@@ -43,8 +43,8 @@ Work strictly top-to-bottom unless blocked by dependencies.
   Deck: `docs/_archive/debt/debt-057-guardrails-against-god-files.md`
 - [x] **DEBT-042**: Loop contract drift + `core/loop.py` god function
   Deck: `docs/_archive/debt/debt-042-loop-command-contract-and-god-module.md`
-- [ ] **DEBT-043**: `erdos search` command god module
-  Deck: `docs/debt/debt-043-search-command-god-module.md`
+- [x] **DEBT-043**: `erdos search` command god module
+  Deck: `docs/_archive/debt/debt-043-search-command-god-module.md`
 - [ ] **DEBT-045**: Split `SearchIndexProtocol` (ISP/DIP)
   Deck: `docs/debt/debt-045-searchindexprotocol-interface-segregation.md`
 - [ ] **DEBT-049**: `SearchIndex` monolith (schema + indexing + retrieval + embeddings)
@@ -136,3 +136,13 @@ Work strictly top-to-bottom unless blocked by dependencies.
 - Added inline exemptions for helper functions (`_run_single_iteration`, `execute_loop`, `run`)
 - Tests cover loop contract semantics: `llm_required`, `no_apply`, success case
 - `make ci` passes (870 tests, 82.25% coverage)
+
+### 2026-01-22: DEBT-043 Fixed
+- Verified refactoring of `erdos search` command from god module (791 LOC) to thin adapter pattern
+- `commands/search.py`: 334 LOC (58% reduction from 791 LOC)
+- `core/search/service.py`: 636 LOC - new service layer with pure orchestration logic (no Typer/Rich)
+- `core/search/types.py`: 63 LOC - contract types (SearchResult, SemanticSearchResult, EmbeddingModelProtocol)
+- `core/search/__init__.py`: 45 LOC - re-exports for backward compatibility
+- Service layer contains: `SearchMode`, `SearchOptions`, `execute_search()`, `search_fts()`, `search_basic()`, `search_semantic()`, `search_hybrid()`, `build_search_index()`, `build_embeddings()`
+- Tests target core service: `test_search_command_helpers.py` imports from `erdos.core.search`
+- `make ci` passes (869 tests, 82.40% coverage)
