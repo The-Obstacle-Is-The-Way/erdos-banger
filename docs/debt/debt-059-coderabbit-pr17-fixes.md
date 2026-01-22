@@ -115,9 +115,35 @@ output_file = result_data.get("file", "unknown")
 message = str(e) or "Unexpected error"
 ```
 
+### 8. `--no-network` Is Silently Ignored Without `--import-upstream` (formalize_cmd.py)
+
+**File:** `src/erdos/commands/lean/formalize_cmd.py`
+
+**Problem:** The `--no-network` option is documented as “requires --import-upstream”, but passing it without `--import-upstream` is silently ignored (no validation, no error).
+
+**Fix:** Add early validation:
+
+```python
+if no_network and not import_upstream:
+    return CLIOutput.err(
+        command="erdos lean formalize",
+        error_type="UsageError",
+        message="--no-network may only be used with --import-upstream",
+        code=ExitCode.USAGE_ERROR,
+    )
+```
+
+### 9. Lean Init Should Use Lean Exit Code for Lean Failures (init_cmd.py)
+
+**File:** `src/erdos/commands/lean/init_cmd.py`
+
+**Problem:** `LeanRunnerError` currently maps to `ExitCode.ERROR`. Lean toolchain failures should return `ExitCode.LEAN_ERROR` for consistency with other Lean commands.
+
+**Fix:** Change the `LeanRunnerError` handler to return `code=ExitCode.LEAN_ERROR`.
+
 ---
 
-## False Positives (Skip)
+## False Positives / Non-Blockers (Skip)
 
 - **batch_formalize.py:95** - CodeRabbit claimed `.lean` vs `.Lean` case mismatch. **FALSE** - both use lowercase `.lean`.
 - **common.py:145** - Duck-typing routing is "fragile" - valid observation but works fine, not urgent.
@@ -127,15 +153,16 @@ message = str(e) or "Unexpected error"
 
 ## Acceptance Criteria
 
-1. All 7 fixes above implemented
-2. Tests added for validation cases (max_concurrent, device)
-3. `make ci` passes
-4. No new regressions
+1. All 9 fixes above implemented
+2. Tests added for validation cases (max_concurrent, device, no_network)
+3. Lean init exit codes validated in tests
+4. `make ci` passes
+5. No new regressions
 
 ---
 
 ## Estimated Scope
 
-- Files: ~6
-- Lines: ~50-80
+- Files: ~8
+- Lines: ~80-140
 - Risk: Low (input validation + defensive coding)
