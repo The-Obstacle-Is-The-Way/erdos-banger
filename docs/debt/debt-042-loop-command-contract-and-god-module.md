@@ -12,7 +12,7 @@
 The loop feature is implemented and well-tested at the core level, but it currently has **two high-risk maintainability issues**:
 
 1. **Contract drift / ambiguity** between archived spec text and the actual CLI + JSON semantics.
-2. `src/erdos/core/loop.py` contains a **god function** (`run_loop`, ~400 LOC) that mixes orchestration, IO, logging, and domain rules.
+2. `src/erdos/core/loop.py` contains a **god function** (`run_loop`, **399** LOC) that mixes orchestration, IO, logging, and domain rules.
 
 This combination increases the risk of “fixes that regress safety” as the loop evolves (SPEC-012 follow-ups, Aristotle integration, richer prompting, resumption, etc.).
 
@@ -22,11 +22,15 @@ This combination increases the risk of “fixes that regress safety” as the lo
 
 ### A) `run_loop` is a god function
 
-- File size: `src/erdos/core/loop.py` is ~683 LOC.
-- Function size: `run_loop` is ~399 LOC (`src/erdos/core/loop.py:285-683`) and has ruff complexity suppressions:
+- File size: `src/erdos/core/loop.py` is **683** LOC.
+- Function size: `run_loop` is **399** LOC (`src/erdos/core/loop.py:285-683`) and has ruff complexity suppressions:
   - `# noqa: PLR0911, PLR0912, PLR0915`
 
 This violates the repo’s stated Clean Code expectation (“avoid god files / mixed responsibilities”).
+
+Reproduce:
+- `wc -l src/erdos/core/loop.py`
+- `python3 - <<'PY'\nimport ast, pathlib\np=pathlib.Path('src/erdos/core/loop.py');t=p.read_text();m=ast.parse(t)\nfor n in ast.walk(m):\n  if isinstance(n, ast.FunctionDef) and n.name=='run_loop':\n    print('run_loop LOC:', n.end_lineno-n.lineno+1, 'at', f'{p}:{n.lineno}')\nPY`
 
 ### B) Spec/contract drift for the loop command
 
@@ -43,6 +47,12 @@ Archived spec text and implementation diverge on key user-facing contracts:
   - Implementation: loop statuses are returned as `CLIOutput.ok(...)` (success true) in some terminal cases (e.g., `llm_required`)
 
 Whether the code or the archived spec is SSOT is currently ambiguous to contributors.
+
+Reproduce:
+- Spec CLI synopsis: `rg -n \"^erdos loop\" docs/_archive/specs/spec-012-loop-command.md`
+- Implementation has `run` subcommand: `rg -n \"def run\\(\" src/erdos/commands/loop.py`
+- Spec includes `--yes`, implementation does not: `rg -n -- \"--yes\" docs/_archive/specs/spec-012-loop-command.md && ! rg -n -- \"--yes\" src/erdos/commands/loop.py`
+- Implementation returns `CLIOutput.ok(...)` for non-success statuses: `rg -n \"return CLIOutput\\.ok\" src/erdos/commands/loop.py`
 
 ---
 

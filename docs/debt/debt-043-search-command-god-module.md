@@ -9,7 +9,7 @@
 
 ## Summary
 
-`src/erdos/commands/search.py` has grown into a large module (~791 LOC) with a large Typer callback (`search`, ~204 LOC). It mixes:
+`src/erdos/commands/search.py` has grown into a large module (**791** LOC) with a large Typer callback (`search`, **204** LOC). It mixes:
 
 - CLI parsing/wiring (Typer)
 - Human output formatting (Rich)
@@ -23,10 +23,14 @@ This violates SRP and makes future changes (SPEC-014 embeddings, batch workflows
 
 ## Evidence
 
-- File size: `wc -l src/erdos/commands/search.py` → ~791 lines
+- File size: `wc -l src/erdos/commands/search.py` → **791** lines
 - Long CLI callback:
-  - `src/erdos/commands/search.py:588-791 def search(...)` (~204 LOC)
+  - `src/erdos/commands/search.py:588-791 def search(...)` (**204** LOC)
   - ruff complexity suppressions: `# noqa: PLR0912, PLR0915`
+
+Reproduce:
+- `wc -l src/erdos/commands/search.py`
+- `python3 - <<'PY'\nimport ast, pathlib\np=pathlib.Path('src/erdos/commands/search.py');t=p.read_text();m=ast.parse(t)\nfor n in ast.walk(m):\n  if isinstance(n, ast.FunctionDef) and n.name=='search':\n    print('search LOC:', n.end_lineno-n.lineno+1, 'at', f'{p}:{n.lineno}')\nPY`
 
 ---
 
