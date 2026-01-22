@@ -122,11 +122,16 @@ def _removed_shim_import_violations(
     shim_modules: set[str],
 ) -> list[str]:
     content = py_file.read_text(encoding="utf-8")
-    tree = ast.parse(content, filename=str(py_file))
+    rel_path = py_file.relative_to(project_root)
+    try:
+        tree = ast.parse(content, filename=str(py_file))
+    except SyntaxError as exc:
+        lineno = exc.lineno or 0
+        message = exc.msg or "SyntaxError"
+        return [f"{rel_path}:{lineno}: SYNTAX ERROR: {message}"]
     lines = content.splitlines()
 
     violations: list[str] = []
-    rel_path = py_file.relative_to(project_root)
 
     for node in ast.walk(tree):
         for lineno in _shim_import_violation_lines(

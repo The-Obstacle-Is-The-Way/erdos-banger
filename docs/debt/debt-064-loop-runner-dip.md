@@ -48,7 +48,7 @@ class LLMExecute(Protocol):
     def __call__(self, llm_command: str, prompt: str) -> tuple[str, int]: ...
 ```
 
-2. Update the loop runner entrypoints to accept an injected executor with a default:
+1. Update the loop runner entrypoints to accept an injected executor with a default:
 
 ```python
 def run_loop(..., llm_execute: LLMExecute = execute_llm) -> LoopResult:
@@ -58,7 +58,7 @@ def _run_single_iteration(..., llm_execute: LLMExecute) -> tuple[...]:
     ...
 ```
 
-3. Update tests to pass a fake executor instead of patching module globals:
+1. Update tests to pass a fake executor instead of patching module globals:
    - Replace `@patch("erdos.core.loop.runner.execute_llm")` with `llm_execute=fake_llm`
    - Keep the fake deterministic (no filesystem/network), return `(response_text, exit_code)`
 
