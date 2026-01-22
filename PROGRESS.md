@@ -47,8 +47,8 @@ Work strictly top-to-bottom unless blocked by dependencies.
   Deck: `docs/_archive/debt/debt-043-search-command-god-module.md`
 - [x] **DEBT-045**: Split `SearchIndexProtocol` (ISP/DIP)
   Deck: `docs/_archive/debt/debt-045-searchindexprotocol-interface-segregation.md`
-- [ ] **DEBT-049**: `SearchIndex` monolith (schema + indexing + retrieval + embeddings)
-  Deck: `docs/debt/debt-049-search-index-monolith.md`
+- [x] **DEBT-049**: `SearchIndex` monolith (schema + indexing + retrieval + embeddings)
+  Deck: `docs/_archive/debt/debt-049-search-index-monolith.md`
 - [ ] **DEBT-052**: `erdos ingest` command god module
   Deck: `docs/debt/debt-052-ingest-command-god-module.md`
 - [ ] **DEBT-050**: `core/ingest/fetch.py` SRP split (thin orchestrator + adapters)
@@ -159,3 +159,15 @@ Work strictly top-to-bottom unless blocked by dependencies.
 - Service layer contains: `SearchMode`, `SearchOptions`, `execute_search()`, `search_fts()`, `search_basic()`, `search_semantic()`, `search_hybrid()`, `build_search_index()`, `build_embeddings()`
 - Tests target core service: `test_search_command_helpers.py` imports from `erdos.core.search`
 - `make ci` passes (869 tests, 82.40% coverage)
+
+### 2026-01-22: DEBT-049 Fixed
+- Refactored `SearchIndex` monolith (679 LOC) into focused collaborators in `src/erdos/core/search/`:
+  - `db.py`: DatabaseManager - SQLite connect + schema (41 LOC)
+  - `indexer.py`: Indexer - write path (45 LOC)
+  - `bm25.py`: BM25Search - FTS search + snippets (27 LOC)
+  - `embeddings_store.py`: EmbeddingsStore - embedding storage + semantic search (81 LOC)
+  - `hybrid.py`: HybridSearch - combined BM25+semantic (35 LOC)
+  - `facade.py`: SearchIndex - thin facade (69 LOC)
+- `search_index.py` at core level is now backward-compatible shim (37 LOC)
+- Public API stable: `from erdos.core.search_index import SearchIndex` works
+- `make ci` passes (869 tests, 82.64% coverage)
