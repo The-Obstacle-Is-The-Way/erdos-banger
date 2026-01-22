@@ -24,7 +24,11 @@ from erdos.core.problem_loader import ProblemLoaderError
 
 if TYPE_CHECKING:
     from erdos.core.embeddings import EmbeddingModel
-    from erdos.core.ports import ProblemRepository, SearchIndexProtocol
+    from erdos.core.ports import (
+        ProblemRepository,
+        SearchIndexProtocol,
+        SearchIndexReadPort,
+    )
 
 
 # Lazy imports to avoid circular import with search_index.py
@@ -101,7 +105,7 @@ def _enrich_result(
 def search_fts(
     query: str,
     *,
-    index: SearchIndexProtocol,
+    index: SearchIndexReadPort,
     repo: ProblemRepository | None = None,
     limit: int = 10,
     problem_id: int | None = None,
@@ -112,7 +116,7 @@ def search_fts(
 
     Args:
         query: Search query
-        index: Search index protocol implementation
+        index: Search index read port (only read operations needed)
         repo: Optional problem repository for enrichment
         limit: Maximum results
         problem_id: Optional filter to specific problem
@@ -260,14 +264,14 @@ def search_basic(
 def search_with_fallback(
     options: SearchOptions,
     *,
-    index: SearchIndexProtocol | None,
+    index: SearchIndexReadPort | None,
     repo: ProblemRepository,
 ) -> CLIOutput:
     """Execute FTS search with fallback to basic substring search.
 
     Args:
         options: Search options
-        index: Search index (may be None if unavailable)
+        index: Search index read port (may be None if unavailable)
         repo: Problem repository
 
     Returns:

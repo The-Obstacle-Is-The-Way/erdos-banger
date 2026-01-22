@@ -78,8 +78,12 @@ class ProblemRepository(Protocol):
     def iter_problems(self) -> Iterator[ProblemRecord]: ...
 
 
-class SearchIndexProtocol(Protocol):
-    """Abstract interface for search operations."""
+class SearchIndexReadPort(Protocol):
+    """Port for read-only search operations (ISP: search + stats).
+
+    Use this port when you only need to query the index, not modify it.
+    This is the minimal interface for retrieval operations (RAG, ask, etc.).
+    """
 
     def search(
         self,
@@ -90,17 +94,31 @@ class SearchIndexProtocol(Protocol):
         source_types: list[ChunkSource] | None = None,
     ) -> list[SearchResult]: ...
 
-    def index_problem(self, problem: ProblemRecord) -> None: ...
-
     def problem_count(self) -> int: ...
 
     def chunk_count(self) -> int: ...
 
-    def clear(self) -> None: ...
-
     def get_stats(self) -> dict[str, object]: ...
 
-    # SPEC-014: Embedding methods
+
+class SearchIndexWritePort(Protocol):
+    """Port for index mutation operations (ISP: indexing + clearing).
+
+    Use this port when you need to build or modify the index.
+    """
+
+    def index_problem(self, problem: ProblemRecord) -> None: ...
+
+    def clear(self) -> None: ...
+
+
+class EmbeddingIndexPort(Protocol):
+    """Port for embedding-based search operations (ISP: semantic search).
+
+    Use this port when you need embedding functionality (semantic/hybrid search).
+    Note: build_embeddings() also requires SearchIndexReadPort for chunk iteration.
+    """
+
     def has_embeddings(self) -> bool: ...
 
     def get_embedding_metadata(self) -> tuple[str | None, int | None]: ...
@@ -127,3 +145,19 @@ class SearchIndexProtocol(Protocol):
         alpha: float = 0.5,
         problem_id: int | None = None,
     ) -> list[SemanticSearchResult]: ...
+
+
+class SearchIndexProtocol(
+    SearchIndexReadPort, SearchIndexWritePort, EmbeddingIndexPort, Protocol
+):
+    """Full search index interface (backward-compatible aggregate).
+
+    This protocol combines all search capabilities for call sites that need
+    the complete interface. Prefer using the focused ports (SearchIndexReadPort,
+    SearchIndexWritePort, EmbeddingIndexPort) when possible.
+
+    Note: Protocol inheritance in Python typing creates a union of all methods.
+    SearchIndex implements this full protocol.
+    """
+
+    ...

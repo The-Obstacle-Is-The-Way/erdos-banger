@@ -45,8 +45,8 @@ Work strictly top-to-bottom unless blocked by dependencies.
   Deck: `docs/_archive/debt/debt-042-loop-command-contract-and-god-module.md`
 - [x] **DEBT-043**: `erdos search` command god module
   Deck: `docs/_archive/debt/debt-043-search-command-god-module.md`
-- [ ] **DEBT-045**: Split `SearchIndexProtocol` (ISP/DIP)
-  Deck: `docs/debt/debt-045-searchindexprotocol-interface-segregation.md`
+- [x] **DEBT-045**: Split `SearchIndexProtocol` (ISP/DIP)
+  Deck: `docs/_archive/debt/debt-045-searchindexprotocol-interface-segregation.md`
 - [ ] **DEBT-049**: `SearchIndex` monolith (schema + indexing + retrieval + embeddings)
   Deck: `docs/debt/debt-049-search-index-monolith.md`
 - [ ] **DEBT-052**: `erdos ingest` command god module
@@ -136,6 +136,19 @@ Work strictly top-to-bottom unless blocked by dependencies.
 - Added inline exemptions for helper functions (`_run_single_iteration`, `execute_loop`, `run`)
 - Tests cover loop contract semantics: `llm_required`, `no_apply`, success case
 - `make ci` passes (870 tests, 82.25% coverage)
+
+### 2026-01-22: DEBT-045 Fixed
+- Split `SearchIndexProtocol` into three focused ports (Interface Segregation Principle):
+  - `SearchIndexReadPort`: `search()`, `problem_count()`, `chunk_count()`, `get_stats()` - for read-only operations
+  - `SearchIndexWritePort`: `index_problem()`, `clear()` - for index mutation
+  - `EmbeddingIndexPort`: embedding metadata/build and semantic/hybrid search
+- `SearchIndexProtocol` remains as backward-compatible aggregate inheriting all three ports
+- Updated call sites to use narrower ports where appropriate:
+  - `ask/retrieval.py`: now uses `SearchIndexReadPort`
+  - `search/service.py::search_fts()`, `search_with_fallback()`: now use `SearchIndexReadPort`
+  - `mcp/server.py::mcp_search_index()`: now uses `SearchIndexReadPort`
+- Full protocol kept for call sites needing combined operations (e.g., `execute_search()`, `ask_question()`)
+- `make ci` passes (869 tests, 82.41% coverage)
 
 ### 2026-01-22: DEBT-043 Fixed
 - Verified refactoring of `erdos search` command from god module (791 LOC) to thin adapter pattern

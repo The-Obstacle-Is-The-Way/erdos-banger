@@ -33,7 +33,11 @@ from erdos.core.search_index import SearchIndex
 
 
 if TYPE_CHECKING:
-    from erdos.core.ports import ProblemRepository, SearchIndexProtocol
+    from erdos.core.ports import (
+        ProblemRepository,
+        SearchIndexProtocol,
+        SearchIndexReadPort,
+    )
 
 
 # Initialize the FastMCP server
@@ -150,7 +154,7 @@ def mcp_search_index(
     limit: int = 10,
     problem_id: int | None = None,
     mode: str = "bm25",
-    index: SearchIndexProtocol,
+    index: SearchIndexReadPort,
     repo: ProblemRepository,
 ) -> dict[str, Any]:
     """Search the problem/literature index.
@@ -160,7 +164,7 @@ def mcp_search_index(
         limit: Maximum results to return
         problem_id: Filter to specific problem
         mode: Search mode (bm25, semantic, hybrid) - only bm25 supported via MCP
-        index: Search index
+        index: Search index read port (only read operations needed)
         repo: Problem repository
 
     Returns:

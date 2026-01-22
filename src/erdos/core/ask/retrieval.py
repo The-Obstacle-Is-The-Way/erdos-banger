@@ -4,12 +4,12 @@ import re
 
 from erdos.core.constants import PREVIEW_LENGTH
 from erdos.core.models import ChunkSource, ProblemRecord
-from erdos.core.ports import SearchIndexProtocol
+from erdos.core.ports import SearchIndexReadPort
 from erdos.core.search_index import SearchResult
 
 
 def perform_retrieval(
-    index: SearchIndexProtocol,
+    index: SearchIndexReadPort,
     problem: ProblemRecord,
     question: str,
     limit: int,
@@ -102,7 +102,7 @@ def fallback_sources(problem: ProblemRecord, *, limit: int) -> list[SearchResult
 
 def retrieve_sources(
     *,
-    index: SearchIndexProtocol,
+    index: SearchIndexReadPort,
     problem: ProblemRecord,
     question: str,
     limit: int,
