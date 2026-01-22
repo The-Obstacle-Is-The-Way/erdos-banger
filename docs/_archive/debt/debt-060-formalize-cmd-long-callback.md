@@ -4,7 +4,7 @@
 **Priority:** P4
 **Found:** 2026-01-22
 **Fixed:** 2026-01-22
-**Fixed In:** (see commit)
+**Fixed In:** 7b871e5
 **Found By:** audit_code_health.py guardrail
 
 ---

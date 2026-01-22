@@ -82,7 +82,7 @@ All debt below has been resolved and archived to `docs/_archive/debt/`.
 | DEBT-055 | Scattered env-based configuration (centralized AppConfig) | P2 | Fixed | b3b5730 |
 | DEBT-044 | `core/` bounded-context refactor (reduce sprawl) | P2 | Fixed | b3b5730 (+ prior) |
 | DEBT-061 | Remove core backward-compatibility shims | P2 | Fixed | 4466340 |
-| DEBT-060 | Formalize command long Typer callback | P4 | Fixed | (see commit) |
+| DEBT-060 | Formalize command long Typer callback | P4 | Fixed | 7b871e5 |
 
 **Next Debt ID:** DEBT-062
 
