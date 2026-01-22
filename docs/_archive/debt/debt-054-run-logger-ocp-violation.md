@@ -1,9 +1,10 @@
 # DEBT-054: `RunLogEntry._extract_result_for_command` Violates OCP (Central `if command == ...` Chain)
 
-**Status:** Open
+**Status:** Fixed
 **Priority:** P3
 **Found:** 2026-01-22
 **Found By:** OCP / maintainability audit
+**Fixed In:** b1637c6
 
 ---
 
@@ -53,12 +54,12 @@ This keeps `run_logger.py` stable while allowing new commands without touching t
 
 ## Acceptance Criteria
 
-1. [ ] No central `if command == ...` chain remains in `run_logger` (or it becomes a small fallback).
-2. [ ] Adding a new command summary does not require editing `run_logger.py`.
-3. [ ] Tests cover at least:
+1. [x] No central `if command == ...` chain remains in `run_logger` (or it becomes a small fallback).
+2. [x] Adding a new command summary does not require editing `run_logger.py`.
+3. [x] Tests cover at least:
    - default summarizer behavior
    - one registered summarizer end-to-end
-4. [ ] `make ci` passes.
+4. [x] `make ci` passes.
 
 ---
 

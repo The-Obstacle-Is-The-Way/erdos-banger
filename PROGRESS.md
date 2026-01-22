@@ -51,10 +51,10 @@ Work strictly top-to-bottom unless blocked by dependencies.
   Deck: `docs/_archive/debt/debt-049-search-index-monolith.md`
 - [x] **DEBT-052**: `erdos ingest` command god module
   Deck: `docs/_archive/debt/debt-052-ingest-command-god-module.md`
-- [ ] **DEBT-050**: `core/ingest/fetch.py` SRP split (thin orchestrator + adapters)
-  Deck: `docs/debt/debt-050-ingest-fetch-srp.md`
-- [ ] **DEBT-054**: Run logger OCP violation (central `if command == ...` chain)
-  Deck: `docs/debt/debt-054-run-logger-ocp-violation.md`
+- [x] **DEBT-050**: `core/ingest/fetch.py` SRP split (thin orchestrator + adapters)
+  Deck: `docs/_archive/debt/debt-050-ingest-fetch-srp.md`
+- [x] **DEBT-054**: Run logger OCP violation (central `if command == ...` chain)
+  Deck: `docs/_archive/debt/debt-054-run-logger-ocp-violation.md`
 - [ ] **DEBT-053**: `core/formal_conjectures.py` monolith
   Deck: `docs/debt/debt-053-formal-conjectures-module-monolith.md`
 - [ ] **DEBT-051**: `core/batch.py` SRP split
@@ -181,3 +181,26 @@ Work strictly top-to-bottom unless blocked by dependencies.
   - Batch ingest filters + resume validation (`TestIsBatchMode`, `TestRunBatchIngestion`)
   - `--no-network`/`--no-download` policy combinations (`TestNoNetworkNowDownloadPolicyCombinations`)
 - `make ci` passes (891 tests, 82.81% coverage)
+
+### 2026-01-22: DEBT-050 Fixed
+- Extracted `download_and_extract_arxiv()` into `src/erdos/core/ingest/arxiv_download.py` (112 LOC)
+  - Isolated download + cache + extraction logic, unit-testable with in-memory tarballs
+- Created `ArxivProvider` in `src/erdos/core/providers/arxiv.py` for metadata lookups
+- Refactored `fetch.py` (646→458 LOC) to use MetadataProvider abstraction:
+  - Removed direct imports of `arxiv_client`, `crossref_client`, `openalex_client`
+  - Added `_build_provider_from_source()` to convert MetadataSource enum to MetadataProvider
+  - All metadata resolution now goes through provider abstraction
+- Backward compatibility preserved via re-exports
+- `make ci` passes (891 tests, 83.56% coverage)
+
+### 2026-01-22: DEBT-054 Fixed
+- Extracted central `if command == ...` chain from `run_logger.py` into registry-based summarizers
+- Created `src/erdos/core/run_logger_summaries.py` with:
+  - `SUMMARIZERS` registry mapping command names to summarizer functions
+  - `get_summarizer()` to retrieve registered or default summarizer
+  - `register_summarizer()` to allow external registration (OCP-compliant)
+  - Individual summarizer functions for each command (show, search, lean check, etc.)
+- Refactored `RunLogEntry._extract_result_for_command()` to delegate to registry
+- Added 29 tests covering all summarizers, default behavior, and end-to-end integration
+- `run_logger.py` reduced from 485 LOC to 453 LOC (32 LOC extracted)
+- `make ci` passes (920 tests, 83.56% coverage)

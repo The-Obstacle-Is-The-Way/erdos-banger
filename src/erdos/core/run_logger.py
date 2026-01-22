@@ -18,6 +18,7 @@ from typing import TYPE_CHECKING, Any
 from pydantic import ConfigDict, Field
 
 from erdos.core.models.base import ErdosBaseModel, utc_now
+from erdos.core.run_logger_summaries import get_summarizer
 
 
 if TYPE_CHECKING:
@@ -238,47 +239,16 @@ class RunLogEntry(ErdosBaseModel):
         return RunLogEntry._extract_result_for_command(cli_output.command, data)
 
     @staticmethod
-    def _extract_result_for_command(  # noqa: PLR0911
+    def _extract_result_for_command(
         command: str, data: dict[str, Any]
     ) -> dict[str, Any]:
-        """Extract result based on command type."""
-        if command == "erdos show":
-            return {
-                "status": data.get("status"),
-                "has_prize": bool(data.get("prize", 0)),
-            }
-        if command == "erdos search":
-            results = data.get("results", [])
-            return {
-                "hit_count": len(results),
-                "top_problem_ids": [
-                    r.get("id") for r in results[:3] if isinstance(r, dict)
-                ],
-            }
-        if command == "erdos lean check":
-            errors = data.get("errors", [])
-            return {
-                "success": data.get("success", True),
-                "error_count": len(errors) if isinstance(errors, list) else 0,
-                "has_sorry": data.get("has_sorry", False),
-            }
-        if command == "erdos lean formalize":
-            return {"file_created": data.get("file_path")}
-        if command == "erdos ingest":
-            return {
-                "references_processed": data.get("references_processed", 0),
-                "manifest_path": data.get("manifest_path"),
-            }
-        if command == "erdos ask":
-            sources = data.get("sources", [])
-            answer = data.get("answer", "")
-            return {
-                "sources_retrieved": len(sources) if isinstance(sources, list) else 0,
-                "llm_enabled": data.get("llm_enabled", False),
-                "answer_length": len(answer) if isinstance(answer, str) else 0,
-            }
-        # Generic: just indicate success
-        return {"success": True}
+        """Extract result based on command type.
+
+        Delegates to the summarizer registry for command-specific extraction.
+        See run_logger_summaries.py for adding new command summarizers.
+        """
+        summarizer = get_summarizer(command)
+        return summarizer(data)
 
     @staticmethod
     def _extract_error(cli_output: CLIOutput) -> dict[str, Any] | None:
