@@ -6,6 +6,7 @@ This directory contains bug reports, adversarial code reviews, and quality audit
 
 | Date | Type | Summary | Status |
 |------|------|---------|--------|
+| 2026-01-22 | Adversarial Review | Post v2.1 architecture audit (loop/search SRP hotspots) | Archived |
 | 2026-01-21 | Adversarial Review | Full codebase audit for bugs, debt, anti-patterns | Archived |
 | 2026-01-17 | Adversarial Review | Full codebase audit covering specs 003-006 | Archived |
 
@@ -55,6 +56,7 @@ All bugs below have been fixed and archived to `docs/_archive/bugs/`.
 - `docs/_archive/bugs/bug-016-manifest-corruption-silent.md`
 - `docs/_archive/bugs/adversarial-review-2026-01-17.md`
 - `docs/_archive/bugs/adversarial-review-2026-01-21.md`
+- `docs/_archive/bugs/adversarial-review-2026-01-22.md`
 - `docs/_archive/bugs/bug-002-search-build-index-json-stdout.md`
 - `docs/_archive/bugs/bug-003-search-fts-loader-missing.md`
 - `docs/_archive/bugs/bug-004-iter-problems-duplicate-ids.md`
@@ -79,6 +81,9 @@ All bugs below have been fixed and archived to `docs/_archive/bugs/`.
   - 2 confirmed bugs (1 P1, 1 P2) - 3 false positives invalidated
   - 7 technical debt items (4 P2, 3 P3)
   - Focus: silent failures, observability gaps, API robustness
+- [Adversarial Review 2026-01-22](../_archive/bugs/adversarial-review-2026-01-22.md)
+  - No new correctness bugs found under `make ci`
+  - 2 active debt items filed (loop + search SRP pressure)
 - [Adversarial Review 2026-01-17](../_archive/bugs/adversarial-review-2026-01-17.md)
   - 3 spec drift issues
   - 9 missing test scenarios

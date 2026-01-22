@@ -16,7 +16,8 @@ This directory contains technical-debt writeups: spec drift, missing fixtures, i
 
 | ID | Title | Priority | Status | Deck |
 |----|-------|----------|--------|------|
-| (none) | | | | |
+| DEBT-042 | Loop contract drift + `core/loop.py` god function | P1 | Open | `debt-042-loop-command-contract-and-god-module.md` |
+| DEBT-043 | `erdos search` command god module (SRP pressure) | P2 | Open | `debt-043-search-command-god-module.md` |
 
 ## Archived Debt
 
@@ -66,7 +67,7 @@ All debt below has been resolved and archived to `docs/_archive/debt/`.
 | DEBT-036 | Marker device selection not exposed | P3 | Fixed | 7005b65 |
 | DEBT-038 | MetadataProvider abstraction missing | P2 | Resolved | SPEC-022 |
 
-**Next Debt ID:** DEBT-042
+**Next Debt ID:** DEBT-044
 
 ### Archived Debt Decks
 
