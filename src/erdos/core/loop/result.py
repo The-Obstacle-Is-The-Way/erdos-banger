@@ -80,8 +80,10 @@ class LoopResult:
             last_check_dict = {
                 "success": self.last_check.success,
                 "error_count": len(self.last_check.errors),
-                "has_sorry": False,  # Populated from file content
-                "has_admit": False,
+                # has_sorry/has_admit are None (unknown) - LeanCheckResult doesn't track these.
+                # Callers should compute from file content if needed.
+                "has_sorry": None,
+                "has_admit": None,
             }
 
         return {

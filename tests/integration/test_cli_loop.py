@@ -137,6 +137,7 @@ class TestLoopJSONContract:
             ],
         )
 
+        assert result.exit_code != 0
         output = json.loads(result.stdout)
         # Per spec-012: LLM_REQUIRED is a failure (success=false)
         assert output["success"] is False

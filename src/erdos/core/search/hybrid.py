@@ -68,6 +68,10 @@ class HybridSearch:
         """
         from erdos.core.embeddings import cosine_similarity  # noqa: PLC0415
 
+        # Validate alpha bounds
+        if not 0.0 <= alpha <= 1.0:
+            raise ValueError(f"alpha must be between 0 and 1, got {alpha}")
+
         self._embeddings.validate_embedder(embedder)
 
         # Get BM25 candidates (expanded set for re-ranking)

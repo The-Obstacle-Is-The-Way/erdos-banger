@@ -79,8 +79,9 @@ class LocalFormalizationInfo:
         if not file_path.exists():
             return cls(path=file_path, exists=False)
 
-        content = file_path.read_text(encoding="utf-8")
+        # Read bytes once, decode for content
         content_bytes = file_path.read_bytes()
+        content = content_bytes.decode("utf-8")
         stat = file_path.stat()
 
         return cls(

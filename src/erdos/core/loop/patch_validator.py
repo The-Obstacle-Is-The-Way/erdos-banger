@@ -277,7 +277,9 @@ def validate_patch(  # noqa: PLR0911
         return PatchResult.reject(f"Patch exceeds {config.max_patch_bytes} bytes")
 
     # 4. Size validation (lines)
-    if replace_text.count("\n") > config.max_patch_lines:
+    # Use splitlines() to count actual lines (count("\n") gives separators, not lines)
+    line_count = len(replace_text.splitlines()) if replace_text else 0
+    if line_count > config.max_patch_lines:
         return PatchResult.reject(f"Patch exceeds {config.max_patch_lines} lines")
 
     # 5. Path validation (security)

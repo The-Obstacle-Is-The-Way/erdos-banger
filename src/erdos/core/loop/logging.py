@@ -9,13 +9,14 @@ import hashlib
 import json
 import secrets
 from datetime import UTC, datetime
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, TextIO
 
 from erdos.core.run_logger import sanitize_secrets
 
 
 if TYPE_CHECKING:
     from pathlib import Path
+    from types import TracebackType
 
 
 def generate_run_id() -> str:
@@ -28,8 +29,7 @@ def generate_run_id() -> str:
 
 def file_hash(path: Path) -> str:
     """Compute SHA-256 hash of file content for logging/cache purposes."""
-    content = path.read_text(encoding="utf-8")
-    return hashlib.sha256(content.encode()).hexdigest()
+    return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
 class LoopLogger:
@@ -37,6 +37,10 @@ class LoopLogger:
 
     Logs events to a JSONL file with automatic secret sanitization.
     Schema version 1 per spec-012-loop-command.md.
+
+    Supports context manager protocol for safe resource management:
+        with LoopLogger(log_path) as logger:
+            logger.log_event(...)
     """
 
     def __init__(self, log_path: Path) -> None:
@@ -47,7 +51,20 @@ class LoopLogger:
         """
         self.log_path = log_path
         log_path.parent.mkdir(parents=True, exist_ok=True)
-        self._file = log_path.open("a", encoding="utf-8")
+        self._file: TextIO = log_path.open("a", encoding="utf-8")
+
+    def __enter__(self) -> LoopLogger:
+        """Enter context manager."""
+        return self
+
+    def __exit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: TracebackType | None,
+    ) -> None:
+        """Exit context manager, ensuring file is closed."""
+        self.close()
 
     def log_event(self, event: str, iteration: int, data: dict[str, Any]) -> None:
         """Log an event to the run log.
@@ -71,4 +88,5 @@ class LoopLogger:
 
     def close(self) -> None:
         """Close the log file."""
-        self._file.close()
+        if not self._file.closed:
+            self._file.close()

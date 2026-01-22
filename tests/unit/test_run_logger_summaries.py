@@ -222,15 +222,15 @@ class TestRegisterSummarizer:
             return {"custom_field": data.get("value", "default")}
 
         register_summarizer("erdos custom", custom_summarizer)
-
-        # Verify it's registered
-        summarizer = get_summarizer("erdos custom")
-        assert summarizer is custom_summarizer
-        result = summarizer({"value": "test"})
-        assert result == {"custom_field": "test"}
-
-        # Cleanup: remove the test registration
-        del SUMMARIZERS["erdos custom"]
+        try:
+            # Verify it's registered
+            summarizer = get_summarizer("erdos custom")
+            assert summarizer is custom_summarizer
+            result = summarizer({"value": "test"})
+            assert result == {"custom_field": "test"}
+        finally:
+            # Cleanup: remove the test registration even if assertions fail
+            SUMMARIZERS.pop("erdos custom", None)
 
     def test_overwrites_existing_summarizer(self) -> None:
         """Should allow overwriting existing summarizers."""
@@ -240,10 +240,11 @@ class TestRegisterSummarizer:
             return {"replaced": True}
 
         register_summarizer("erdos show", replacement)
-        assert get_summarizer("erdos show") is replacement
-
-        # Restore original
-        register_summarizer("erdos show", original)
+        try:
+            assert get_summarizer("erdos show") is replacement
+        finally:
+            # Restore original even if assertions fail
+            register_summarizer("erdos show", original)
         assert get_summarizer("erdos show") is original
 
 

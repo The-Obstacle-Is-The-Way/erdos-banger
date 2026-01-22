@@ -89,7 +89,7 @@ class FunctionViolation:
 
 
 def count_lines(path: Path) -> int:
-    """Count non-empty, non-comment lines in a Python file."""
+    """Count total lines in a Python file."""
     try:
         content = path.read_text()
         return len(content.splitlines())

@@ -105,9 +105,10 @@ def filter_problem_ids(
         results.append(problem.id)
 
     # Apply skip/limit after filtering
-    if filters.skip:
+    # Use explicit None check so skip=0 and limit=0 work correctly
+    if filters.skip is not None:
         results = results[filters.skip :]
-    if filters.limit:
+    if filters.limit is not None:
         results = results[: filters.limit]
 
     return results
@@ -148,6 +149,9 @@ class BatchState:
 
     def mark_failed(self, problem_id: int) -> None:
         """Mark a problem as failed."""
+        # Remove from completed if present (on retry failure after previous success)
+        if problem_id in self.completed:
+            self.completed.remove(problem_id)
         if problem_id not in self.failed:
             self.failed.append(problem_id)
         self.last_updated = datetime.now(tz=UTC)

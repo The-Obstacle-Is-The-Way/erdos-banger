@@ -9,6 +9,8 @@ from __future__ import annotations
 import logging
 from typing import TYPE_CHECKING
 
+import defusedxml.ElementTree as ET
+
 from erdos.core.arxiv_client import fetch_arxiv_atom, parse_arxiv_atom
 
 
@@ -45,10 +47,21 @@ class ArxivProvider:
         return None
 
     def get_by_arxiv(self, arxiv_id: str) -> ReferenceRecord | None:
-        """Fetch metadata by arXiv ID via arXiv API."""
+        """Fetch metadata by arXiv ID via arXiv API.
+
+        Raises:
+            requests.RequestException: On network errors.
+            ValueError: On parsing errors (converted from ParseError).
+        """
         logger.debug("arXiv lookup: %s", arxiv_id)
         atom_xml = fetch_arxiv_atom(arxiv_id, timeout=self.timeout)
-        return parse_arxiv_atom(atom_xml)
+        try:
+            return parse_arxiv_atom(atom_xml)
+        except ET.ParseError as e:
+            # Convert ParseError to ValueError per MetadataProvider contract
+            raise ValueError(
+                f"Failed to parse arXiv response for {arxiv_id}: {e}"
+            ) from e
 
     def search(
         self,

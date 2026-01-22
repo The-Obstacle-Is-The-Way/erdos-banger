@@ -16,7 +16,7 @@ import tarfile
 import time
 from datetime import UTC, datetime
 from enum import Enum
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, assert_never
 
 import defusedxml.ElementTree as ET
 import requests
@@ -89,8 +89,8 @@ def _build_provider_from_source(
         return ArxivProvider(timeout=timeout)
     if source == MetadataSource.CROSSREF:
         return CrossrefProvider(mailto=mailto, timeout=timeout)
-    # Unreachable but helps type checker
-    return CrossrefProvider(mailto=mailto, timeout=timeout)
+    # Exhaustive match - type checker will catch missing enum cases
+    assert_never(source)
 
 
 def _find_existing_manifest_entry(

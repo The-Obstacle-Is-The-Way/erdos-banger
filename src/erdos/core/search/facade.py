@@ -87,7 +87,9 @@ class SearchIndex:
         # 2. Environment variable (legacy fallback)
         env_path = os.environ.get("ERDOS_INDEX_PATH")
         if env_path:
-            return cls(Path(env_path))
+            env_path_obj = Path(env_path)
+            env_path_obj.parent.mkdir(parents=True, exist_ok=True)
+            return cls(env_path_obj)
 
         # 3. Default path
         default_path = Path("index/erdos.sqlite")

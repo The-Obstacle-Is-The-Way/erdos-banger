@@ -55,8 +55,10 @@ def fetch_upstream_lean_file(
     # Try cache first
     if cache_path.exists():
         logger.debug("Using cached file: %s", cache_path)
-        content = cache_path.read_text(encoding="utf-8")
-        sha256 = hashlib.sha256(cache_path.read_bytes()).hexdigest()
+        # Read bytes once, decode for content and hash for sha256
+        content_bytes = cache_path.read_bytes()
+        content = content_bytes.decode("utf-8")
+        sha256 = hashlib.sha256(content_bytes).hexdigest()
         return FetchResult(
             content=content,
             sha256=sha256,

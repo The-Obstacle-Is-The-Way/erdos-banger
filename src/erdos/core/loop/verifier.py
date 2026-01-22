@@ -10,6 +10,11 @@ from dataclasses import dataclass
 from enum import Enum, auto
 
 
+# Pre-compiled patterns for performance (these functions may be called repeatedly)
+_SORRY_PATTERN = re.compile(r"\bsorry\b")
+_ADMIT_PATTERN = re.compile(r"\badmit\b")
+
+
 class LoopExitCondition(Enum):
     """Exit conditions for the loop."""
 
@@ -32,8 +37,7 @@ def count_sorries(text: str) -> int:
     Returns:
         Number of sorry occurrences
     """
-    pattern = re.compile(r"\bsorry\b")
-    return len(pattern.findall(text))
+    return len(_SORRY_PATTERN.findall(text))
 
 
 def count_admits(text: str) -> int:
@@ -47,8 +51,7 @@ def count_admits(text: str) -> int:
     Returns:
         Number of admit occurrences
     """
-    pattern = re.compile(r"\badmit\b")
-    return len(pattern.findall(text))
+    return len(_ADMIT_PATTERN.findall(text))
 
 
 @dataclass
