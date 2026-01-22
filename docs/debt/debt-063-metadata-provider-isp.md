@@ -40,6 +40,18 @@ class MetadataProvider(Protocol):
 
 ---
 
+## Impacted Files (SSOT)
+
+- `src/erdos/core/ports.py` (protocol definitions)
+- `src/erdos/core/providers/arxiv.py` (currently defines unsupported `get_by_doi()` and `search()`)
+- `src/erdos/core/providers/crossref.py` (currently defines unsupported `get_by_arxiv()` and `search()`)
+- `src/erdos/core/providers/openalex.py` (supports all three)
+- `src/erdos/core/providers/fallback.py` (currently assumes a single “do everything” provider interface)
+- `src/erdos/core/context.py::build_metadata_provider()` (creates the default chain)
+- `src/erdos/core/ingest/fetch.py::_build_provider_from_source()` (builds providers from `MetadataSource`)
+
+---
+
 ## Recommended Fix
 
 Split the fat protocol into focused protocols **and update the provider/fallback wiring so unsupported methods disappear**.
@@ -89,9 +101,10 @@ Concrete implementation plan:
 2. [ ] `src/erdos/core/providers/arxiv.py` no longer defines `get_by_doi()` or `search()`
 3. [ ] `src/erdos/core/providers/crossref.py` no longer defines `get_by_arxiv()` or `search()`
 4. [ ] Fallback composition supports all three operations via dedicated chains (DOI/arXiv/search)
-5. [ ] Call sites depend on the minimal required protocol (mypy enforces this)
-6. [ ] All existing tests pass
-7. [ ] `make ci` passes
+5. [ ] `src/erdos/core/ingest/fetch.py` depends only on the minimal lookup protocols it needs (DOI/arXiv), not the full provider
+6. [ ] Call sites depend on the minimal required protocol (mypy enforces this)
+7. [ ] All existing tests pass
+8. [ ] `make ci` passes
 
 ---
 

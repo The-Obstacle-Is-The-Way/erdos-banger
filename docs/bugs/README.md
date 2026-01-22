@@ -65,6 +65,7 @@ All bugs below have been fixed and archived to `docs/_archive/bugs/`.
 - `docs/_archive/bugs/bug-006-ruff-lints-submodule.md`
 - `docs/_archive/bugs/bug-018-openalex-client-broken.md`
 - `docs/_archive/bugs/bug-019-convert-format-no-op.md`
+- `docs/_archive/bugs/bug-020-openalex-get-by-arxiv-returns-none.md`
 
 ## Bug Priority Definitions
 

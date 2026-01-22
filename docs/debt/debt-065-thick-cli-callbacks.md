@@ -36,6 +36,15 @@ src/erdos/commands/search.py:198 search(): 139 LOC (threshold: 120)    [EXEMPT]
 - `commands/search.py::search()` and `commands/ingest.py::ingest()` are long largely due to **Typer option declarations + docstrings**; their bodies already mostly delegate to core services.
 - `commands/loop.py::execute_loop()` is **application orchestration** (Lean project init, skeleton generation, running the loop, mapping statuses). This is the strongest SRP violation in the command layer.
 
+**Guardrail note (SSOT):**
+
+`commands/loop.py::execute_loop()` is currently exempted from the long-function guardrail via an inline docstring marker:
+
+- `src/erdos/commands/loop.py` → `execute_loop()` contains `# exempt: DEBT-042`
+- Problem: **DEBT-042 is archived**; the exemption pointer is stale.
+
+This deck’s work should remove the need for that exemption entirely (preferred). If an intermediate step is needed, temporarily update the exemption marker to `DEBT-065`.
+
 ---
 
 ## Scope (This Deck)
