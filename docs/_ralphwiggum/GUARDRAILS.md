@@ -37,7 +37,7 @@ This document is a **living record** of guardrails, failure patterns, and “got
 
 - Symptom: Ralph hits "branches have diverged" and attempts `git rebase` or `git pull --rebase`, causing merge conflicts that stall the loop.
 - Common cause: Multiple commits pushed in quick succession, or a race condition with the remote.
-- Mitigation: **NEVER use `git rebase` or `git pull`**. If `git push` fails due to divergence, use `git push --force-with-lease` (safe force push). The Ralph branch is autonomous - divergence means something unexpected happened, and force-push is the correct recovery.
+- Mitigation: **On the Ralph branch, NEVER use `git rebase` or `git pull`**. If `git push` fails due to divergence, use `git push --force-with-lease` (safe force push). The Ralph branch is autonomous - divergence means something unexpected happened, and force-push is the correct recovery.
 
 ### FP-004: Secrets accidentally end up in tracked logs
 

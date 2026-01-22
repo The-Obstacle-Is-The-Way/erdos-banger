@@ -65,7 +65,7 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 ```bash
 # Start from dev
 git checkout dev
-git pull origin dev
+git pull --ff-only origin dev  # Human pre-flight on dev (not on the Ralph branch)
 
 # Create Ralph branch
 git checkout -b ralph-wiggum-<sprint>
@@ -255,7 +255,7 @@ git push
 git push --force-with-lease
 ```
 
-This is safe because the Ralph branch is autonomous - you are the only committer. **NEVER use `git rebase` or `git pull`** - these cause merge conflicts that derail the loop.
+This is safe because the Ralph branch is autonomous - you are the only committer. **On the Ralph branch during autonomous execution, NEVER use `git rebase` or `git pull`** - these cause merge conflicts that derail the loop.
 
 If pushing is blocked (auth/CI outage), stop the loop and request human intervention.
 
@@ -523,7 +523,7 @@ For a step-by-step pre-flight, see `docs/_ralphwiggum/LAUNCH_CHECKLIST.md`.
 
 ```bash
 # 1. Create sandbox branch
-git checkout dev && git pull
+git checkout dev && git pull --ff-only origin dev
 git checkout -b ralph-wiggum-<sprint>
 
 # 2. Ensure PROGRESS.md and PROMPT.md exist in root
