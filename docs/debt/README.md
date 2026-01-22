@@ -18,6 +18,21 @@ This directory contains technical-debt writeups: spec drift, missing fixtures, i
 |----|-------|----------|--------|------|
 | DEBT-042 | Loop contract drift + `core/loop.py` god function | P1 | Open | `debt-042-loop-command-contract-and-god-module.md` |
 | DEBT-043 | `erdos search` command god module (SRP pressure) | P2 | Open | `debt-043-search-command-god-module.md` |
+| DEBT-044 | `core/` bounded-context refactor (reduce sprawl) | P2 | Open | `debt-044-core-bounded-context-refactor.md` |
+| DEBT-045 | Split `SearchIndexProtocol` (ISP/DIP) | P2 | Open | `debt-045-searchindexprotocol-interface-segregation.md` |
+| DEBT-046 | CLIOutput `success` vs exit code ambiguity | P2 | Open | `debt-046-clioutput-success-vs-exitcode.md` |
+| DEBT-047 | Loop logging sanitization/unification | P3 | Open | `debt-047-loop-logging-sanitization-and-unification.md` |
+| DEBT-048 | MCP server module size + CI coverage gap | P3 | Open | `debt-048-mcp-server-god-module-and-ci-coverage.md` |
+| DEBT-049 | SearchIndex monolith (SRP extraction) | P2 | Open | `debt-049-search-index-monolith.md` |
+| DEBT-050 | Ingest fetch SRP split | P2 | Open | `debt-050-ingest-fetch-srp.md` |
+| DEBT-051 | Batch module SRP split | P3 | Open | `debt-051-batch-module-srp.md` |
+| DEBT-052 | `erdos ingest` command god module | P2 | Open | `debt-052-ingest-command-god-module.md` |
+| DEBT-053 | Formal conjectures module monolith | P3 | Open | `debt-053-formal-conjectures-module-monolith.md` |
+| DEBT-054 | Run logger OCP violation (central command switch) | P3 | Open | `debt-054-run-logger-ocp-violation.md` |
+| DEBT-055 | Scattered env-based configuration | P2 | Open | `debt-055-configuration-scattered-env-deps.md` |
+| DEBT-056 | FallbackProvider broad exception catches | P3 | Open | `debt-056-fallback-provider-broad-exceptions.md` |
+| DEBT-057 | Guardrails against god-file regressions | P3 | Open | `debt-057-guardrails-against-god-files.md` |
+| DEBT-058 | MD5 `# noqa: S324` in loop module | P3 | Open | `debt-058-md5-noqa-in-loop.md` |
 
 ## Archived Debt
 
@@ -67,7 +82,7 @@ All debt below has been resolved and archived to `docs/_archive/debt/`.
 | DEBT-036 | Marker device selection not exposed | P3 | Fixed | 7005b65 |
 | DEBT-038 | MetadataProvider abstraction missing | P2 | Resolved | SPEC-022 |
 
-**Next Debt ID:** DEBT-044
+**Next Debt ID:** DEBT-059
 
 ### Archived Debt Decks
 
