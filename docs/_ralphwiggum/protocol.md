@@ -181,11 +181,38 @@ Or use the Makefile:
 make ci  # Runs format-check, lint, typecheck, cov
 ```
 
+### Final Validation (Run Before Declaring Sprint Complete)
+
+`make ci` intentionally skips `requires_network` tests to keep CI deterministic.
+
+Before declaring an overnight sprint “done” (i.e., when `PROGRESS.md` has no unchecked items), run the full suite at least once:
+
+```bash
+make test-all
+```
+
+If any tests fail:
+- file a bug deck in `docs/bugs/`
+- add a new unchecked item to `PROGRESS.md`
+- do **not** declare the sprint complete
+
 ### Test Markers
 
 - `requires_lean` - Skip if Lean not installed
 - `requires_network` - Skip for offline tests
 - Default: `-m "not requires_lean and not requires_network"`
+
+#### Optional Extras (MCP)
+
+Some tests are skipped unless optional dependencies are installed. Example:
+- MCP tests will show as “SKIPPED: mcp not installed” unless you install the `mcp` extra.
+
+To run MCP tests locally:
+
+```bash
+uv sync --extra mcp
+uv run pytest tests/integration/test_mcp_server.py tests/unit/test_mcp_tools.py
+```
 
 ### Atomic Commit Format
 

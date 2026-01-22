@@ -45,10 +45,12 @@ make sync-frozen
 make lock-check
 make ci
 make smoke
+make test-all  # Full suite (includes requires_network; may hit real APIs)
 ```
 
 - [ ] `make ci` passes
 - [ ] `make smoke` passes
+- [ ] `make test-all` passes (recommended before/after a long sprint; may require network)
 
 ---
 

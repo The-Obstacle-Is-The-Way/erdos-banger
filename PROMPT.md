@@ -37,6 +37,10 @@ Then read the specific debt deck for the current task.
 6. Complete that ONE item fully:
    - acceptance criteria met
    - `make ci` passes
+   - **If this completes the sprint** (no unchecked boxes remain in `PROGRESS.md` after you check off the item), also run:
+     - `make test-all`
+     - If `mcp` tests were skipped, optionally install extras and re-run:
+       - `uv sync --extra mcp` then `uv run pytest tests/integration/test_mcp_server.py tests/unit/test_mcp_tools.py`
 7. Update the deck:
    - set **Status: Fixed**
    - add **Fixed In: <commit>**
@@ -90,6 +94,19 @@ Before marking ANY task complete:
 ```bash
 make ci
 ```
+
+### Final Quality Gate (Sprint Complete)
+
+If `PROGRESS.md` has **no unchecked** items remaining (the sprint is complete), additionally run:
+
+```bash
+make test-all
+```
+
+If any tests fail, do **not** declare the sprint complete:
+- write a bug deck in `docs/bugs/`
+- add a new unchecked item to `PROGRESS.md`
+- commit and exit
 
 ---
 
