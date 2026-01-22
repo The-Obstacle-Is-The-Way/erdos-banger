@@ -4,7 +4,7 @@
 **Priority:** P2
 **Found:** 2026-01-22
 **Found By:** Clean architecture audit (module sprawl)
-**Fixed In:** 5dffa3d
+**Fixed In:** 4466340
 
 ---
 

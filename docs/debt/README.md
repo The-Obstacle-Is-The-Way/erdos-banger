@@ -83,7 +83,7 @@ All debt below has been resolved and archived to `docs/_archive/debt/`.
 | DEBT-048 | MCP server CI coverage gap | P3 | Fixed | c756f4e |
 | DEBT-055 | Scattered env-based configuration (centralized AppConfig) | P2 | Fixed | b3b5730 |
 | DEBT-044 | `core/` bounded-context refactor (reduce sprawl) | P2 | Fixed | b3b5730 (+ prior) |
-| DEBT-061 | Remove core backward-compatibility shims | P2 | Fixed | 5dffa3d |
+| DEBT-061 | Remove core backward-compatibility shims | P2 | Fixed | 4466340 |
 
 **Next Debt ID:** DEBT-062
 
