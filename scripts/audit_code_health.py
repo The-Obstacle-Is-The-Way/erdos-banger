@@ -170,13 +170,15 @@ def check_function_exemption(
         ):
             # Check docstring
             docstring = ast.get_docstring(node)
-            if docstring and "# exempt:" in docstring.lower():
-                parts = docstring.lower().split("# exempt:")
-                if len(parts) > 1:
-                    debt_id = parts[1].strip().split()[0].upper()
+            if docstring:
+                marker = "# exempt:"
+                marker_index = docstring.lower().find(marker)
+                if marker_index != -1:
+                    after = docstring[marker_index + len(marker) :]
+                    debt_id = after.strip().split()[0].upper() if after.strip() else ""
                     if debt_id.startswith("DEBT-"):
                         return True, debt_id
-                return True, None
+                    return True, None
 
     return False, None
 
@@ -195,14 +197,14 @@ def audit_modules(base_path: Path) -> list[ModuleViolation]:
             if path.name == "__init__.py":
                 continue
 
-            lines = count_lines(path)
+            try:
+                content = path.read_text()
+            except (OSError, UnicodeDecodeError):
+                content = ""
+
+            lines = len(content.splitlines()) if content else 0
             if lines > threshold:
                 path_str = str(path.relative_to(base_path))
-                try:
-                    content = path.read_text()
-                except (OSError, UnicodeDecodeError):
-                    content = ""
-
                 exempted, debt_id = check_module_exemption(path_str, content)
                 violations.append(
                     ModuleViolation(

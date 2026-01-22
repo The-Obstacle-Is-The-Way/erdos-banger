@@ -26,6 +26,8 @@ from erdos.core.timing import measure_time_ms
 
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
+
     from erdos.core.batch import BatchProgress
 
 
@@ -115,7 +117,7 @@ def _print_human_batch(result_data: dict[str, Any]) -> None:
 
 def _create_progress_callback(
     json_mode: bool,
-) -> tuple[bool, None] | tuple[bool, Any]:
+) -> tuple[bool, Callable[[BatchProgress], None] | None]:
     """Create progress callback for batch operations.
 
     Returns:

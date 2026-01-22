@@ -89,6 +89,10 @@ def load_provenance(prov_path: Path) -> ProvenanceFile:
 
     if data is None:
         return ProvenanceFile()
+    if not isinstance(data, dict):
+        raise ValueError(
+            f"Invalid provenance file format at {prov_path} (expected a mapping)"
+        )
 
     imports = []
     for item in data.get("imports", []):

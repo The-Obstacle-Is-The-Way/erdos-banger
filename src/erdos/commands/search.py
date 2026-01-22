@@ -209,7 +209,7 @@ def search(
         int | None,
         typer.Option("--problem", "-p", help="Filter to specific problem ID"),
     ] = None,
-    build_index: Annotated[
+    build_index_flag: Annotated[
         bool,
         typer.Option(
             "--build-index", help="Build/rebuild the search index before searching"
@@ -295,7 +295,7 @@ def search(
 
                 # Build index if requested
                 result = _handle_index_build(
-                    build_index,
+                    build_index_flag,
                     index,
                     progress_console,
                     repo=app_ctx.problems,
@@ -317,7 +317,7 @@ def search(
                         query=query,
                         limit=limit,
                         problem_id=problem_filter,
-                        build_index=build_index,
+                        build_index=build_index_flag,
                         build_embeddings=build_embeddings_flag,
                         mode=mode,
                         alpha=alpha,

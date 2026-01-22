@@ -355,6 +355,14 @@ class TestSaveLoadProvenance:
         assert loaded.schema_version == 1
         assert len(loaded.imports) == 0
 
+    def test_load_invalid_yaml_raises(self, tmp_path: Path) -> None:
+        """Invalid provenance YAML type raises ValueError."""
+        prov_path = tmp_path / ".provenance.yaml"
+        prov_path.write_text("- not a mapping\n- still not\n", encoding="utf-8")
+
+        with pytest.raises(ValueError, match=r"expected a mapping"):
+            load_provenance(prov_path)
+
 
 # ============================================================================
 # Fetch Upstream Tests (mocked network)

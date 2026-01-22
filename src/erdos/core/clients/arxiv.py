@@ -8,6 +8,7 @@ API Reference: https://info.arxiv.org/help/api/user-manual.html
 
 import io
 import logging
+import posixpath
 import re
 import tarfile
 import time
@@ -91,7 +92,6 @@ def parse_arxiv_atom(xml_text: str) -> ReferenceRecord:
                 published_elem.text,
                 exc_info=True,
             )
-            pass  # Year is optional, continue without it
 
     # Construct OA URL (use https)
     oa_url = f"https://arxiv.org/abs/{arxiv_id}"
@@ -163,28 +163,32 @@ def extract_arxiv_text(tarball_bytes: bytes) -> bytes:
         tarfile.TarError: If tarball is malformed.
     """
     tar_buffer = io.BytesIO(tarball_bytes)
-    tex_files = []
+
+    def _is_safe_member_name(name: str) -> bool:
+        """Return True if a tar member name is safe to handle."""
+        normalized = posixpath.normpath(name)
+        return not (
+            normalized.startswith("/")
+            or normalized == ".."
+            or normalized.startswith("../")
+        )
 
     with tarfile.open(fileobj=tar_buffer, mode="r:*") as tar:
+        largest_member: tarfile.TarInfo | None = None
         for member in tar.getmembers():
-            if member.isfile() and member.name.endswith(".tex"):
-                tex_files.append((member.name, member.size))
+            if (
+                member.isfile()
+                and member.name.endswith(".tex")
+                and _is_safe_member_name(member.name)
+                and (largest_member is None or member.size > largest_member.size)
+            ):
+                largest_member = member
 
-    if not tex_files:
-        raise ValueError("No .tex files found in arXiv source tarball")
+        if largest_member is None:
+            raise ValueError("No .tex files found in arXiv source tarball")
 
-    # Select largest .tex file
-    largest_tex = max(tex_files, key=lambda x: x[1])
-    largest_name = largest_tex[0]
-
-    # Extract the largest file
-    tar_buffer.seek(0)
-    with tarfile.open(fileobj=tar_buffer, mode="r:*") as tar:
-        file_obj = tar.extractfile(largest_name)
+        file_obj = tar.extractfile(largest_member)
         if file_obj is None:
-            raise ValueError(f"Could not extract {largest_name}")
-
-        # Read up to MAX_TEX_FILE_SIZE bytes
-        content = file_obj.read(MAX_TEX_FILE_SIZE)
-
-    return content
+            raise ValueError(f"Could not extract {largest_member.name}")
+        with file_obj:
+            return file_obj.read(MAX_TEX_FILE_SIZE)

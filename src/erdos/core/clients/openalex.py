@@ -120,7 +120,8 @@ def _extract_arxiv_id_from_landing_page_url(url: str | None) -> str | None:
     if not url or not isinstance(url, str):
         return None
     if url.lower().startswith(_ARXIV_DOI_PREFIX):
-        return url[len(_ARXIV_DOI_PREFIX) :]
+        candidate = url[len(_ARXIV_DOI_PREFIX) :]
+        return re.sub(r"v\d+$", "", candidate)
     match = re.search(r"arxiv\.org/abs/([^\s?#]+)", url)
     if not match:
         match = re.search(r"arxiv\.org/pdf/([^\s?#]+)", url)
@@ -129,8 +130,9 @@ def _extract_arxiv_id_from_landing_page_url(url: str | None) -> str | None:
         candidate = match.group(1)
         if candidate.lower().endswith(".pdf"):
             candidate = candidate[: -len(".pdf")]
-        return candidate
-    return match.group(1)
+        return re.sub(r"v\d+$", "", candidate)
+    candidate = match.group(1)
+    return re.sub(r"v\d+$", "", candidate)
 
 
 def extract_arxiv_id_from_work(work: dict[str, Any]) -> str | None:

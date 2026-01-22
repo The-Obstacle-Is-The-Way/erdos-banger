@@ -73,6 +73,7 @@ Work strictly top-to-bottom unless blocked by dependencies.
 (Ralph appends a short entry per completed task.)
 
 ### 2026-01-22: DEBT-059 Fixed
+
 - Fixed CLIOutput invariant violation in batch_formalize.py (use CLIOutput.err for partial failures)
 - Added max_concurrent validation in formalize_cmd.py (reject < 1)
 - Added --no-network validation in formalize_cmd.py (requires --import-upstream)
@@ -86,6 +87,7 @@ Work strictly top-to-bottom unless blocked by dependencies.
 - `make ci` passes (850 tests, 81.85% coverage)
 
 ### 2026-01-22: DEBT-046 Fixed
+
 - Eliminated `CLIOutput.err(..., code=0)` contract smell for IndexEmpty
 - Changed `search_problems_fts` to return `None` when index is empty (signals fallback)
 - Updated `_search_with_fallback` and `mcp_search_index` to handle None and fallback to basic search
@@ -94,6 +96,7 @@ Work strictly top-to-bottom unless blocked by dependencies.
 - `make ci` passes (852 tests, 81.85% coverage)
 
 ### 2026-01-22: DEBT-056 Fixed
+
 - FallbackProvider now catches only expected exception types per port contract
 - Replaced `except Exception` with `except _EXPECTED_PROVIDER_ERRORS` (RequestException, ValueError)
 - Unknown exceptions (RuntimeError, TypeError, AttributeError, etc.) now propagate for fail-fast debugging
@@ -101,6 +104,7 @@ Work strictly top-to-bottom unless blocked by dependencies.
 - `make ci` passes (856 tests, 81.89% coverage)
 
 ### 2026-01-22: DEBT-058 Fixed
+
 - Replaced insecure MD5 usage in loop.py with safe primitives (Option A from deck)
 - `_generate_run_id()`: replaced `hashlib.md5()` with `secrets.token_hex(3)` (consistent with run_logger.py)
 - `_file_hash()`: replaced `hashlib.md5()` with `hashlib.sha256()` for file content hashing
@@ -108,6 +112,7 @@ Work strictly top-to-bottom unless blocked by dependencies.
 - `make ci` passes (856 tests, 81.90% coverage)
 
 ### 2026-01-22: DEBT-047 Fixed
+
 - Added shared `sanitize_secrets()` function to `run_logger.py` for consistent secret redaction
 - Sanitizes both key names (api_key, token, secret, password, credential) and string values (API keys, Bearer tokens, Authorization headers)
 - Updated `LoopLogger.log_event()` to sanitize data before writing to log files
@@ -116,6 +121,7 @@ Work strictly top-to-bottom unless blocked by dependencies.
 - `make ci` passes (867 tests, 82.00% coverage)
 
 ### 2026-01-22: DEBT-057 Fixed
+
 - Added `scripts/audit_code_health.py` - CI guardrail against god-file regressions
 - Enforces LOC thresholds: 400 for command modules, 500 for core modules, 120 for functions
 - Reports violations with file:line locations; exempted violations paired with debt decks pass CI
@@ -125,6 +131,7 @@ Work strictly top-to-bottom unless blocked by dependencies.
 - `make ci` passes (867 tests, 82.00% coverage)
 
 ### 2026-01-22: DEBT-042 Fixed
+
 - Extracted `src/erdos/core/loop.py` (683 LOC) into bounded-context subpackage `src/erdos/core/loop/`:
   - `runner.py`: main loop orchestration (`run_loop` now 58 LOC, down from 399 LOC)
   - `logging.py`: `LoopLogger`, `generate_run_id`, `file_hash`
@@ -138,6 +145,7 @@ Work strictly top-to-bottom unless blocked by dependencies.
 - `make ci` passes (870 tests, 82.25% coverage)
 
 ### 2026-01-22: DEBT-045 Fixed
+
 - Split `SearchIndexProtocol` into three focused ports (Interface Segregation Principle):
   - `SearchIndexReadPort`: `search()`, `problem_count()`, `chunk_count()`, `get_stats()` - for read-only operations
   - `SearchIndexWritePort`: `index_problem()`, `clear()` - for index mutation
@@ -151,6 +159,7 @@ Work strictly top-to-bottom unless blocked by dependencies.
 - `make ci` passes (869 tests, 82.41% coverage)
 
 ### 2026-01-22: DEBT-043 Fixed
+
 - Verified refactoring of `erdos search` command from god module (791 LOC) to thin adapter pattern
 - `commands/search.py`: 334 LOC (58% reduction from 791 LOC)
 - `core/search/service.py`: 636 LOC - new service layer with pure orchestration logic (no Typer/Rich)
@@ -161,6 +170,7 @@ Work strictly top-to-bottom unless blocked by dependencies.
 - `make ci` passes (869 tests, 82.40% coverage)
 
 ### 2026-01-22: DEBT-049 Fixed
+
 - Refactored `SearchIndex` monolith (679 LOC) into focused collaborators in `src/erdos/core/search/`:
   - `db.py`: DatabaseManager - SQLite connect + schema (41 LOC)
   - `indexer.py`: Indexer - write path (45 LOC)
@@ -173,6 +183,7 @@ Work strictly top-to-bottom unless blocked by dependencies.
 - `make ci` passes (869 tests, 82.64% coverage)
 
 ### 2026-01-22: DEBT-052 Fixed
+
 - Validated ingest command refactoring is already complete:
   - `src/erdos/commands/ingest.py`: 302 LOC (thin CLI adapter)
   - `src/erdos/core/ingest/app.py`: 340 LOC (pure orchestration, no Typer/Rich)
@@ -183,6 +194,7 @@ Work strictly top-to-bottom unless blocked by dependencies.
 - `make ci` passes (891 tests, 82.81% coverage)
 
 ### 2026-01-22: DEBT-050 Fixed
+
 - Extracted `download_and_extract_arxiv()` into `src/erdos/core/ingest/arxiv_download.py` (112 LOC)
   - Isolated download + cache + extraction logic, unit-testable with in-memory tarballs
 - Created `ArxivProvider` in `src/erdos/core/providers/arxiv.py` for metadata lookups
@@ -194,6 +206,7 @@ Work strictly top-to-bottom unless blocked by dependencies.
 - `make ci` passes (891 tests, 83.56% coverage)
 
 ### 2026-01-22: DEBT-054 Fixed
+
 - Extracted central `if command == ...` chain from `run_logger.py` into registry-based summarizers
 - Created `src/erdos/core/run_logger_summaries.py` with:
   - `SUMMARIZERS` registry mapping command names to summarizer functions
@@ -206,6 +219,7 @@ Work strictly top-to-bottom unless blocked by dependencies.
 - `make ci` passes (920 tests, 83.56% coverage)
 
 ### 2026-01-22: DEBT-053 Fixed
+
 - Extracted `formal_conjectures.py` (482 LOC) into bounded-context package `src/erdos/core/formal_conjectures/`:
   - `config.py`: constants + error class (19 LOC)
   - `paths.py`: URL building + cache/local path helpers (59 LOC)
@@ -220,6 +234,7 @@ Work strictly top-to-bottom unless blocked by dependencies.
 - `make ci` passes (920 tests, 83.56% coverage)
 
 ### 2026-01-22: DEBT-051 Fixed
+
 - Extracted `batch.py` (571 LOC) into bounded-context package `src/erdos/core/batch/`:
   - `models.py`: BatchFilters, BatchState, BatchProgress, BatchResult, filter_problem_ids (235 LOC)
   - `persistence.py`: generate_batch_id, save/load_batch_state, save/load_latest_batch_id (87 LOC)
@@ -232,6 +247,7 @@ Work strictly top-to-bottom unless blocked by dependencies.
 - `make ci` passes (920 tests, 83.66% coverage)
 
 ### 2026-01-22: DEBT-048 Fixed
+
 - Analyzed MCP server.py (574 LOC) and justified cohesion:
   - Clear internal structure: helpers → testable core functions → thin MCP wrappers
   - Core functions accept explicit dependencies for unit testability
@@ -244,6 +260,7 @@ Work strictly top-to-bottom unless blocked by dependencies.
 - `make ci` passes (920 tests, 81.42% coverage)
 
 ### 2026-01-22: DEBT-055 Fixed
+
 - Created centralized `src/erdos/core/config.py` with `AppConfig` dataclass:
   - Consolidates all env var reads: `ERDOS_DATA_PATH`, `ERDOS_INDEX_PATH`, `ERDOS_RUN_LOG_PATH`, `ERDOS_REPO_ROOT`, `ERDOS_MAILTO`, `ERDOS_LLM_COMMAND`, `ARISTOTLE_API_KEY`, `ERDOS_ARISTOTLE_COMMAND`, `OPENALEX_API_KEY`
   - `AppConfig.from_env()` is the single source of truth for env-based configuration
@@ -259,6 +276,7 @@ Work strictly top-to-bottom unless blocked by dependencies.
 - `make ci` passes (928 tests, 81.53% coverage)
 
 ### 2026-01-22: DEBT-044 Fixed
+
 - Validated bounded-context refactor is complete from prior commits (DEBT-042 through DEBT-055)
 - 10 bounded-context subpackages exist: ask/, batch/, clients/, formal_conjectures/, ingest/, loop/, models/, pdf/, providers/, search/
 - 11 backward-compatible shim modules re-export from subpackages (arxiv_client, crossref_client, openalex_client, embeddings, index_builder, search_index, batch, loop_config, loop_verifier, patch_validator, pdf_converter)

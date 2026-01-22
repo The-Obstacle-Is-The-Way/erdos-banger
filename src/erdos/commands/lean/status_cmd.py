@@ -130,7 +130,7 @@ def _get_all_problems_status(
         upstream_formalized = sum(
             1
             for p in problems
-            if upstream_info.get(p.id, None) and upstream_info[p.id].formalized
+            if (upstream := upstream_info.get(p.id)) and upstream.formalized
         )
 
     local_exists = 0

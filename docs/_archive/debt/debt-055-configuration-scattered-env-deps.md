@@ -3,7 +3,7 @@
 **Status:** Fixed
 **Priority:** P2
 **Found:** 2026-01-22
-**Fixed In:** (this commit)
+**Fixed In:** b3b5730
 **Found By:** Clean Architecture / DIP audit
 
 ---

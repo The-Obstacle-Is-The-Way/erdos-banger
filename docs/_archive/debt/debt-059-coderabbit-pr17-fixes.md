@@ -37,8 +37,14 @@ if result.failed_count > 0:
     return CLIOutput(
         command="erdos lean formalize",
         success=False,
-        data=data,  # Include details for debugging
-        error={"type": "PartialFailure", "message": f"{result.failed_count} problems failed"},
+        data=None,  # CLIOutput invariant: data must be None on failure
+        error={
+            "type": "PartialFailure",
+            "message": f"{result.failed_count} problems failed",
+            "code": ExitCode.ERROR,
+            # Optional: include batch metadata in error extras
+            "failed_ids": result.failed_ids,
+        },
     )
 ```
 
@@ -154,11 +160,11 @@ if no_network and not import_upstream:
 
 ## Acceptance Criteria
 
-1. All 9 fixes above implemented
-2. Tests added for validation cases (max_concurrent, device, no_network)
-3. Lean init exit codes validated in tests
-4. `make ci` passes
-5. No new regressions
+- [x] All 9 fixes above implemented
+- [x] Tests added for validation cases (max_concurrent, device, no_network)
+- [x] Lean init exit codes validated in tests
+- [x] `make ci` passes
+- [x] No new regressions
 
 ---
 
