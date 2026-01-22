@@ -20,7 +20,6 @@ This directory contains technical-debt writeups: spec drift, missing fixtures, i
 | DEBT-043 | `erdos search` command god module (SRP pressure) | P2 | Open | `debt-043-search-command-god-module.md` |
 | DEBT-044 | `core/` bounded-context refactor (reduce sprawl) | P2 | Open | `debt-044-core-bounded-context-refactor.md` |
 | DEBT-045 | Split `SearchIndexProtocol` (ISP/DIP) | P2 | Open | `debt-045-searchindexprotocol-interface-segregation.md` |
-| DEBT-046 | CLIOutput `success` vs exit code ambiguity | P2 | Open | `debt-046-clioutput-success-vs-exitcode.md` |
 | DEBT-047 | Loop logging sanitization/unification | P3 | Open | `debt-047-loop-logging-sanitization-and-unification.md` |
 | DEBT-048 | MCP server module size + CI coverage gap | P3 | Open | `debt-048-mcp-server-god-module-and-ci-coverage.md` |
 | DEBT-049 | SearchIndex monolith (SRP extraction) | P2 | Open | `debt-049-search-index-monolith.md` |
@@ -82,6 +81,7 @@ All debt below has been resolved and archived to `docs/_archive/debt/`.
 | DEBT-036 | Marker device selection not exposed | P3 | Fixed | 7005b65 |
 | DEBT-038 | MetadataProvider abstraction missing | P2 | Resolved | SPEC-022 |
 | DEBT-059 | CodeRabbit PR#17 fixes (validation + invariants) | P2 | Fixed | 61ad15e |
+| DEBT-046 | CLIOutput `success` vs exit code ambiguity | P2 | Fixed | 0046cdf |
 
 **Next Debt ID:** DEBT-060
 
@@ -129,3 +129,4 @@ All debt below has been resolved and archived to `docs/_archive/debt/`.
 - `docs/_archive/debt/debt-036-marker-mps-not-configured.md`
 - `docs/_archive/debt/debt-038-metadata-provider-abstraction.md`
 - `docs/_archive/debt/debt-059-coderabbit-pr17-fixes.md`
+- `docs/_archive/debt/debt-046-clioutput-success-vs-exitcode.md`

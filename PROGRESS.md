@@ -31,8 +31,8 @@ Work strictly top-to-bottom unless blocked by dependencies.
 
 - [x] **DEBT-059**: CodeRabbit PR#17 fixes (input validation + invariant bugs)
   Deck: `docs/_archive/debt/debt-059-coderabbit-pr17-fixes.md`
-- [ ] **DEBT-046**: CLIOutput `success=false` with exit code 0 ambiguity (search IndexEmpty)
-  Deck: `docs/debt/debt-046-clioutput-success-vs-exitcode.md`
+- [x] **DEBT-046**: CLIOutput `success=false` with exit code 0 ambiguity (search IndexEmpty)
+  Deck: `docs/_archive/debt/debt-046-clioutput-success-vs-exitcode.md`
 - [ ] **DEBT-056**: FallbackProvider catches `Exception` broadly (may hide provider bugs)
   Deck: `docs/debt/debt-056-fallback-provider-broad-exceptions.md`
 - [ ] **DEBT-058**: MD5 `# noqa: S324` in loop module (justify or replace)
@@ -84,3 +84,11 @@ Work strictly top-to-bottom unless blocked by dependencies.
 - Fixed Lean init exit code to use LEAN_ERROR for LeanRunnerError
 - Added tests for all validation cases
 - `make ci` passes (850 tests, 81.85% coverage)
+
+### 2026-01-22: DEBT-046 Fixed
+- Eliminated `CLIOutput.err(..., code=0)` contract smell for IndexEmpty
+- Changed `search_problems_fts` to return `None` when index is empty (signals fallback)
+- Updated `_search_with_fallback` and `mcp_search_index` to handle None and fallback to basic search
+- Fallback returns `CLIOutput.ok` with `fallback_reason="index_empty"` for unambiguous semantics
+- Added tests: `test_empty_index_returns_none`, `test_populated_index_returns_results`, updated fallback test
+- `make ci` passes (852 tests, 81.85% coverage)

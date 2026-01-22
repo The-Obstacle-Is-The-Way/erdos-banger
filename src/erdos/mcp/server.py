@@ -185,6 +185,14 @@ def mcp_search_index(
         problem_id=problem_id,
     )
 
+    # Fallback to basic search if index is empty (FTS returns None)
+    if result is None:
+        result = search_problems_basic(query, repo, limit, problem_id)
+        if result.success and result.data:
+            result.data["mode"] = "basic"
+            result.data["fallback_reason"] = "index_empty"
+        return _cli_output_to_dict(result)
+
     # Update mode in response
     if result.success and result.data:
         result.data["mode"] = mode

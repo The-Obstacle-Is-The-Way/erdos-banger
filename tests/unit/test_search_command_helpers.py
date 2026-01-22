@@ -141,13 +141,9 @@ class TestSearchWithFallback:
     def test_fallback_to_basic_on_empty_index(
         self, mock_fts: mock.Mock, mock_basic: mock.Mock
     ) -> None:
-        """Should fall back to basic search when index is empty."""
-        mock_fts.return_value = CLIOutput.err(
-            command="erdos search",
-            error_type="IndexEmpty",
-            message="Index is empty",
-            code=0,
-        )
+        """Should fall back to basic search when index is empty (FTS returns None)."""
+        # FTS returns None when index is empty
+        mock_fts.return_value = None
         repo = mock.Mock()
         index = mock.Mock()
         expected_result = CLIOutput.ok(
@@ -165,6 +161,9 @@ class TestSearchWithFallback:
         result = _search_with_fallback(options, index=index, repo=repo)
 
         assert result.success is True
+        assert result.data is not None
+        assert result.data.get("mode") == "basic"
+        assert result.data.get("fallback_reason") == "index_empty"
         mock_basic.assert_called_once_with("prime", repo, 10, None)
 
     @mock.patch("erdos.commands.search.search_problems_basic")
@@ -182,8 +181,8 @@ class TestSearchWithFallback:
         mock_basic.assert_called_once_with("prime", repo, 10, None)
 
     @mock.patch("erdos.commands.search.search_problems_fts")
-    def test_non_empty_index_error_not_fallback(self, mock_fts: mock.Mock) -> None:
-        """Should not fall back for non-IndexEmpty errors."""
+    def test_other_fts_errors_not_fallback(self, mock_fts: mock.Mock) -> None:
+        """Should not fall back for FTS errors (non-None results)."""
         mock_fts.return_value = CLIOutput.err(
             command="erdos search",
             error_type="IndexError",
@@ -240,6 +239,7 @@ class TestSearchProblemsFts:
         index = mock.Mock()
         result = search_problems_fts("", index=index)
 
+        assert result is not None
         assert result.success is False
         assert result.error is not None
         assert result.error["type"] == "UsageError"
@@ -251,7 +251,31 @@ class TestSearchProblemsFts:
         index = mock.Mock()
         result = search_problems_fts("   ", index=index)
 
+        assert result is not None
         assert result.success is False
         assert result.error is not None
         assert result.error["type"] == "UsageError"
         assert result.error["code"] == ExitCode.USAGE_ERROR
+
+    def test_empty_index_returns_none(self) -> None:
+        """Should return None when index is empty (signals fallback needed)."""
+        index = mock.Mock()
+        index.problem_count.return_value = 0
+        result = search_problems_fts("prime", index=index)
+
+        assert result is None
+        index.problem_count.assert_called_once()
+
+    def test_populated_index_returns_results(self) -> None:
+        """Should return CLIOutput with results when index has data."""
+        index = mock.Mock()
+        index.problem_count.return_value = 10
+        index.search.return_value = []
+
+        result = search_problems_fts("prime", index=index)
+
+        assert result is not None
+        assert result.success is True
+        assert result.data is not None
+        assert result.data["use_fts"] is True
+        assert result.data["query"] == "prime"

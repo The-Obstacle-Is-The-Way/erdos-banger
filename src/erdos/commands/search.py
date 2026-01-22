@@ -128,8 +128,11 @@ def search_problems_fts(
     repo: ProblemRepository | None = None,
     limit: int = 10,
     problem_id: int | None = None,
-) -> CLIOutput:
-    """Search using FTS5 index (preferred)."""
+) -> CLIOutput | None:
+    """Search using FTS5 index (preferred).
+
+    Returns None if index is empty (caller should fall back to basic search).
+    """
     try:
         # Guard against empty query (consistent with basic search)
         if not query.strip():
@@ -140,14 +143,9 @@ def search_problems_fts(
                 code=ExitCode.USAGE_ERROR,
             )
 
-        # Check if index has data
+        # Check if index has data - return None to signal caller should fallback
         if index.problem_count() == 0:
-            return CLIOutput.err(
-                command="erdos search",
-                error_type="IndexEmpty",
-                message="Search index is empty. Run with --build-index to populate it.",
-                code=0,  # Not really an error, just needs index built
-            )
+            return None
 
         results = index.search(query, limit=limit, problem_id=problem_id)
 
@@ -324,7 +322,7 @@ def _search_with_fallback(
             result.data["mode"] = "basic"
         return result
 
-    result = search_problems_fts(
+    fts_result = search_problems_fts(
         options.query,
         index=index,
         repo=repo,
@@ -332,19 +330,21 @@ def _search_with_fallback(
         problem_id=options.problem_id,
     )
 
-    # Update mode for display
-    if result.success and result.data:
-        result.data["mode"] = "bm25"
-
-    # If index is empty, fall back to basic search
-    if not result.success and result.error and result.error.get("type") == "IndexEmpty":
+    # None means index is empty - fall back to basic search
+    if fts_result is None:
         result = search_problems_basic(
             options.query, repo, options.limit, options.problem_id
         )
         if result.success and result.data:
             result.data["mode"] = "basic"
+            result.data["fallback_reason"] = "index_empty"
+        return result
 
-    return result
+    # Update mode for display
+    if fts_result.success and fts_result.data:
+        fts_result.data["mode"] = "bm25"
+
+    return fts_result
 
 
 def _get_embedding_model(
