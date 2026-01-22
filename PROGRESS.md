@@ -59,8 +59,8 @@ Work strictly top-to-bottom unless blocked by dependencies.
   Deck: `docs/_archive/debt/debt-053-formal-conjectures-module-monolith.md`
 - [x] **DEBT-051**: `core/batch.py` SRP split
   Deck: `docs/_archive/debt/debt-051-batch-module-srp.md`
-- [ ] **DEBT-048**: MCP server module size + CI coverage gap
-  Deck: `docs/debt/debt-048-mcp-server-god-module-and-ci-coverage.md`
+- [x] **DEBT-048**: MCP server module size + CI coverage gap
+  Deck: `docs/_archive/debt/debt-048-mcp-server-god-module-and-ci-coverage.md`
 - [ ] **DEBT-055**: Scattered env-based configuration (hidden dependencies)
   Deck: `docs/debt/debt-055-configuration-scattered-env-deps.md`
 - [ ] **DEBT-044**: `core/` bounded-context refactor (reduce sprawl)
@@ -230,3 +230,15 @@ Work strictly top-to-bottom unless blocked by dependencies.
 - Public API stable: all imports via `from erdos.core.batch import ...` work
 - Added TC003 exemption in pyproject.toml for Path runtime usage
 - `make ci` passes (920 tests, 83.66% coverage)
+
+### 2026-01-22: DEBT-048 Fixed
+- Analyzed MCP server.py (574 LOC) and justified cohesion:
+  - Clear internal structure: helpers → testable core functions → thin MCP wrappers
+  - Core functions accept explicit dependencies for unit testability
+  - Not covered by audit guardrails (only audits commands/ and core/)
+  - Splitting would be premature optimization at this size
+- Added `test-mcp` CI job to `.github/workflows/ci.yml`:
+  - Installs dependencies with `--extra mcp`
+  - Runs both unit and integration MCP tests on every push/PR
+- Removed MCP from coverage omit list (now has dedicated CI job)
+- `make ci` passes (920 tests, 81.42% coverage)
