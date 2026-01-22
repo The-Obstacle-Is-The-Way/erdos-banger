@@ -1,6 +1,7 @@
 # DEBT-052: `erdos ingest` Command Module Is a God File (CLI + Batch + Printing + Policy)
 
-**Status:** Open
+**Status:** Fixed
+**Fixed In:** 8c53292
 **Priority:** P2
 **Found:** 2026-01-22
 **Found By:** SRP / vertical-slice audit (post v2.1)
@@ -89,13 +90,16 @@ src/erdos/commands/ingest/
 
 ## Acceptance Criteria
 
-1. [ ] `src/erdos/commands/ingest.py` reduced to ≤ ~300 LOC (or split into package).
-2. [ ] Ingest orchestration exists in a pure core module (no Typer/Rich imports).
-3. [ ] Unit tests cover ingest orchestration for:
-   - single-problem ingest
-   - batch ingest filters + resume validation
-   - `--no-network` / `--no-download` policy combinations
-4. [ ] `make ci` passes.
+1. [x] `src/erdos/commands/ingest.py` reduced to ≤ ~300 LOC (or split into package).
+   - **Actual:** 302 LOC (thin adapter)
+2. [x] Ingest orchestration exists in a pure core module (no Typer/Rich imports).
+   - **Actual:** `src/erdos/core/ingest/app.py` (340 LOC) - pure orchestration
+3. [x] Unit tests cover ingest orchestration for:
+   - single-problem ingest: `TestRunSingleIngestion`
+   - batch ingest filters + resume validation: `TestIsBatchMode`, `TestRunBatchIngestion`
+   - `--no-network` / `--no-download` policy combinations: `TestNoNetworkNowDownloadPolicyCombinations`
+   - **Actual:** `tests/unit/test_ingest_app.py` (440 LOC)
+4. [x] `make ci` passes (891 tests, 82.81% coverage).
 
 ---
 

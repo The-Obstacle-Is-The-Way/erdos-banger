@@ -4,12 +4,24 @@ This package provides:
 - stable_key: Stable key generation for deduplication
 - models: Result dataclasses
 - fetch: Reference fetching and download
-- service: Orchestration (ingest_problem_references)
+- service: Single-problem orchestration (ingest_problem_references)
+- app: Application service (batch + single orchestration)
 
 All public APIs are re-exported for backward compatibility.
 """
 
 # Re-export public APIs for backward compatibility
+from erdos.core.ingest.app import (
+    IngestOptions,
+    batch_result_to_cli_output,
+    create_batch_process_fn,
+    execute_ingest,
+    get_repo_root,
+    is_batch_mode,
+    prepare_mailto,
+    run_batch_ingestion,
+    run_single_ingestion,
+)
 from erdos.core.ingest.fetch import (
     MetadataSource,
     download_and_extract_arxiv,
@@ -35,26 +47,30 @@ _ReferenceProcessResult = ReferenceProcessResult
 _ProcessAllReferencesResult = ProcessAllReferencesResult
 
 __all__ = [
-    # Models
     "ArxivDownloadResult",
     "HasIdentifiers",
+    "IngestOptions",
     "MetadataSource",
     "ProcessAllReferencesResult",
     "ReferenceProcessResult",
     "_ProcessAllReferencesResult",
     "_ReferenceProcessResult",
-    # Backward compat aliases
     "_download_and_extract_arxiv",
     "_fetch_reference_entry",
     "_process_all_references",
     "_process_single_reference",
-    # Fetch
+    "batch_result_to_cli_output",
+    "create_batch_process_fn",
     "download_and_extract_arxiv",
+    "execute_ingest",
     "fetch_reference_entry",
-    # Stable key
+    "get_repo_root",
     "get_stable_key",
-    # Service
     "ingest_problem_references",
+    "is_batch_mode",
+    "prepare_mailto",
     "process_all_references",
     "process_single_reference",
+    "run_batch_ingestion",
+    "run_single_ingestion",
 ]

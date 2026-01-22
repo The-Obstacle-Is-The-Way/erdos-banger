@@ -20,7 +20,6 @@ This directory contains technical-debt writeups: spec drift, missing fixtures, i
 | DEBT-048 | MCP server module size + CI coverage gap | P3 | Open | `debt-048-mcp-server-god-module-and-ci-coverage.md` |
 | DEBT-050 | Ingest fetch SRP split | P2 | Open | `debt-050-ingest-fetch-srp.md` |
 | DEBT-051 | Batch module SRP split | P3 | Open | `debt-051-batch-module-srp.md` |
-| DEBT-052 | `erdos ingest` command god module | P2 | Open | `debt-052-ingest-command-god-module.md` |
 | DEBT-053 | Formal conjectures module monolith | P3 | Open | `debt-053-formal-conjectures-module-monolith.md` |
 | DEBT-054 | Run logger OCP violation (central command switch) | P3 | Open | `debt-054-run-logger-ocp-violation.md` |
 | DEBT-055 | Scattered env-based configuration | P2 | Open | `debt-055-configuration-scattered-env-deps.md` |
@@ -83,6 +82,7 @@ All debt below has been resolved and archived to `docs/_archive/debt/`.
 | DEBT-043 | `erdos search` command god module (SRP pressure) | P2 | Fixed | 4f99202 |
 | DEBT-045 | Split `SearchIndexProtocol` (ISP/DIP) | P2 | Fixed | 279928f |
 | DEBT-049 | SearchIndex monolith (SRP extraction) | P2 | Fixed | 96ec69a |
+| DEBT-052 | `erdos ingest` command god module | P2 | Fixed | 8c53292 |
 
 **Next Debt ID:** DEBT-061
 
@@ -139,3 +139,4 @@ All debt below has been resolved and archived to `docs/_archive/debt/`.
 - `docs/_archive/debt/debt-043-search-command-god-module.md`
 - `docs/_archive/debt/debt-045-searchindexprotocol-interface-segregation.md`
 - `docs/_archive/debt/debt-049-search-index-monolith.md`
+- `docs/_archive/debt/debt-052-ingest-command-god-module.md`

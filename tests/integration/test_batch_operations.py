@@ -209,7 +209,7 @@ class TestBatchStateTracking:
         env["ERDOS_REPO_ROOT"] = str(tmp_path)
 
         # Mock the actual ingestion to avoid network calls
-        with patch("erdos.commands.ingest.ingest_problem_references") as mock_ingest:
+        with patch("erdos.core.ingest.app.ingest_problem_references") as mock_ingest:
             from erdos.core.models import CLIOutput
 
             mock_ingest.return_value = CLIOutput.ok(

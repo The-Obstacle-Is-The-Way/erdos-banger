@@ -49,8 +49,8 @@ Work strictly top-to-bottom unless blocked by dependencies.
   Deck: `docs/_archive/debt/debt-045-searchindexprotocol-interface-segregation.md`
 - [x] **DEBT-049**: `SearchIndex` monolith (schema + indexing + retrieval + embeddings)
   Deck: `docs/_archive/debt/debt-049-search-index-monolith.md`
-- [ ] **DEBT-052**: `erdos ingest` command god module
-  Deck: `docs/debt/debt-052-ingest-command-god-module.md`
+- [x] **DEBT-052**: `erdos ingest` command god module
+  Deck: `docs/_archive/debt/debt-052-ingest-command-god-module.md`
 - [ ] **DEBT-050**: `core/ingest/fetch.py` SRP split (thin orchestrator + adapters)
   Deck: `docs/debt/debt-050-ingest-fetch-srp.md`
 - [ ] **DEBT-054**: Run logger OCP violation (central `if command == ...` chain)
@@ -171,3 +171,13 @@ Work strictly top-to-bottom unless blocked by dependencies.
 - `search_index.py` at core level is now backward-compatible shim (37 LOC)
 - Public API stable: `from erdos.core.search_index import SearchIndex` works
 - `make ci` passes (869 tests, 82.64% coverage)
+
+### 2026-01-22: DEBT-052 Fixed
+- Validated ingest command refactoring is already complete:
+  - `src/erdos/commands/ingest.py`: 302 LOC (thin CLI adapter)
+  - `src/erdos/core/ingest/app.py`: 340 LOC (pure orchestration, no Typer/Rich)
+- Unit tests exist in `tests/unit/test_ingest_app.py` (440 LOC) covering:
+  - Single-problem ingest (`TestRunSingleIngestion`)
+  - Batch ingest filters + resume validation (`TestIsBatchMode`, `TestRunBatchIngestion`)
+  - `--no-network`/`--no-download` policy combinations (`TestNoNetworkNowDownloadPolicyCombinations`)
+- `make ci` passes (891 tests, 82.81% coverage)
