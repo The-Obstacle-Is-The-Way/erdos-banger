@@ -31,7 +31,16 @@ echo ""
 rm -rf logs/ralph 2>/dev/null || true
 mkdir -p logs/ralph
 
+start_ts="$(date +%s)"
+
 for i in $(seq 1 "$MAX"); do
+    now_ts="$(date +%s)"
+    elapsed="$((now_ts - start_ts))"
+    if (( elapsed >= TIMEOUT )); then
+        echo "Session timeout reached after ${elapsed}s (limit: ${TIMEOUT}s). Stopping." | tee -a "logs/ralph/iteration_$(printf "%03d" "$i").log"
+        break
+    fi
+
     n=$(printf "%03d" "$i")
     log="logs/ralph/iteration_${n}.log"
 
