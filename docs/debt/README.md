@@ -14,9 +14,7 @@ This directory contains technical-debt writeups: spec drift, missing fixtures, i
 
 ## Active Debt
 
-| ID | Title | Priority | Status | Deck |
-|----|-------|----------|--------|------|
-| DEBT-060 | Formalize command long Typer callback | P4 | Open | `debt-060-formalize-cmd-long-callback.md` |
+*No active debt items.*
 
 ## Archived Debt
 
@@ -84,6 +82,7 @@ All debt below has been resolved and archived to `docs/_archive/debt/`.
 | DEBT-055 | Scattered env-based configuration (centralized AppConfig) | P2 | Fixed | b3b5730 |
 | DEBT-044 | `core/` bounded-context refactor (reduce sprawl) | P2 | Fixed | b3b5730 (+ prior) |
 | DEBT-061 | Remove core backward-compatibility shims | P2 | Fixed | 4466340 |
+| DEBT-060 | Formalize command long Typer callback | P4 | Fixed | (see commit) |
 
 **Next Debt ID:** DEBT-062
 
@@ -149,3 +148,4 @@ All debt below has been resolved and archived to `docs/_archive/debt/`.
 - `docs/_archive/debt/debt-055-configuration-scattered-env-deps.md`
 - `docs/_archive/debt/debt-044-core-bounded-context-refactor.md`
 - `docs/_archive/debt/debt-061-remove-core-compatibility-shims.md`
+- `docs/_archive/debt/debt-060-formalize-cmd-long-callback.md`

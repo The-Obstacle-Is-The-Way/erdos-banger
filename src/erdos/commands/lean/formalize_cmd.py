@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING, Annotated
 
@@ -9,6 +10,7 @@ import typer
 
 
 if TYPE_CHECKING:
+    from erdos.core.context import AppContext
     from erdos.core.ports import ProblemRepository
 
 from erdos.commands.app_context import get_app_context
@@ -34,18 +36,61 @@ from erdos.core.models import CLIOutput
 from erdos.core.timing import measure_time_ms
 
 
-def _is_batch_mode(
-    problem_id: int | None,
-    all_problems: bool,
-    status: str | None,
-    tag: list[str] | None,
-) -> bool:
-    """Determine if batch mode should be activated for formalize."""
-    if all_problems:
-        return True
-    if problem_id is None:
-        return bool(status is not None or tag)
-    return False
+_COMMAND = "erdos lean formalize"
+
+
+@dataclass
+class _FormalizeArgs:
+    """Validated arguments for formalize command."""
+
+    problem_id: int | None
+    project_path: Path
+    force: bool
+    import_upstream: bool
+    no_network: bool
+    all_problems: bool
+    status: str | None
+    tag: list[str] | None
+    limit: int | None
+    skip_existing: bool
+    dry_run: bool
+    max_concurrent: int
+    json_mode: bool
+
+    @property
+    def batch_mode(self) -> bool:
+        """Determine if batch mode should be activated."""
+        if self.all_problems:
+            return True
+        if self.problem_id is None:
+            return bool(self.status is not None or self.tag)
+        return False
+
+
+def _validate_args(args: _FormalizeArgs) -> CLIOutput | None:
+    """Validate formalize arguments. Returns error CLIOutput if invalid, None if OK."""
+    if not args.batch_mode and args.problem_id is None:
+        return CLIOutput.err(
+            command=_COMMAND,
+            error_type="UsageError",
+            message="Provide a PROBLEM_ID or use batch options (--all, --status, --tag)",
+            code=ExitCode.USAGE_ERROR,
+        )
+    if args.max_concurrent < 1:
+        return CLIOutput.err(
+            command=_COMMAND,
+            error_type="UsageError",
+            message="--max-concurrent must be >= 1",
+            code=ExitCode.USAGE_ERROR,
+        )
+    if args.no_network and not args.import_upstream:
+        return CLIOutput.err(
+            command=_COMMAND,
+            error_type="UsageError",
+            message="--no-network requires --import-upstream",
+            code=ExitCode.USAGE_ERROR,
+        )
+    return None
 
 
 def _run_batch_formalize(
@@ -61,7 +106,6 @@ def _run_batch_formalize(
 ) -> CLIOutput:
     """Execute batch formalize logic."""
     if dry_run:
-        # Just show what would be processed
         data = {
             "batch_id": "",
             "mode": "batch",
@@ -72,9 +116,8 @@ def _run_batch_formalize(
             "dry_run": True,
             "problem_ids": problem_ids,
         }
-        return CLIOutput.ok(command="erdos lean formalize", data=data)
+        return CLIOutput.ok(command=_COMMAND, data=data)
 
-    # Progress callback for human output
     def on_progress(progress: BatchProgress) -> None:
         status_icon = "[green]✓[/green]" if progress.success else "[red]✗[/red]"
         err_console.print(
@@ -91,8 +134,57 @@ def _run_batch_formalize(
         max_concurrent=max_concurrent,
         on_progress=None if json_mode else on_progress,
     )
-
     return batch_result_to_cli_output(result, problem_ids, dry_run)
+
+
+def _execute_formalize(args: _FormalizeArgs, app_ctx: AppContext) -> CLIOutput:
+    """Execute formalize based on mode (batch/single/import)."""
+    if args.batch_mode:
+        filters = BatchFilters(status=args.status, tags=args.tag, limit=args.limit)
+        problems = app_ctx.problems.load_all()
+        problem_ids = filter_problem_ids(problems, filters)
+        if not problem_ids:
+            return CLIOutput.err(
+                command=_COMMAND,
+                error_type="NotFoundError",
+                message="No problems match the given filters",
+                code=ExitCode.NOT_FOUND,
+            )
+        return _run_batch_formalize(
+            problem_ids,
+            args.project_path,
+            repo=app_ctx.problems,
+            force=args.force,
+            skip_existing=args.skip_existing,
+            max_concurrent=args.max_concurrent,
+            dry_run=args.dry_run,
+            json_mode=args.json_mode,
+        )
+
+    if args.problem_id is not None and args.import_upstream:
+        return import_upstream_formalization(
+            args.problem_id,
+            args.project_path,
+            force=args.force,
+            no_network=args.no_network,
+            skip_lean_validation=True,
+        )
+
+    if args.problem_id is not None:
+        return formalize_problem(
+            args.problem_id,
+            args.project_path,
+            repo=app_ctx.problems,
+            force=args.force,
+        )
+
+    # Unreachable due to earlier validation
+    return CLIOutput.err(
+        command=_COMMAND,
+        error_type="UsageError",
+        message="Provide a PROBLEM_ID or use batch options",
+        code=ExitCode.USAGE_ERROR,
+    )
 
 
 def register(app: typer.Typer) -> None:
@@ -104,21 +196,17 @@ def register(app: typer.Typer) -> None:
         problem_id: Annotated[
             int | None,
             typer.Argument(
-                help="Problem ID to formalize (omit for batch mode).",
-                min=1,
+                help="Problem ID to formalize (omit for batch mode).", min=1
             ),
         ] = None,
         project_path: Annotated[
             Path | None,
             typer.Option(
-                "--path",
-                "-p",
-                help="Path to Lean project (default: formal/lean/)",
+                "--path", "-p", help="Path to Lean project (default: formal/lean/)"
             ),
         ] = None,
         force: Annotated[
-            bool,
-            typer.Option("--force", "-f", help="Overwrite existing file"),
+            bool, typer.Option("--force", "-f", help="Overwrite existing file")
         ] = False,
         import_upstream: Annotated[
             bool,
@@ -134,10 +222,8 @@ def register(app: typer.Typer) -> None:
                 help="Use cached upstream file only (requires --import-upstream)",
             ),
         ] = False,
-        # Batch options (SPEC-015)
         all_problems: Annotated[
-            bool,
-            typer.Option("--all", help="Process all problems (batch mode)"),
+            bool, typer.Option("--all", help="Process all problems (batch mode)")
         ] = False,
         status: Annotated[
             str | None,
@@ -151,8 +237,7 @@ def register(app: typer.Typer) -> None:
             typer.Option("--tag", help="Filter by tag (can be repeated)"),
         ] = None,
         limit: Annotated[
-            int | None,
-            typer.Option("--limit", help="Max problems to process"),
+            int | None, typer.Option("--limit", help="Max problems to process")
         ] = None,
         skip_existing: Annotated[
             bool,
@@ -161,8 +246,7 @@ def register(app: typer.Typer) -> None:
             ),
         ] = False,
         dry_run: Annotated[
-            bool,
-            typer.Option("--dry-run", help="Show what would be processed"),
+            bool, typer.Option("--dry-run", help="Show what would be processed")
         ] = False,
         max_concurrent: Annotated[
             int,
@@ -181,111 +265,35 @@ def register(app: typer.Typer) -> None:
 
         Use --import-upstream to import existing formalizations instead.
         """
-        json_mode = bool((ctx.obj or {}).get("json"))
+        args = _FormalizeArgs(
+            problem_id=problem_id,
+            project_path=project_path or Path("formal/lean"),
+            force=force,
+            import_upstream=import_upstream,
+            no_network=no_network,
+            all_problems=all_problems,
+            status=status,
+            tag=tag,
+            limit=limit,
+            skip_existing=skip_existing,
+            dry_run=dry_run,
+            max_concurrent=max_concurrent,
+            json_mode=bool((ctx.obj or {}).get("json")),
+        )
 
-        # Determine mode
-        batch_mode = _is_batch_mode(problem_id, all_problems, status, tag)
-
-        # Validate: need problem_id or batch filters
-        if not batch_mode and problem_id is None:
-            result = CLIOutput.err(
-                command="erdos lean formalize",
-                error_type="UsageError",
-                message="Provide a PROBLEM_ID or use batch options "
-                "(--all, --status, --tag)",
-                code=ExitCode.USAGE_ERROR,
-            )
-            exit_with_result(ctx, result, print_human=print_human)
-            return
-
-        # Validate: --max-concurrent must be >= 1
-        if max_concurrent < 1:
-            result = CLIOutput.err(
-                command="erdos lean formalize",
-                error_type="UsageError",
-                message="--max-concurrent must be >= 1",
-                code=ExitCode.USAGE_ERROR,
-            )
-            exit_with_result(ctx, result, print_human=print_human)
-            return
-
-        # Validate: --no-network requires --import-upstream
-        if no_network and not import_upstream:
-            result = CLIOutput.err(
-                command="erdos lean formalize",
-                error_type="UsageError",
-                message="--no-network requires --import-upstream",
-                code=ExitCode.USAGE_ERROR,
-            )
-            exit_with_result(ctx, result, print_human=print_human)
+        if validation_error := _validate_args(args):
+            exit_with_result(ctx, validation_error, print_human=print_human)
             return
 
         with measure_time_ms() as duration:
-            app_ctx, app_error = get_app_context(ctx, command="erdos lean formalize")
+            app_ctx, app_error = get_app_context(ctx, command=_COMMAND)
             if app_error is not None:
                 exit_with_result(ctx, app_error)
                 return
             if app_ctx is None:
                 return  # Unreachable
-
-            path = project_path or Path("formal/lean")
-
-            if batch_mode:
-                # Batch formalize
-                filters = BatchFilters(
-                    status=status,
-                    tags=tag,
-                    limit=limit,
-                )
-                problems = app_ctx.problems.load_all()
-                problem_ids_to_process = filter_problem_ids(problems, filters)
-
-                if not problem_ids_to_process:
-                    result = CLIOutput.err(
-                        command="erdos lean formalize",
-                        error_type="NotFoundError",
-                        message="No problems match the given filters",
-                        code=ExitCode.NOT_FOUND,
-                    )
-                else:
-                    result = _run_batch_formalize(
-                        problem_ids_to_process,
-                        path,
-                        repo=app_ctx.problems,
-                        force=force,
-                        skip_existing=skip_existing,
-                        max_concurrent=max_concurrent,
-                        dry_run=dry_run,
-                        json_mode=json_mode,
-                    )
-            elif problem_id is not None and import_upstream:
-                # Import upstream formalization (single problem)
-                result = import_upstream_formalization(
-                    problem_id,
-                    path,
-                    force=force,
-                    no_network=no_network,
-                    skip_lean_validation=True,  # Skip validation for formalize
-                )
-            elif problem_id is not None:
-                # Single problem formalize
-                result = formalize_problem(
-                    problem_id,
-                    path,
-                    repo=app_ctx.problems,
-                    force=force,
-                )
-            else:
-                # Should be unreachable due to earlier validation
-                result = CLIOutput.err(
-                    command="erdos lean formalize",
-                    error_type="UsageError",
-                    message="Provide a PROBLEM_ID or use batch options",
-                    code=ExitCode.USAGE_ERROR,
-                )
+            result = _execute_formalize(args, app_ctx)
 
         result.duration_ms = duration[0]
-
-        # Use appropriate human printer
-        print_fn = print_human_batch_formalize if batch_mode else print_human
+        print_fn = print_human_batch_formalize if args.batch_mode else print_human
         exit_with_result(ctx, result, print_human=print_fn)

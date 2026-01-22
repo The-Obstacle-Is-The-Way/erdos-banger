@@ -31,11 +31,12 @@ Work strictly top-to-bottom unless blocked by dependencies.
 
 - [x] **DEBT-061**: Remove core backward-compatibility shims
   Deck: `docs/_archive/debt/debt-061-remove-core-compatibility-shims.md`
-- [ ] **DEBT-060**: Formalize command long Typer callback
-  Deck: `docs/debt/debt-060-formalize-cmd-long-callback.md`
+- [x] **DEBT-060**: Formalize command long Typer callback
+  Deck: `docs/_archive/debt/debt-060-formalize-cmd-long-callback.md`
 
 ---
 
 ## Work Log
 
+- **2026-01-22 (DEBT-060)**: Refactored `formalize_cmd.py` to reduce function LOC. Extracted `_FormalizeArgs` dataclass, `_validate_args()` and `_execute_formalize()` helpers. `register()` now 80 LOC (from 194), `formalize()` now 76 LOC (from 190). Removed DEBT-060 exemptions from audit script. `make ci` passes.
 - **2026-01-22 (DEBT-061)**: Removed 10 backward-compatibility shim files from `src/erdos/core/` and updated all imports to use bounded-context modules directly. Added regression guard tests in `test_dependencies.py`. `make ci` passes.

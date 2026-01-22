@@ -59,8 +59,6 @@ EXEMPTED_FUNCTIONS: dict[tuple[str, str], str] = {
     ("src/erdos/commands/convert.py", "convert"): "DEBT-036",
     ("src/erdos/commands/loop.py", "run"): "DEBT-042",
     ("src/erdos/core/ingest/service.py", "ingest_problem_references"): "DEBT-050",
-    ("src/erdos/commands/lean/formalize_cmd.py", "register"): "DEBT-060",
-    ("src/erdos/commands/lean/formalize_cmd.py", "formalize"): "DEBT-060",
 }
 
 
