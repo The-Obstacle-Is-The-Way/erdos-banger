@@ -30,6 +30,7 @@ if result.failed_count > 0:
 ```
 
 **Fix:** Return a proper partial-failure output:
+
 ```python
 if result.failed_count > 0:
     return CLIOutput(
@@ -47,6 +48,7 @@ if result.failed_count > 0:
 **Problem:** `ThreadPoolExecutor(max_workers=0)` raises `ValueError`. No input validation.
 
 **Fix:** Add validation before ThreadPoolExecutor:
+
 ```python
 if max_concurrent < 1:
     return CLIOutput.err(
@@ -64,6 +66,7 @@ if max_concurrent < 1:
 **Problem:** `--device` help says "cpu/cuda/mps" but accepts any string.
 
 **Fix:** Validate against allowed set:
+
 ```python
 if device:
     allowed = {"cpu", "cuda", "mps"}
@@ -95,6 +98,7 @@ if device:
 **Problem:** Direct `result_data["file"]` access can raise KeyError.
 
 **Fix:** Use `.get()` with fallback:
+
 ```python
 output_file = result_data.get("file", "unknown")
 ```
@@ -106,6 +110,7 @@ output_file = result_data.get("file", "unknown")
 **Problem:** `str(e)` can be empty, failing CLIOutput validation.
 
 **Fix:** Add fallback message:
+
 ```python
 message = str(e) or "Unexpected error"
 ```
@@ -116,7 +121,7 @@ message = str(e) or "Unexpected error"
 
 - **batch_formalize.py:95** - CodeRabbit claimed `.lean` vs `.Lean` case mismatch. **FALSE** - both use lowercase `.lean`.
 - **common.py:145** - Duck-typing routing is "fragile" - valid observation but works fine, not urgent.
-- **providers/__init__.py:27** - Import order vs comment mismatch - trivial, not worth a commit.
+- `src/erdos/core/providers/__init__.py:27` - Import order vs comment mismatch - trivial, not worth a commit.
 
 ---
 

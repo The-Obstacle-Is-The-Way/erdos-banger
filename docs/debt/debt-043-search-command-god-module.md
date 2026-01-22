@@ -30,7 +30,20 @@ This violates SRP and makes future changes (SPEC-014 embeddings, batch workflows
 
 Reproduce:
 - `wc -l src/erdos/commands/search.py`
-- `python3 - <<'PY'\nimport ast, pathlib\np=pathlib.Path('src/erdos/commands/search.py');t=p.read_text();m=ast.parse(t)\nfor n in ast.walk(m):\n  if isinstance(n, ast.FunctionDef) and n.name=='search':\n    print('search LOC:', n.end_lineno-n.lineno+1, 'at', f'{p}:{n.lineno}')\nPY`
+
+```bash
+python3 - <<'PY'
+import ast
+import pathlib
+
+p = pathlib.Path("src/erdos/commands/search.py")
+t = p.read_text()
+m = ast.parse(t)
+for n in ast.walk(m):
+    if isinstance(n, ast.FunctionDef) and n.name == "search":
+        print("search LOC:", n.end_lineno - n.lineno + 1, "at", f"{p}:{n.lineno}")
+PY
+```
 
 ---
 
@@ -46,7 +59,7 @@ Reproduce:
 
 1. Create a core service layer for search orchestration:
 
-```
+```text
 src/erdos/core/search/service.py
 ```
 
@@ -63,7 +76,7 @@ Responsibilities:
 
 3. If file size still grows, split command module into a package:
 
-```
+```text
 src/erdos/commands/search/
 ├── __init__.py
 ├── cmd.py

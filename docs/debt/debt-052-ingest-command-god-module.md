@@ -27,7 +27,20 @@ This is not just a “line length” issue — it makes it hard to add ingest-re
 
 - File size: `wc -l src/erdos/commands/ingest.py` → **550** lines
 - Long Typer callback:
-  - `python3 - <<'PY'\nimport ast, pathlib\np=pathlib.Path('src/erdos/commands/ingest.py');t=p.read_text();m=ast.parse(t)\nfor n in ast.walk(m):\n  if isinstance(n, ast.FunctionDef) and n.name=='ingest':\n    print('ingest LOC:', n.end_lineno-n.lineno+1, 'at', f'{p}:{n.lineno}')\nPY`
+
+```bash
+python3 - <<'PY'
+import ast
+import pathlib
+
+p = pathlib.Path("src/erdos/commands/ingest.py")
+t = p.read_text()
+m = ast.parse(t)
+for n in ast.walk(m):
+    if isinstance(n, ast.FunctionDef) and n.name == "ingest":
+        print("ingest LOC:", n.end_lineno - n.lineno + 1, "at", f"{p}:{n.lineno}")
+PY
+```
 
 ---
 
@@ -50,7 +63,7 @@ Create a single testable entrypoint that:
 
 Example target module:
 
-```
+```text
 src/erdos/core/ingest/app.py
 ```
 
@@ -65,7 +78,7 @@ src/erdos/core/ingest/app.py
 
 If the module is still >~300 LOC after extraction, split into:
 
-```
+```text
 src/erdos/commands/ingest/
 ├── __init__.py
 ├── cmd.py

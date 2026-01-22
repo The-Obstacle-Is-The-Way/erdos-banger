@@ -37,7 +37,7 @@ Every time we add a new command or change a command’s output schema, we are in
 
 Introduce a registry mapping `command -> summarizer(data) -> dict`, with a stable default:
 
-```
+```text
 src/erdos/core/run_logger_summaries.py
 ```
 

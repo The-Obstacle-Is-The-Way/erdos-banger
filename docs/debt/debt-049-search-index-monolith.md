@@ -45,7 +45,7 @@ The file has multiple conceptual reasons to change:
 
 Extract into a bounded-context package and keep `search_index.py` as a shim:
 
-```
+```text
 src/erdos/core/search/
 ├── __init__.py
 ├── db.py              # sqlite connect + schema manager

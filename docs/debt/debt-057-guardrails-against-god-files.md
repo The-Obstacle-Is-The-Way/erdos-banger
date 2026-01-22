@@ -49,7 +49,7 @@ Example:
 
 Run in CI:
 
-```
+```bash
 uv run python scripts/audit_code_health.py
 ```
 

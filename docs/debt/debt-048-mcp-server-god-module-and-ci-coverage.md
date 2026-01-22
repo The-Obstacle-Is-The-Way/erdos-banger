@@ -31,7 +31,7 @@
 
 Split into a package:
 
-```
+```text
 src/erdos/mcp/
 ├── server.py          # thin entrypoint
 ├── tools.py           # tool definitions

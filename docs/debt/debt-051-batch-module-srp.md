@@ -24,7 +24,7 @@ The code works and is well-tested, but this is a classic “feature accretion”
 
 Split into a package:
 
-```
+```text
 src/erdos/core/batch/
 ├── __init__.py
 ├── models.py          # BatchState, BatchResult, filters, serialization

@@ -42,10 +42,12 @@ Both have complexity suppressions (`PLR091*`) indicating ruff has already identi
 ## SOLID / Clean Architecture Notes
 
 ### SRP
+
 - `run_loop` mixes orchestration, IO, logging, and domain rules → high coupling.
 - `commands/search.py` mixes CLI, output, orchestration, and domain decisions.
 
 ### DIP
+
 - Provider orchestration work (SPEC-022) improved DIP by introducing `MetadataProvider` + `SearchIndexProtocol`.
 - Remaining DIP pressure is largely “command-layer orchestration” rather than “core imports UI”.
 

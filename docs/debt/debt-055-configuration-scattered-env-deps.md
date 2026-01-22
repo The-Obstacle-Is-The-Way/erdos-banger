@@ -45,7 +45,7 @@ Examples (as of 2026-01-22):
 
 1. Create a single configuration object (dataclass or Pydantic model):
 
-```
+```text
 src/erdos/core/config.py
 ```
 

@@ -45,7 +45,7 @@ Reproduce:
 
 Split the protocol into smaller, intention-revealing ports:
 
-```
+```text
 SearchIndexReadPort      # search(), stats(), counts
 SearchIndexWritePort     # index_problem(), clear()
 EmbeddingIndexPort       # has_embeddings(), build_embeddings(), search_semantic(), search_hybrid()

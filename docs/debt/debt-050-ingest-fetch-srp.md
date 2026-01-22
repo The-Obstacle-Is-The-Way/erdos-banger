@@ -40,7 +40,7 @@ Reproduce:
 
 Split into focused modules inside `core/ingest/`:
 
-```
+```text
 src/erdos/core/ingest/
 ├── fetch.py              # thin orchestrator (kept for compatibility)
 ├── arxiv_download.py     # download + cache + extract

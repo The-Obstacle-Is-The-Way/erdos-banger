@@ -49,7 +49,7 @@ Create or expand bounded-context subpackages and move code so that:
 
 Suggested target layout:
 
-```
+```text
 src/erdos/core/
 ├── ask/                  # already exists
 ├── ingest/               # already exists

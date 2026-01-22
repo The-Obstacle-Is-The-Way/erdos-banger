@@ -246,11 +246,13 @@ Dependency manifests:
 ### Push Strategy (Remote Backup)
 
 After each atomic commit:
+
 ```bash
 git push
 ```
 
 **If push fails with "branches have diverged":**
+
 ```bash
 git push --force-with-lease
 ```

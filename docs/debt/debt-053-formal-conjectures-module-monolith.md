@@ -44,7 +44,7 @@ All of this is related to “formal conjectures integration”, but it still vio
 
 Extract into a bounded-context package and keep a compatibility shim:
 
-```
+```text
 src/erdos/core/formal_conjectures/
 ├── __init__.py
 ├── config.py          # repo/url + cache path policy
