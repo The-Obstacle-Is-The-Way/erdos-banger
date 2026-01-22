@@ -39,8 +39,8 @@ Work strictly top-to-bottom unless blocked by dependencies.
   Deck: `docs/_archive/debt/debt-058-md5-noqa-in-loop.md`
 - [x] **DEBT-047**: Loop run logs are unsanitized/duplicated (LoopLogger vs RunLogger)
   Deck: `docs/_archive/debt/debt-047-loop-logging-sanitization-and-unification.md`
-- [ ] **DEBT-057**: Add CI guardrails against god-file regressions
-  Deck: `docs/debt/debt-057-guardrails-against-god-files.md`
+- [x] **DEBT-057**: Add CI guardrails against god-file regressions
+  Deck: `docs/_archive/debt/debt-057-guardrails-against-god-files.md`
 - [ ] **DEBT-042**: Loop contract drift + `core/loop.py` god function
   Deck: `docs/debt/debt-042-loop-command-contract-and-god-module.md`
 - [ ] **DEBT-043**: `erdos search` command god module
@@ -113,4 +113,13 @@ Work strictly top-to-bottom unless blocked by dependencies.
 - Updated `LoopLogger.log_event()` to sanitize data before writing to log files
 - Refactored `RunLogEntry._sanitize_args()` to use shared `sanitize_secrets()` function
 - Added 4 tests for LoopLogger sanitization + 8 tests for sanitize_secrets function
+- `make ci` passes (867 tests, 82.00% coverage)
+
+### 2026-01-22: DEBT-057 Fixed
+- Added `scripts/audit_code_health.py` - CI guardrail against god-file regressions
+- Enforces LOC thresholds: 400 for command modules, 500 for core modules, 120 for functions
+- Reports violations with file:line locations; exempted violations paired with debt decks pass CI
+- Added `make audit` target and integrated into `make ci`
+- Documented thresholds in CLAUDE.md under "Code Health Guardrails" section
+- Created DEBT-060 for `formalize_cmd.py` long Typer callback (discovered during audit)
 - `make ci` passes (867 tests, 82.00% coverage)

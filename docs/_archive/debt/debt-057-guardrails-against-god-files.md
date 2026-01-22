@@ -1,9 +1,10 @@
 # DEBT-057: No Automated Guardrails Against “God Files” Regressing (Commands/Core)
 
-**Status:** Open
+**Status:** Fixed
 **Priority:** P3
 **Found:** 2026-01-22
 **Found By:** Clean Code audit (post v2.1 refactors)
+**Fixed In:** 1f37f5c
 
 ---
 
@@ -57,10 +58,10 @@ uv run python scripts/audit_code_health.py
 
 ## Acceptance Criteria
 
-1. [ ] CI fails if new code introduces a module/function above agreed thresholds without explicit justification.
-2. [ ] The audit script reports the worst offenders with file:line locations.
-3. [ ] Thresholds are documented in `AGENTS.md` (or `CLAUDE.md`) for contributors.
-4. [ ] `make ci` passes.
+1. [x] CI fails if new code introduces a module/function above agreed thresholds without explicit justification.
+2. [x] The audit script reports the worst offenders with file:line locations.
+3. [x] Thresholds are documented in `AGENTS.md` (or `CLAUDE.md`) for contributors.
+4. [x] `make ci` passes.
 
 ---
 

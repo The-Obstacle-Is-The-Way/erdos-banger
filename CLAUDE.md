@@ -19,7 +19,7 @@ uv run erdos list --status open --limit 5
 uv run erdos show 6
 
 # Full CI check (run before every commit)
-make ci                    # format-check + lint + typecheck + cov
+make ci                    # format-check + lint + typecheck + cov + audit
 
 # Individual checks
 make lint                  # ruff check
@@ -28,6 +28,7 @@ make typecheck             # mypy src/ tests/
 make test                  # pytest (skip Lean + network)
 make test-all              # pytest (all tests)
 make smoke                 # CLI smoke test
+make audit                 # LOC guardrails check
 ```
 
 ## Running Tests
@@ -114,6 +115,26 @@ src/erdos/
 - 80% minimum test coverage enforced
 - All CLI output through Rich console or `exit_with_result()`
 - Clean Code / SOLID: keep Typer callbacks thin, move orchestration into `src/erdos/core/`, and avoid growing new "god modules". If a necessary refactor is too large for the current change, create a debt deck in `docs/debt/` with evidence + acceptance criteria.
+
+## Code Health Guardrails
+
+CI enforces LOC (lines of code) thresholds to prevent god-file regressions:
+
+| Scope | Threshold | Rationale |
+|-------|-----------|-----------|
+| Command modules (`commands/**/*.py`) | 400 LOC | Keep Typer callbacks thin |
+| Core modules (`core/**/*.py`) | 500 LOC | Business logic may be denser |
+| Functions | 120 LOC | Readable, testable units |
+
+**Existing violations are exempted** if paired with a debt deck. Run `make audit` to check.
+
+**To add an exemption:**
+1. Create a debt deck in `docs/debt/debt-XXX-*.md` documenting the issue
+2. Add the module/function to `EXEMPTED_MODULES` or `EXEMPTED_FUNCTIONS` in `scripts/audit_code_health.py`
+
+**Inline exemption markers** (alternative to hardcoding):
+- Module: Add `# exempt: DEBT-XXX` in the first 50 lines
+- Function: Add `# exempt: DEBT-XXX` in the docstring
 
 ## Core Package Boundaries
 

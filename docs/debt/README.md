@@ -28,7 +28,7 @@ This directory contains technical-debt writeups: spec drift, missing fixtures, i
 | DEBT-053 | Formal conjectures module monolith | P3 | Open | `debt-053-formal-conjectures-module-monolith.md` |
 | DEBT-054 | Run logger OCP violation (central command switch) | P3 | Open | `debt-054-run-logger-ocp-violation.md` |
 | DEBT-055 | Scattered env-based configuration | P2 | Open | `debt-055-configuration-scattered-env-deps.md` |
-| DEBT-057 | Guardrails against god-file regressions | P3 | Open | `debt-057-guardrails-against-god-files.md` |
+| DEBT-060 | Formalize command long Typer callback | P4 | Open | `debt-060-formalize-cmd-long-callback.md` |
 
 ## Archived Debt
 
@@ -82,8 +82,9 @@ All debt below has been resolved and archived to `docs/_archive/debt/`.
 | DEBT-056 | FallbackProvider broad exception catches | P3 | Fixed | 5a6ce89 |
 | DEBT-058 | MD5 `# noqa: S324` in loop module | P3 | Fixed | 3891aeb |
 | DEBT-047 | Loop logging sanitization/unification | P3 | Fixed | c090fb3 |
+| DEBT-057 | Guardrails against god-file regressions | P3 | Fixed | 1f37f5c |
 
-**Next Debt ID:** DEBT-060
+**Next Debt ID:** DEBT-061
 
 ### Archived Debt Decks
 
@@ -133,3 +134,4 @@ All debt below has been resolved and archived to `docs/_archive/debt/`.
 - `docs/_archive/debt/debt-056-fallback-provider-broad-exceptions.md`
 - `docs/_archive/debt/debt-058-md5-noqa-in-loop.md`
 - `docs/_archive/debt/debt-047-loop-logging-sanitization-and-unification.md`
+- `docs/_archive/debt/debt-057-guardrails-against-god-files.md`

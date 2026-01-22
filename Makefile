@@ -20,6 +20,7 @@ CLEAN_DIRS := .pytest_cache .mypy_cache .ruff_cache .coverage htmlcov dist build
 	smoke \
 	check fix \
 	security \
+	audit \
 	clean reset \
 	ci
 
@@ -126,6 +127,11 @@ reset: clean ## 🔄 Nuclear option - clean everything and reinstall
 	$(RUN) pre-commit install --install-hooks
 	@echo "✅ Fresh environment ready"
 
+##@ Code Health
+
+audit: ## Check code health (LOC guardrails)
+	$(RUN) python scripts/audit_code_health.py
+
 ##@ CI
 
-ci: format-check lint typecheck cov ## Run CI-equivalent checks
+ci: format-check lint typecheck cov audit ## Run CI-equivalent checks
