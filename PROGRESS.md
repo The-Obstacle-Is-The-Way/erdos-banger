@@ -33,8 +33,8 @@ Work strictly top-to-bottom unless blocked by dependencies.
   Deck: `docs/_archive/debt/debt-059-coderabbit-pr17-fixes.md`
 - [x] **DEBT-046**: CLIOutput `success=false` with exit code 0 ambiguity (search IndexEmpty)
   Deck: `docs/_archive/debt/debt-046-clioutput-success-vs-exitcode.md`
-- [ ] **DEBT-056**: FallbackProvider catches `Exception` broadly (may hide provider bugs)
-  Deck: `docs/debt/debt-056-fallback-provider-broad-exceptions.md`
+- [x] **DEBT-056**: FallbackProvider catches `Exception` broadly (may hide provider bugs)
+  Deck: `docs/_archive/debt/debt-056-fallback-provider-broad-exceptions.md`
 - [ ] **DEBT-058**: MD5 `# noqa: S324` in loop module (justify or replace)
   Deck: `docs/debt/debt-058-md5-noqa-in-loop.md`
 - [ ] **DEBT-047**: Loop run logs are unsanitized/duplicated (LoopLogger vs RunLogger)
@@ -92,3 +92,10 @@ Work strictly top-to-bottom unless blocked by dependencies.
 - Fallback returns `CLIOutput.ok` with `fallback_reason="index_empty"` for unambiguous semantics
 - Added tests: `test_empty_index_returns_none`, `test_populated_index_returns_results`, updated fallback test
 - `make ci` passes (852 tests, 81.85% coverage)
+
+### 2026-01-22: DEBT-056 Fixed
+- FallbackProvider now catches only expected exception types per port contract
+- Replaced `except Exception` with `except _EXPECTED_PROVIDER_ERRORS` (RequestException, ValueError)
+- Unknown exceptions (RuntimeError, TypeError, AttributeError, etc.) now propagate for fail-fast debugging
+- Added 4 tests: `test_propagates_unexpected_exceptions`, `test_propagates_unexpected_exceptions_arxiv`, `test_propagates_unexpected_exceptions_search`, `test_falls_back_on_value_error`
+- `make ci` passes (856 tests, 81.89% coverage)

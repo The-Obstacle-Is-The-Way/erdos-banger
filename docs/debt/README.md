@@ -29,7 +29,6 @@ This directory contains technical-debt writeups: spec drift, missing fixtures, i
 | DEBT-053 | Formal conjectures module monolith | P3 | Open | `debt-053-formal-conjectures-module-monolith.md` |
 | DEBT-054 | Run logger OCP violation (central command switch) | P3 | Open | `debt-054-run-logger-ocp-violation.md` |
 | DEBT-055 | Scattered env-based configuration | P2 | Open | `debt-055-configuration-scattered-env-deps.md` |
-| DEBT-056 | FallbackProvider broad exception catches | P3 | Open | `debt-056-fallback-provider-broad-exceptions.md` |
 | DEBT-057 | Guardrails against god-file regressions | P3 | Open | `debt-057-guardrails-against-god-files.md` |
 | DEBT-058 | MD5 `# noqa: S324` in loop module | P3 | Open | `debt-058-md5-noqa-in-loop.md` |
 
@@ -82,6 +81,7 @@ All debt below has been resolved and archived to `docs/_archive/debt/`.
 | DEBT-038 | MetadataProvider abstraction missing | P2 | Resolved | SPEC-022 |
 | DEBT-059 | CodeRabbit PR#17 fixes (validation + invariants) | P2 | Fixed | 61ad15e |
 | DEBT-046 | CLIOutput `success` vs exit code ambiguity | P2 | Fixed | 0046cdf |
+| DEBT-056 | FallbackProvider broad exception catches | P3 | Fixed | 5a6ce89 |
 
 **Next Debt ID:** DEBT-060
 
@@ -130,3 +130,4 @@ All debt below has been resolved and archived to `docs/_archive/debt/`.
 - `docs/_archive/debt/debt-038-metadata-provider-abstraction.md`
 - `docs/_archive/debt/debt-059-coderabbit-pr17-fixes.md`
 - `docs/_archive/debt/debt-046-clioutput-success-vs-exitcode.md`
+- `docs/_archive/debt/debt-056-fallback-provider-broad-exceptions.md`

@@ -5,6 +5,8 @@ from __future__ import annotations
 import logging
 from typing import TYPE_CHECKING
 
+import requests
+
 
 if TYPE_CHECKING:
     from erdos.core.models import ReferenceRecord
@@ -12,6 +14,12 @@ if TYPE_CHECKING:
 
 
 logger = logging.getLogger(__name__)
+
+# Expected exception types per MetadataProvider contract (ports.py):
+# - requests.RequestException: network/API errors (non-404)
+# - ValueError: invalid identifiers or irrecoverable parse errors
+# Unknown exceptions propagate (fail fast on programming errors).
+_EXPECTED_PROVIDER_ERRORS = (requests.RequestException, ValueError)
 
 
 class FallbackProvider:
@@ -60,7 +68,7 @@ class FallbackProvider:
                 logger.debug(
                     "DOI %s not found in %s, trying next", doi, provider.provider_name
                 )
-            except Exception:
+            except _EXPECTED_PROVIDER_ERRORS:
                 logger.warning(
                     "Provider %s failed for DOI %s, trying next",
                     provider.provider_name,
@@ -85,7 +93,7 @@ class FallbackProvider:
                     arxiv_id,
                     provider.provider_name,
                 )
-            except Exception:
+            except _EXPECTED_PROVIDER_ERRORS:
                 logger.warning(
                     "Provider %s failed for arXiv %s, trying next",
                     provider.provider_name,
@@ -108,7 +116,7 @@ class FallbackProvider:
                         provider.provider_name,
                     )
                     return results
-            except Exception:
+            except _EXPECTED_PROVIDER_ERRORS:
                 logger.warning(
                     "Provider %s failed for search '%s', trying next",
                     provider.provider_name,

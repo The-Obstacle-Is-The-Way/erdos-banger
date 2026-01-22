@@ -108,15 +108,81 @@ class TestFallbackProvider:
         assert len(primary._call_log) == 1
         assert len(fallback._call_log) == 1
 
-    def test_falls_back_when_primary_raises(self) -> None:
-        """Fallback is used when primary raises an exception."""
+    def test_falls_back_when_primary_raises_expected_error(self) -> None:
+        """Fallback is used when primary raises an expected exception type."""
+        import requests
+
         from erdos.core.providers import FallbackProvider
 
         record = ReferenceRecord(title="Test Paper", doi="10.1234/test")
 
         primary = MagicMock()
         primary.provider_name = "primary"
-        primary.get_by_doi.side_effect = Exception("API error")
+        # RequestException is an expected error type per port contract
+        primary.get_by_doi.side_effect = requests.RequestException("API error")
+
+        fallback = MockProvider("fallback", {("doi", "10.1234/test"): record})
+
+        provider = FallbackProvider(primary, fallback)
+        result = provider.get_by_doi("10.1234/test")
+
+        assert result == record
+
+    def test_propagates_unexpected_exceptions(self) -> None:
+        """Unexpected exceptions (programming errors) should propagate, not be caught."""
+        from erdos.core.providers import FallbackProvider
+
+        primary = MagicMock()
+        primary.provider_name = "primary"
+        # RuntimeError is NOT an expected error type - should propagate
+        primary.get_by_doi.side_effect = RuntimeError("Programming bug")
+
+        fallback = MockProvider("fallback")
+
+        provider = FallbackProvider(primary, fallback)
+
+        with pytest.raises(RuntimeError, match="Programming bug"):
+            provider.get_by_doi("10.1234/test")
+
+    def test_propagates_unexpected_exceptions_arxiv(self) -> None:
+        """Unexpected exceptions for arXiv lookups should propagate."""
+        from erdos.core.providers import FallbackProvider
+
+        primary = MagicMock()
+        primary.provider_name = "primary"
+        primary.get_by_arxiv.side_effect = TypeError("Unexpected type bug")
+
+        fallback = MockProvider("fallback")
+
+        provider = FallbackProvider(primary, fallback)
+
+        with pytest.raises(TypeError, match="Unexpected type bug"):
+            provider.get_by_arxiv("2103.03874")
+
+    def test_propagates_unexpected_exceptions_search(self) -> None:
+        """Unexpected exceptions for search should propagate."""
+        from erdos.core.providers import FallbackProvider
+
+        primary = MagicMock()
+        primary.provider_name = "primary"
+        primary.search.side_effect = AttributeError("Missing attribute")
+
+        fallback = MockProvider("fallback")
+
+        provider = FallbackProvider(primary, fallback)
+
+        with pytest.raises(AttributeError, match="Missing attribute"):
+            provider.search("erdos", limit=10)
+
+    def test_falls_back_on_value_error(self) -> None:
+        """ValueError (invalid identifier) should trigger fallback per contract."""
+        from erdos.core.providers import FallbackProvider
+
+        record = ReferenceRecord(title="Test Paper", doi="10.1234/test")
+
+        primary = MagicMock()
+        primary.provider_name = "primary"
+        primary.get_by_doi.side_effect = ValueError("Invalid DOI format")
 
         fallback = MockProvider("fallback", {("doi", "10.1234/test"): record})
 
