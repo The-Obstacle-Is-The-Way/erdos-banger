@@ -123,15 +123,38 @@ class ProblemLoader:
         self._cache: dict[int, ProblemRecord] | None = None
 
     @classmethod
-    def from_default(cls) -> ProblemLoader:
+    def _resolve_path(cls, path: Path) -> ProblemLoader | None:
+        """Resolve a path (file or directory) to a ProblemLoader.
+
+        Args:
+            path: File or directory path to resolve.
+
+        Returns:
+            ProblemLoader if valid path found, None otherwise.
+        """
+        if path.exists() and path.is_file():
+            return cls(path)
+        if path.exists() and path.is_dir():
+            for filename in ("problems_enriched.yaml", "problems.yaml"):
+                yaml_path = path / filename
+                if yaml_path.exists():
+                    return cls(yaml_path)
+        return None
+
+    @classmethod
+    def from_default(cls, *, data_path: Path | None = None) -> ProblemLoader:
         """
         Create loader using default data path.
 
         Looks for a problems YAML in these locations (in order):
-        1. ERDOS_DATA_PATH environment variable (file or directory)
-        2. ./data/problems_enriched.yaml (relative to cwd; v1 default)
-        3. Package data directory (built-in sample dataset)
-        4. ./data/erdosproblems/data/problems.yaml (upstream metadata-only)
+        1. Explicit data_path parameter (if provided)
+        2. ERDOS_DATA_PATH environment variable (file or directory)
+        3. ./data/problems_enriched.yaml (relative to cwd; v1 default)
+        4. Package data directory (built-in sample dataset)
+        5. ./data/erdosproblems/data/problems.yaml (upstream metadata-only)
+
+        Args:
+            data_path: Explicit path to use (skips env/filesystem search).
 
         Returns:
             ProblemLoader instance
@@ -139,18 +162,34 @@ class ProblemLoader:
         Raises:
             ProblemLoaderError: If no valid path found
         """
+        # 1. Explicit path from config (DIP-compliant)
+        if data_path is not None:
+            loader = cls._resolve_path(data_path)
+            if loader is not None:
+                return loader
+            raise ProblemLoaderError(f"data_path not found: {data_path}")
+
+        # 2. Environment variable (legacy fallback)
         env_path = os.environ.get("ERDOS_DATA_PATH")
         if env_path:
-            env = Path(env_path)
-            if env.exists() and env.is_file():
-                return cls(env)
-            if env.exists() and env.is_dir():
-                for filename in ("problems_enriched.yaml", "problems.yaml"):
-                    yaml_path = env / filename
-                    if yaml_path.exists():
-                        return cls(yaml_path)
+            loader = cls._resolve_path(Path(env_path))
+            if loader is not None:
+                return loader
             raise ProblemLoaderError(f"ERDOS_DATA_PATH not found: {env_path}")
 
+        # 3. Common file paths
+        return cls._find_default_paths()
+
+    @classmethod
+    def _find_default_paths(cls) -> ProblemLoader:
+        """Search default filesystem locations for problems YAML.
+
+        Returns:
+            ProblemLoader instance
+
+        Raises:
+            ProblemLoaderError: If no valid path found
+        """
         enriched_path = Path("data/problems_enriched.yaml")
         if enriched_path.exists():
             return cls(enriched_path)
@@ -160,19 +199,18 @@ class ProblemLoader:
             pkg_data = pkg_files.joinpath("data", "problems_enriched.yaml")
             with as_file(pkg_data) as real_path:
                 if real_path.exists():
-                    # Read content within context to avoid temp file cleanup issue
                     content = real_path.read_text(encoding="utf-8")
                     return cls(real_path, _content=content)
         except (ImportError, TypeError, AttributeError, FileNotFoundError):
             logger.debug("Package data loading skipped", exc_info=True)
-            pass
 
         relative_path = Path("data/erdosproblems/data/problems.yaml")
         if relative_path.exists():
             return cls(relative_path)
 
         raise ProblemLoaderError(
-            "Could not find problems YAML. Set ERDOS_DATA_PATH or create data/problems_enriched.yaml."
+            "Could not find problems YAML. "
+            "Set ERDOS_DATA_PATH or create data/problems_enriched.yaml."
         )
 
     @property

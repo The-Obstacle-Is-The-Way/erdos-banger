@@ -70,14 +70,26 @@ class SearchIndex:
         self._hybrid = HybridSearch(self._db, self._bm25, self._embeddings)
 
     @classmethod
-    def from_default(cls) -> SearchIndex:
-        """Create index using default path (index/erdos.sqlite)."""
-        # Check environment variable
+    def from_default(cls, *, index_path: Path | None = None) -> SearchIndex:
+        """Create index using default path (index/erdos.sqlite).
+
+        Args:
+            index_path: Explicit path to use (skips env/default lookup).
+
+        Returns:
+            SearchIndex instance.
+        """
+        # 1. Explicit path from config (DIP-compliant)
+        if index_path is not None:
+            index_path.parent.mkdir(parents=True, exist_ok=True)
+            return cls(index_path)
+
+        # 2. Environment variable (legacy fallback)
         env_path = os.environ.get("ERDOS_INDEX_PATH")
         if env_path:
             return cls(Path(env_path))
 
-        # Default path
+        # 3. Default path
         default_path = Path("index/erdos.sqlite")
         default_path.parent.mkdir(parents=True, exist_ok=True)
         return cls(default_path)

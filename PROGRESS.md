@@ -61,8 +61,8 @@ Work strictly top-to-bottom unless blocked by dependencies.
   Deck: `docs/_archive/debt/debt-051-batch-module-srp.md`
 - [x] **DEBT-048**: MCP server module size + CI coverage gap
   Deck: `docs/_archive/debt/debt-048-mcp-server-god-module-and-ci-coverage.md`
-- [ ] **DEBT-055**: Scattered env-based configuration (hidden dependencies)
-  Deck: `docs/debt/debt-055-configuration-scattered-env-deps.md`
+- [x] **DEBT-055**: Scattered env-based configuration (hidden dependencies)
+  Deck: `docs/_archive/debt/debt-055-configuration-scattered-env-deps.md`
 - [ ] **DEBT-044**: `core/` bounded-context refactor (reduce sprawl)
   Deck: `docs/debt/debt-044-core-bounded-context-refactor.md`
 
@@ -242,3 +242,18 @@ Work strictly top-to-bottom unless blocked by dependencies.
   - Runs both unit and integration MCP tests on every push/PR
 - Removed MCP from coverage omit list (now has dedicated CI job)
 - `make ci` passes (920 tests, 81.42% coverage)
+
+### 2026-01-22: DEBT-055 Fixed
+- Created centralized `src/erdos/core/config.py` with `AppConfig` dataclass:
+  - Consolidates all env var reads: `ERDOS_DATA_PATH`, `ERDOS_INDEX_PATH`, `ERDOS_RUN_LOG_PATH`, `ERDOS_REPO_ROOT`, `ERDOS_MAILTO`, `ERDOS_LLM_COMMAND`, `ARISTOTLE_API_KEY`, `ERDOS_ARISTOTLE_COMMAND`, `OPENALEX_API_KEY`
+  - `AppConfig.from_env()` is the single source of truth for env-based configuration
+- Updated `AppContext` (composition root) to hold config and pass it to dependencies
+- Refactored factory methods to accept optional explicit parameters:
+  - `ProblemLoader.from_default(data_path=...)` - uses explicit path or falls back to env/defaults
+  - `SearchIndex.from_default(index_path=...)` - uses explicit path or falls back to env/defaults
+  - `validate_aristotle_config(api_key=..., command=...)` - uses explicit values or falls back to env
+  - `get_repo_root(repo_root=...)` - uses explicit path or falls back to env/cwd
+- Added `AppContext.from_config(config)` for tests to bypass env vars entirely
+- Added 10 unit tests for `AppConfig` covering defaults, env reading, and testability
+- Extracted `_resolve_path()` and `_find_default_paths()` helpers in ProblemLoader to reduce complexity
+- `make ci` passes (928 tests, 81.53% coverage)

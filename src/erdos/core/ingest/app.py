@@ -63,8 +63,17 @@ class IngestOptions:
     use_llm: bool = False
 
 
-def get_repo_root() -> Path:
-    """Get repository root from environment or current directory."""
+def get_repo_root(*, repo_root: Path | None = None) -> Path:
+    """Get repository root.
+
+    Args:
+        repo_root: Explicit path (falls back to ERDOS_REPO_ROOT, then cwd).
+
+    Returns:
+        Repository root path.
+    """
+    if repo_root is not None:
+        return repo_root
     env_root = os.environ.get("ERDOS_REPO_ROOT")
     if env_root:
         return Path(env_root)
