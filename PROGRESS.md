@@ -29,6 +29,8 @@
 
 Work strictly top-to-bottom unless blocked by dependencies.
 
+- [ ] **DEBT-059**: CodeRabbit PR#17 fixes (input validation + invariant bugs)
+  Deck: `docs/debt/debt-059-coderabbit-pr17-fixes.md`
 - [ ] **DEBT-046**: CLIOutput `success=false` with exit code 0 ambiguity (search IndexEmpty)
   Deck: `docs/debt/debt-046-clioutput-success-vs-exitcode.md`
 - [ ] **DEBT-056**: FallbackProvider catches `Exception` broadly (may hide provider bugs)

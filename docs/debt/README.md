@@ -33,6 +33,7 @@ This directory contains technical-debt writeups: spec drift, missing fixtures, i
 | DEBT-056 | FallbackProvider broad exception catches | P3 | Open | `debt-056-fallback-provider-broad-exceptions.md` |
 | DEBT-057 | Guardrails against god-file regressions | P3 | Open | `debt-057-guardrails-against-god-files.md` |
 | DEBT-058 | MD5 `# noqa: S324` in loop module | P3 | Open | `debt-058-md5-noqa-in-loop.md` |
+| DEBT-059 | CodeRabbit PR#17 fixes (validation + invariants) | P2 | Open | `debt-059-coderabbit-pr17-fixes.md` |
 
 ## Archived Debt
 
@@ -82,7 +83,7 @@ All debt below has been resolved and archived to `docs/_archive/debt/`.
 | DEBT-036 | Marker device selection not exposed | P3 | Fixed | 7005b65 |
 | DEBT-038 | MetadataProvider abstraction missing | P2 | Resolved | SPEC-022 |
 
-**Next Debt ID:** DEBT-059
+**Next Debt ID:** DEBT-060
 
 ### Archived Debt Decks
 
