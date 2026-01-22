@@ -32,8 +32,18 @@ LOG_SCHEMA_VERSION = 1
 # Default log file location
 DEFAULT_LOG_FILE = Path("logs/runs.jsonl")
 
-# Secret keys to redact from args
+# Secret keys to redact from args (matched case-insensitively in key names)
 SECRET_KEY_PATTERNS = ("key", "token", "secret", "password", "credential")
+
+# Regex patterns to redact from string values (API keys, Authorization headers, etc.)
+SECRET_VALUE_PATTERNS = (
+    re.compile(r"sk-[a-zA-Z0-9]{20,}"),  # OpenAI-style API keys
+    re.compile(r"Bearer\s+[a-zA-Z0-9._-]+", re.IGNORECASE),  # Bearer tokens
+    re.compile(
+        r"Authorization:\s*\S+(\s+\S+)?", re.IGNORECASE
+    ),  # Authorization headers
+    re.compile(r"[a-zA-Z0-9_-]{32,}"),  # Generic long tokens (32+ chars)
+)
 
 
 def generate_run_id() -> str:
@@ -89,6 +99,48 @@ def parse_since(since: str) -> datetime:
         pass
 
     raise ValueError(f"Invalid since format: {since}. Use Nd/Nh/Nm or ISO 8601.")
+
+
+def sanitize_secrets(data: dict[str, Any]) -> dict[str, Any]:
+    """Redact sensitive values from a dictionary, including nested structures.
+
+    This sanitizes both:
+    1. Keys containing sensitive patterns (key, token, secret, password, credential)
+    2. String values matching secret patterns (API keys, Authorization headers, etc.)
+
+    Args:
+        data: Dictionary to sanitize
+
+    Returns:
+        Sanitized copy with secrets redacted
+    """
+
+    def sanitize_string(value: str) -> str:
+        """Redact secret patterns in a string value."""
+        result = value
+        for pattern in SECRET_VALUE_PATTERNS:
+            result = pattern.sub("[REDACTED]", result)
+        return result
+
+    def sanitize_value(key: str, value: Any) -> Any:
+        """Recursively sanitize a value."""
+        key_lower = key.lower()
+        if any(pattern in key_lower for pattern in SECRET_KEY_PATTERNS):
+            return "[REDACTED]"
+        if isinstance(value, str):
+            return sanitize_string(value)
+        if isinstance(value, dict):
+            return {k: sanitize_value(k, v) for k, v in value.items()}
+        if isinstance(value, list):
+            return [
+                sanitize_value("", item)
+                if not isinstance(item, dict)
+                else {k: sanitize_value(k, v) for k, v in item.items()}
+                for item in value
+            ]
+        return value
+
+    return {key: sanitize_value(key, value) for key, value in data.items()}
 
 
 class RunLogEntry(ErdosBaseModel):
@@ -149,24 +201,7 @@ class RunLogEntry(ErdosBaseModel):
     @staticmethod
     def _sanitize_args(args: dict[str, Any]) -> dict[str, Any]:
         """Redact sensitive values from args, including nested structures."""
-
-        def sanitize_value(key: str, value: Any) -> Any:
-            """Recursively sanitize a value."""
-            key_lower = key.lower()
-            if any(pattern in key_lower for pattern in SECRET_KEY_PATTERNS):
-                return "[REDACTED]"
-            if isinstance(value, dict):
-                return {k: sanitize_value(k, v) for k, v in value.items()}
-            if isinstance(value, list):
-                return [
-                    sanitize_value("", item)
-                    if not isinstance(item, dict)
-                    else {k: sanitize_value(k, v) for k, v in item.items()}
-                    for item in value
-                ]
-            return value
-
-        return {key: sanitize_value(key, value) for key, value in args.items()}
+        return sanitize_secrets(args)
 
     @staticmethod
     def _extract_problem_id(args: dict[str, Any], cli_output: CLIOutput) -> int | None:

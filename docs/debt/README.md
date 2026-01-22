@@ -20,7 +20,6 @@ This directory contains technical-debt writeups: spec drift, missing fixtures, i
 | DEBT-043 | `erdos search` command god module (SRP pressure) | P2 | Open | `debt-043-search-command-god-module.md` |
 | DEBT-044 | `core/` bounded-context refactor (reduce sprawl) | P2 | Open | `debt-044-core-bounded-context-refactor.md` |
 | DEBT-045 | Split `SearchIndexProtocol` (ISP/DIP) | P2 | Open | `debt-045-searchindexprotocol-interface-segregation.md` |
-| DEBT-047 | Loop logging sanitization/unification | P3 | Open | `debt-047-loop-logging-sanitization-and-unification.md` |
 | DEBT-048 | MCP server module size + CI coverage gap | P3 | Open | `debt-048-mcp-server-god-module-and-ci-coverage.md` |
 | DEBT-049 | SearchIndex monolith (SRP extraction) | P2 | Open | `debt-049-search-index-monolith.md` |
 | DEBT-050 | Ingest fetch SRP split | P2 | Open | `debt-050-ingest-fetch-srp.md` |
@@ -82,6 +81,7 @@ All debt below has been resolved and archived to `docs/_archive/debt/`.
 | DEBT-046 | CLIOutput `success` vs exit code ambiguity | P2 | Fixed | 0046cdf |
 | DEBT-056 | FallbackProvider broad exception catches | P3 | Fixed | 5a6ce89 |
 | DEBT-058 | MD5 `# noqa: S324` in loop module | P3 | Fixed | 3891aeb |
+| DEBT-047 | Loop logging sanitization/unification | P3 | Fixed | c090fb3 |
 
 **Next Debt ID:** DEBT-060
 
@@ -132,3 +132,4 @@ All debt below has been resolved and archived to `docs/_archive/debt/`.
 - `docs/_archive/debt/debt-046-clioutput-success-vs-exitcode.md`
 - `docs/_archive/debt/debt-056-fallback-provider-broad-exceptions.md`
 - `docs/_archive/debt/debt-058-md5-noqa-in-loop.md`
+- `docs/_archive/debt/debt-047-loop-logging-sanitization-and-unification.md`

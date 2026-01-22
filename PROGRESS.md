@@ -37,8 +37,8 @@ Work strictly top-to-bottom unless blocked by dependencies.
   Deck: `docs/_archive/debt/debt-056-fallback-provider-broad-exceptions.md`
 - [x] **DEBT-058**: MD5 `# noqa: S324` in loop module (justify or replace)
   Deck: `docs/_archive/debt/debt-058-md5-noqa-in-loop.md`
-- [ ] **DEBT-047**: Loop run logs are unsanitized/duplicated (LoopLogger vs RunLogger)
-  Deck: `docs/debt/debt-047-loop-logging-sanitization-and-unification.md`
+- [x] **DEBT-047**: Loop run logs are unsanitized/duplicated (LoopLogger vs RunLogger)
+  Deck: `docs/_archive/debt/debt-047-loop-logging-sanitization-and-unification.md`
 - [ ] **DEBT-057**: Add CI guardrails against god-file regressions
   Deck: `docs/debt/debt-057-guardrails-against-god-files.md`
 - [ ] **DEBT-042**: Loop contract drift + `core/loop.py` god function
@@ -106,3 +106,11 @@ Work strictly top-to-bottom unless blocked by dependencies.
 - `_file_hash()`: replaced `hashlib.md5()` with `hashlib.sha256()` for file content hashing
 - Removed all `# noqa: S324` suppressions from the file
 - `make ci` passes (856 tests, 81.90% coverage)
+
+### 2026-01-22: DEBT-047 Fixed
+- Added shared `sanitize_secrets()` function to `run_logger.py` for consistent secret redaction
+- Sanitizes both key names (api_key, token, secret, password, credential) and string values (API keys, Bearer tokens, Authorization headers)
+- Updated `LoopLogger.log_event()` to sanitize data before writing to log files
+- Refactored `RunLogEntry._sanitize_args()` to use shared `sanitize_secrets()` function
+- Added 4 tests for LoopLogger sanitization + 8 tests for sanitize_secrets function
+- `make ci` passes (867 tests, 82.00% coverage)

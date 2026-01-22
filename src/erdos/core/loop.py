@@ -25,6 +25,7 @@ from erdos.core.loop_verifier import (
     count_sorries,
 )
 from erdos.core.patch_validator import PatchStatus, validate_patch
+from erdos.core.run_logger import sanitize_secrets
 
 
 if TYPE_CHECKING:
@@ -267,13 +268,16 @@ class LoopLogger:
         self._file = log_path.open("a", encoding="utf-8")
 
     def log_event(self, event: str, iteration: int, data: dict[str, Any]) -> None:
-        """Log an event to the run log."""
+        """Log an event to the run log.
+
+        Data is sanitized to redact secrets (API keys, tokens, Authorization headers).
+        """
         entry = {
             "schema_version": 1,
             "iteration": iteration,
             "event": event,
             "timestamp": datetime.now(UTC).isoformat(),
-            "data": data,
+            "data": sanitize_secrets(data),
         }
         self._file.write(json.dumps(entry) + "\n")
         self._file.flush()

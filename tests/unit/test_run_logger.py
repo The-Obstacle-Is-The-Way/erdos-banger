@@ -16,6 +16,7 @@ from erdos.core.run_logger import (
     RunLogger,
     generate_run_id,
     parse_since,
+    sanitize_secrets,
 )
 
 
@@ -423,3 +424,83 @@ class TestRunLoggerSearchIntegration:
         assert result is not None
         assert result.get("hit_count") == 3
         assert result.get("top_problem_ids") == [4, 6, 123]
+
+
+class TestSanitizeSecrets:
+    """Tests for the sanitize_secrets() function."""
+
+    def test_redacts_api_key_in_string_values(self) -> None:
+        """API keys embedded in string values should be redacted."""
+        data = {"prompt": "Use this key: sk-abcdefghij1234567890abcd"}
+        result = sanitize_secrets(data)
+        assert "sk-abcdefghij1234567890abcd" not in result["prompt"]
+        assert "[REDACTED]" in result["prompt"]
+
+    def test_redacts_bearer_tokens(self) -> None:
+        """Bearer tokens should be redacted."""
+        data = {"text": "Token: Bearer my_secret_token_value"}
+        result = sanitize_secrets(data)
+        assert "my_secret_token_value" not in result["text"]
+        assert "[REDACTED]" in result["text"]
+
+    def test_redacts_authorization_headers(self) -> None:
+        """Authorization headers should be redacted."""
+        data = {"headers": "Authorization: Basic dXNlcjpwYXNz"}
+        result = sanitize_secrets(data)
+        assert "dXNlcjpwYXNz" not in result["headers"]
+        assert "[REDACTED]" in result["headers"]
+
+    def test_redacts_by_key_name(self) -> None:
+        """Keys containing secret patterns should have values redacted."""
+        data = {
+            "api_key": "my-key",
+            "auth_token": "tok123",
+            "password": "secret",
+            "credential_data": "creds",
+        }
+        result = sanitize_secrets(data)
+        redacted = "[REDACTED]"
+        assert result["api_key"] == redacted
+        assert result["auth_token"] == redacted
+        assert result["password"] == redacted
+        assert result["credential_data"] == redacted
+
+    def test_handles_nested_dicts(self) -> None:
+        """Nested dictionaries should be sanitized recursively."""
+        data = {
+            "outer": {
+                "api_key": "secret-val",
+                "inner": {"text": "Use sk-test1234567890abcdefghij"},
+            }
+        }
+        result = sanitize_secrets(data)
+        assert result["outer"]["api_key"] == "[REDACTED]"
+        assert "sk-test1234567890abcdefghij" not in result["outer"]["inner"]["text"]
+
+    def test_handles_lists(self) -> None:
+        """Lists should be sanitized recursively."""
+        data = {
+            "items": [
+                "normal text",
+                "has key: sk-abcdefghij1234567890abcd",
+                {"api_key": "secret"},
+            ]
+        }
+        result = sanitize_secrets(data)
+        assert result["items"][0] == "normal text"
+        assert "sk-abcdefghij1234567890abcd" not in result["items"][1]
+        assert result["items"][2]["api_key"] == "[REDACTED]"
+
+    def test_preserves_non_secret_data(self) -> None:
+        """Non-secret data should be preserved unchanged."""
+        data = {
+            "message": "Hello world",
+            "count": 42,
+            "flag": True,
+            "nested": {"value": 123},
+        }
+        result = sanitize_secrets(data)
+        assert result["message"] == "Hello world"
+        assert result["count"] == 42
+        assert result["flag"] is True
+        assert result["nested"]["value"] == 123

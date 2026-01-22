@@ -1,9 +1,10 @@
 # DEBT-047: Loop Run Logs Are Unsanitized and Duplicated (LoopLogger vs RunLogger)
 
-**Status:** Open
+**Status:** Fixed
 **Priority:** P3
 **Found:** 2026-01-22
 **Found By:** Security / observability audit
+**Fixed In:** c090fb3
 
 ---
 
@@ -53,9 +54,9 @@ Reproduce:
 
 ## Acceptance Criteria
 
-1. [ ] Loop log events redact common secret patterns (API keys, tokens, `Authorization:` headers).
-2. [ ] Tests prove sanitization works for nested data (prompt + response).
-3. [ ] `make ci` passes.
+1. [x] Loop log events redact common secret patterns (API keys, tokens, `Authorization:` headers).
+2. [x] Tests prove sanitization works for nested data (prompt + response).
+3. [x] `make ci` passes.
 
 ---
 

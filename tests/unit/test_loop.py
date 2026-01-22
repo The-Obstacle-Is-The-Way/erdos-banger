@@ -462,3 +462,93 @@ by trivial
 
         # Should hit NO_FIX status on first iteration
         assert result.status == LoopStatus.NO_FIX_POSSIBLE
+
+
+class TestLoopLoggerSanitization:
+    """Test that LoopLogger sanitizes secrets from log data."""
+
+    def test_sanitizes_api_keys_in_prompt(self, tmp_path: Path) -> None:
+        """API keys in prompt data should be redacted."""
+        import json
+
+        from erdos.core.loop import LoopLogger
+
+        log_path = tmp_path / "test.jsonl"
+        logger = LoopLogger(log_path)
+
+        # Prompt containing an API key
+        prompt_with_key = "Use this API key: sk-abcdefghij1234567890abcd"
+        logger.log_event("llm_prompt", 1, {"prompt": prompt_with_key})
+        logger.close()
+
+        logged = json.loads(log_path.read_text().strip())
+        assert "sk-abcdefghij1234567890abcd" not in logged["data"]["prompt"]
+        assert "[REDACTED]" in logged["data"]["prompt"]
+
+    def test_sanitizes_authorization_headers_in_prompt(self, tmp_path: Path) -> None:
+        """Authorization headers in prompt should be redacted."""
+        import json
+
+        from erdos.core.loop import LoopLogger
+
+        log_path = tmp_path / "test.jsonl"
+        logger = LoopLogger(log_path)
+
+        prompt_with_auth = "Headers: Authorization: Bearer my-secret-token-xyz"
+        logger.log_event("llm_prompt", 1, {"prompt": prompt_with_auth})
+        logger.close()
+
+        logged = json.loads(log_path.read_text().strip())
+        assert "my-secret-token-xyz" not in logged["data"]["prompt"]
+        assert "[REDACTED]" in logged["data"]["prompt"]
+
+    def test_sanitizes_response_with_nested_secrets(self, tmp_path: Path) -> None:
+        """Nested data structures with secrets should be sanitized."""
+        import json
+
+        from erdos.core.loop import LoopLogger
+
+        log_path = tmp_path / "test.jsonl"
+        logger = LoopLogger(log_path)
+
+        # Response with nested structure containing secrets
+        data = {
+            "response": "Use token: sk-test1234567890abcdefghij",
+            "exit_code": 0,
+            "metadata": {
+                "api_key": "secret-key-value",
+                "auth_header": "Authorization: secret123",
+            },
+        }
+        logger.log_event("llm_response", 1, data)
+        logger.close()
+
+        logged = json.loads(log_path.read_text().strip())
+        # Check that api_key is redacted by key name
+        assert logged["data"]["metadata"]["api_key"] == "[REDACTED]"
+        # Check that response string has API key redacted
+        assert "sk-test1234567890abcdefghij" not in logged["data"]["response"]
+        # Check that Authorization header is redacted
+        assert "secret123" not in logged["data"]["metadata"]["auth_header"]
+
+    def test_preserves_non_secret_data(self, tmp_path: Path) -> None:
+        """Non-secret data should be preserved unchanged."""
+        import json
+
+        from erdos.core.loop import LoopLogger
+
+        log_path = tmp_path / "test.jsonl"
+        logger = LoopLogger(log_path)
+
+        data = {
+            "prompt": "Fix the theorem: by trivial",
+            "file_path": "/path/to/file.lean",
+            "iteration": 3,
+        }
+        logger.log_event("llm_prompt", 1, data)
+        logger.close()
+
+        logged = json.loads(log_path.read_text().strip())
+        assert logged["data"]["prompt"] == "Fix the theorem: by trivial"
+        assert logged["data"]["file_path"] == "/path/to/file.lean"
+        assert logged["data"]["iteration"] == 3
