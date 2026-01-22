@@ -78,4 +78,4 @@ def _run_single_iteration(..., llm_execute: LLMExecute) -> tuple[...]:
 
 - Changing LLM execution logic
 - Adding new LLM backends (that would be a feature)
-- Modifying CLI interface
+- Modifying CLI

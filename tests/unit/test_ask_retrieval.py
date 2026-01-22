@@ -149,7 +149,7 @@ def test_retrieval_filters_by_problem_id():
     assert call_args.kwargs["problem_id"] == 42
 
 
-def testretrieve_sources_empty_index():
+def test_retrieve_sources_empty_index():
     """retrieve_sources returns fallback sources when index is empty."""
     problem = ProblemRecord(
         id=6,
@@ -175,7 +175,7 @@ def testretrieve_sources_empty_index():
     assert query is None
 
 
-def testretrieve_sources_with_index_data():
+def test_retrieve_sources_with_index_data():
     """retrieve_sources combines fallback and retrieved sources."""
     problem = ProblemRecord(
         id=6,
@@ -214,7 +214,7 @@ def testretrieve_sources_with_index_data():
     assert query is not None
 
 
-def testretrieve_sources_deduplicates():
+def test_retrieve_sources_deduplicates():
     """retrieve_sources removes duplicate chunk IDs."""
     problem = ProblemRecord(
         id=6,

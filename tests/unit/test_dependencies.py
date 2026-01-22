@@ -1,7 +1,9 @@
 """Tests for project dependency configuration."""
 
+import ast
 import re
 import tomllib
+from itertools import chain
 from pathlib import Path
 
 import requests
@@ -87,6 +89,57 @@ REMOVED_SHIM_MODULES = [
 ]
 
 
+def _shim_import_violation_lines(
+    node: ast.AST,
+    *,
+    dotted_shims: set[str],
+    shim_modules: set[str],
+) -> list[int]:
+    linenos: list[int] = []
+
+    if isinstance(node, ast.Import):
+        if any(alias.name in dotted_shims for alias in node.names):
+            linenos = [node.lineno]
+    elif isinstance(node, ast.ImportFrom):
+        module = node.module
+        if module and (
+            module in dotted_shims
+            or (
+                module == "erdos.core"
+                and any(alias.name in shim_modules for alias in node.names)
+            )
+        ):
+            linenos = [node.lineno]
+
+    return linenos
+
+
+def _removed_shim_import_violations(
+    py_file: Path,
+    *,
+    project_root: Path,
+    dotted_shims: set[str],
+    shim_modules: set[str],
+) -> list[str]:
+    content = py_file.read_text(encoding="utf-8")
+    tree = ast.parse(content, filename=str(py_file))
+    lines = content.splitlines()
+
+    violations: list[str] = []
+    rel_path = py_file.relative_to(project_root)
+
+    for node in ast.walk(tree):
+        for lineno in _shim_import_violation_lines(
+            node,
+            dotted_shims=dotted_shims,
+            shim_modules=shim_modules,
+        ):
+            line = lines[lineno - 1].strip() if lineno <= len(lines) else ""
+            violations.append(f"{rel_path}:{lineno}: {line}")
+
+    return violations
+
+
 def test_no_core_backward_compat_shim_files() -> None:
     """Ensure DEBT-061 shim files do not exist in src/erdos/core/.
 
@@ -117,25 +170,23 @@ def test_no_imports_of_removed_shim_paths() -> None:
     tests_dir = project_root / "tests"
     this_file = Path(__file__).resolve()
 
-    # Build a pattern that matches any of the removed shim imports
-    shim_import_pattern = re.compile(
-        r"erdos\.core\.("
-        + "|".join(re.escape(m) for m in REMOVED_SHIM_MODULES)
-        + r")\b"
-    )
+    # Parse imports to avoid false positives from comments/strings.
+    shim_modules = set(REMOVED_SHIM_MODULES)
+    dotted_shims = {f"erdos.core.{m}" for m in shim_modules}
 
     violations: list[str] = []
 
-    for search_dir in [src_dir, tests_dir]:
-        for py_file in search_dir.rglob("*.py"):
-            # Skip this test file to avoid false positives from error messages
-            if py_file.resolve() == this_file:
-                continue
-            content = py_file.read_text(encoding="utf-8")
-            for line_num, line in enumerate(content.splitlines(), start=1):
-                if shim_import_pattern.search(line):
-                    rel_path = py_file.relative_to(project_root)
-                    violations.append(f"{rel_path}:{line_num}: {line.strip()}")
+    for py_file in chain(src_dir.rglob("*.py"), tests_dir.rglob("*.py")):
+        if py_file.resolve() == this_file:
+            continue
+        violations.extend(
+            _removed_shim_import_violations(
+                py_file,
+                project_root=project_root,
+                dotted_shims=dotted_shims,
+                shim_modules=shim_modules,
+            )
+        )
 
     assert not violations, (
         f"Found {len(violations)} import(s) of removed DEBT-061 shim paths:\n"

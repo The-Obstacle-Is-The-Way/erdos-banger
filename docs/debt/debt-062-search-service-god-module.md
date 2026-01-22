@@ -81,13 +81,13 @@ src/erdos/core/search/
 Implementation steps (concrete):
 
 1. Move code from `src/erdos/core/search/service.py` into the modules above (keep behavior identical).
-2. Update call sites:
+1. Update call sites:
    - `src/erdos/commands/search.py`
    - `src/erdos/mcp/server.py`
    - `tests/unit/test_search_command_helpers.py`
    - `src/erdos/core/search/__init__.py` re-exports (if we keep them)
-3. Update the module exemption marker in `src/erdos/core/search/service.py` from `DEBT-043` → `DEBT-062` (temporary).
-4. Once `service.py` is ≤ 500 LOC, **remove** the exemption marker entirely.
+1. Update the module exemption marker in `src/erdos/core/search/service.py` from `DEBT-043` → `DEBT-062` (temporary).
+1. Once `service.py` is ≤ 500 LOC, **remove** the exemption marker entirely.
 
 ---
 
@@ -104,5 +104,5 @@ Implementation steps (concrete):
 ## Non-Goals
 
 - Changing search algorithm implementations
-- Modifying CLI interface or JSON output format
+- Modifying CLI or JSON output format
 - Adding new search modes (that would be a feature)

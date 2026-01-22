@@ -4,7 +4,7 @@ This module contains the core search logic, separated from CLI concerns.
 The CLI adapter (commands/search.py) calls these functions and handles
 Typer/Rich presentation.
 
-# exempt: DEBT-043
+# exempt: DEBT-062
 """
 
 from __future__ import annotations
@@ -31,16 +31,6 @@ if TYPE_CHECKING:
         SearchIndexReadPort,
     )
     from erdos.core.search.embeddings import EmbeddingModel
-
-
-def _get_search_index_class() -> type:
-    """Return the SearchIndex class."""
-    return SearchIndex
-
-
-def _get_search_index_error() -> type[Exception]:
-    """Return the SearchIndexError class."""
-    return SearchIndexError
 
 
 logger = logging.getLogger(__name__)
@@ -150,7 +140,7 @@ def search_fts(
             },
         )
 
-    except _get_search_index_error() as e:
+    except SearchIndexError as e:
         return CLIOutput.err(
             command="erdos search",
             error_type="IndexError",
@@ -361,7 +351,7 @@ def build_search_index(
     try:
         build_index(loader=repo, index=index, rebuild=True)
         return None
-    except (ProblemLoaderError, _get_search_index_error()) as e:
+    except (ProblemLoaderError, SearchIndexError) as e:
         error_type = (
             "LoaderError" if isinstance(e, ProblemLoaderError) else "IndexError"
         )
@@ -399,7 +389,7 @@ def build_embeddings(
         )
 
     try:
-        if isinstance(index, _get_search_index_class()):
+        if isinstance(index, SearchIndex):
             count = index.build_embeddings(embedder)
             return count, None
         else:
@@ -409,7 +399,7 @@ def build_embeddings(
                 message="Embedding build requires SearchIndex instance",
                 code=ExitCode.CONFIG_ERROR,
             )
-    except _get_search_index_error() as e:
+    except SearchIndexError as e:
         return 0, CLIOutput.err(
             command="erdos search",
             error_type="IndexError",
@@ -434,7 +424,7 @@ def search_semantic(
     Returns:
         CLIOutput with semantic search results
     """
-    if not isinstance(index, _get_search_index_class()):
+    if not isinstance(index, SearchIndex):
         return CLIOutput.err(
             command="erdos search",
             error_type="ConfigError",
@@ -490,7 +480,7 @@ def search_semantic(
                 "embedding_model": options.embedding_model,
             },
         )
-    except _get_search_index_error() as e:
+    except SearchIndexError as e:
         return CLIOutput.err(
             command="erdos search",
             error_type="IndexError",
@@ -515,7 +505,7 @@ def search_hybrid(
     Returns:
         CLIOutput with hybrid search results
     """
-    if not isinstance(index, _get_search_index_class()):
+    if not isinstance(index, SearchIndex):
         return CLIOutput.err(
             command="erdos search",
             error_type="ConfigError",
@@ -575,7 +565,7 @@ def search_hybrid(
                 "embedding_model": options.embedding_model,
             },
         )
-    except _get_search_index_error() as e:
+    except SearchIndexError as e:
         return CLIOutput.err(
             command="erdos search",
             error_type="IndexError",

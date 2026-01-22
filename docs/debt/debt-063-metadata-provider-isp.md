@@ -112,4 +112,4 @@ Concrete implementation plan:
 
 - Adding new metadata providers
 - Changing provider HTTP semantics (requests, parsing, retry/rate-limiting)
-- Modifying CLI interface
+- Modifying CLI
