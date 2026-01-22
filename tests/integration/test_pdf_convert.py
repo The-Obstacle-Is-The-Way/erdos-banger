@@ -8,6 +8,7 @@ from unittest.mock import patch
 from typer.testing import CliRunner
 
 from erdos.cli import app
+from erdos.core.exit_codes import ExitCode
 
 
 runner = CliRunner()
@@ -194,6 +195,77 @@ class TestConvertCommandOptions:
         )
         # Should not crash (may fail if converter not available - exit 10)
         assert result.exit_code in (0, 1, 2, 10)
+
+
+class TestConvertCommandDeviceValidation:
+    """Tests for convert command --device validation (DEBT-059)."""
+
+    def test_device_invalid_value_fails(self, tmp_path: Path) -> None:
+        """--device with invalid value returns usage error."""
+        pdf_file = tmp_path / "test.pdf"
+        pdf_file.write_bytes(b"%PDF-1.4 test")
+
+        result = runner.invoke(
+            app,
+            ["--json", "convert", str(pdf_file), "--device", "invalid"],
+        )
+
+        # Should be usage error (2) for invalid device
+        assert result.exit_code == ExitCode.USAGE_ERROR
+        import json
+
+        data = json.loads(result.stdout)
+        assert data["success"] is False
+        assert data["error"]["type"] == "UsageError"
+        assert "device" in data["error"]["message"].lower()
+
+    def test_device_cpu_accepted(self, tmp_path: Path) -> None:
+        """--device cpu is a valid value."""
+        pdf_file = tmp_path / "test.pdf"
+        pdf_file.write_bytes(b"%PDF-1.4 test")
+
+        result = runner.invoke(
+            app,
+            ["convert", str(pdf_file), "--device", "cpu"],
+        )
+        # Should not fail due to invalid device (may fail due to missing converter = 10)
+        assert result.exit_code in (0, 1, 10)
+
+    def test_device_cuda_accepted(self, tmp_path: Path) -> None:
+        """--device cuda is a valid value."""
+        pdf_file = tmp_path / "test.pdf"
+        pdf_file.write_bytes(b"%PDF-1.4 test")
+
+        result = runner.invoke(
+            app,
+            ["convert", str(pdf_file), "--device", "cuda"],
+        )
+        # Should not fail due to invalid device (may fail due to missing converter = 10)
+        assert result.exit_code in (0, 1, 10)
+
+    def test_device_mps_accepted(self, tmp_path: Path) -> None:
+        """--device mps is a valid value."""
+        pdf_file = tmp_path / "test.pdf"
+        pdf_file.write_bytes(b"%PDF-1.4 test")
+
+        result = runner.invoke(
+            app,
+            ["convert", str(pdf_file), "--device", "mps"],
+        )
+        # Should not fail due to invalid device (may fail due to missing converter = 10)
+        assert result.exit_code in (0, 1, 10)
+
+    def test_device_case_insensitive(self, tmp_path: Path) -> None:
+        """--device is case insensitive (CPU, Cpu, cpu all work)."""
+        pdf_file = tmp_path / "test.pdf"
+        pdf_file.write_bytes(b"%PDF-1.4 test")
+
+        result = runner.invoke(
+            app,
+            ["convert", str(pdf_file), "--device", "CPU"],
+        )
+        # Should not fail due to invalid device (may fail due to missing converter = 10)
+        assert result.exit_code in (0, 1, 10)
 
 
 class TestConvertCommandLLMOptions:

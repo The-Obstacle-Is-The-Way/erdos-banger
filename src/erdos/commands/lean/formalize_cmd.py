@@ -198,6 +198,28 @@ def register(app: typer.Typer) -> None:
             exit_with_result(ctx, result, print_human=print_human)
             return
 
+        # Validate: --max-concurrent must be >= 1
+        if max_concurrent < 1:
+            result = CLIOutput.err(
+                command="erdos lean formalize",
+                error_type="UsageError",
+                message="--max-concurrent must be >= 1",
+                code=ExitCode.USAGE_ERROR,
+            )
+            exit_with_result(ctx, result, print_human=print_human)
+            return
+
+        # Validate: --no-network requires --import-upstream
+        if no_network and not import_upstream:
+            result = CLIOutput.err(
+                command="erdos lean formalize",
+                error_type="UsageError",
+                message="--no-network requires --import-upstream",
+                code=ExitCode.USAGE_ERROR,
+            )
+            exit_with_result(ctx, result, print_human=print_human)
+            return
+
         with measure_time_ms() as duration:
             app_ctx, app_error = get_app_context(ctx, command="erdos lean formalize")
             if app_error is not None:

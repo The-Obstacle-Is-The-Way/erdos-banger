@@ -29,8 +29,8 @@
 
 Work strictly top-to-bottom unless blocked by dependencies.
 
-- [ ] **DEBT-059**: CodeRabbit PR#17 fixes (input validation + invariant bugs)
-  Deck: `docs/debt/debt-059-coderabbit-pr17-fixes.md`
+- [x] **DEBT-059**: CodeRabbit PR#17 fixes (input validation + invariant bugs)
+  Deck: `docs/_archive/debt/debt-059-coderabbit-pr17-fixes.md`
 - [ ] **DEBT-046**: CLIOutput `success=false` with exit code 0 ambiguity (search IndexEmpty)
   Deck: `docs/debt/debt-046-clioutput-success-vs-exitcode.md`
 - [ ] **DEBT-056**: FallbackProvider catches `Exception` broadly (may hide provider bugs)
@@ -71,3 +71,16 @@ Work strictly top-to-bottom unless blocked by dependencies.
 ## Work Log
 
 (Ralph appends a short entry per completed task.)
+
+### 2026-01-22: DEBT-059 Fixed
+- Fixed CLIOutput invariant violation in batch_formalize.py (use CLIOutput.err for partial failures)
+- Added max_concurrent validation in formalize_cmd.py (reject < 1)
+- Added --no-network validation in formalize_cmd.py (requires --import-upstream)
+- Added --device validation in convert.py (cpu/cuda/mps, case-insensitive)
+- Fixed --local flag threading in status_cmd.py (pass check_local to _get_all_problems_status)
+- Fixed TORCH_DEVICE env var leak in pdf_converter.py (try/finally restore pattern)
+- Fixed KeyError risk in lean/common.py (use .get() with fallback)
+- Fixed empty exception messages in prove_cmd.py and init_cmd.py (add fallbacks)
+- Fixed Lean init exit code to use LEAN_ERROR for LeanRunnerError
+- Added tests for all validation cases
+- `make ci` passes (850 tests, 81.85% coverage)

@@ -117,18 +117,27 @@ def _get_all_problems_status(
     project_path: Path,
     repo: ProblemRepository,
     upstream_info: dict[int, Any],
+    *,
+    check_upstream: bool,
+    check_local: bool,
 ) -> CLIOutput:
     """Get summary status for all problems."""
     problems = repo.load_all()
     total = len(problems)
-    upstream_formalized = sum(
-        1
-        for p in problems
-        if upstream_info.get(p.id, None) and upstream_info[p.id].formalized
-    )
-    local_exists = sum(
-        1 for p in problems if get_local_file_path(project_path, p.id).exists()
-    )
+
+    upstream_formalized = 0
+    if check_upstream:
+        upstream_formalized = sum(
+            1
+            for p in problems
+            if upstream_info.get(p.id, None) and upstream_info[p.id].formalized
+        )
+
+    local_exists = 0
+    if check_local:
+        local_exists = sum(
+            1 for p in problems if get_local_file_path(project_path, p.id).exists()
+        )
 
     return CLIOutput.ok(
         command="erdos lean status",
@@ -173,7 +182,13 @@ def get_formalization_status(
                 check_upstream,
                 check_local,
             )
-        return _get_all_problems_status(project_path, repo, upstream_info)
+        return _get_all_problems_status(
+            project_path,
+            repo,
+            upstream_info,
+            check_upstream=check_upstream,
+            check_local=check_local,
+        )
     except FormalConjecturesError as e:
         return CLIOutput.err(
             command="erdos lean status",

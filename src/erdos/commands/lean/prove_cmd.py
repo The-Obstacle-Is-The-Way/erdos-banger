@@ -73,7 +73,7 @@ def prove_with_aristotle(
         return CLIOutput.err(
             command="erdos lean prove",
             error_type=e.error_type,
-            message=str(e),
+            message=str(e) or f"AristotleError ({e.error_type})",
             code=exit_code,
         )
     except Exception as e:
@@ -81,7 +81,7 @@ def prove_with_aristotle(
         return CLIOutput.err(
             command="erdos lean prove",
             error_type="Error",
-            message=str(e),
+            message=str(e) or "Unexpected error",
             code=ExitCode.ERROR,
         )
 

@@ -31,16 +31,16 @@ def init_lean_project(project_path: Path, *, fetch_mathlib: bool = True) -> CLIO
     except LeanRunnerError as e:
         return CLIOutput.err(
             command="erdos lean init",
-            error_type="InitError",
-            message=str(e),
-            code=ExitCode.ERROR,
+            error_type="LeanRunnerError",
+            message=str(e) or "Lean initialization failed",
+            code=ExitCode.LEAN_ERROR,
         )
     except Exception as e:
         logger.exception("Unexpected error in lean init command")
         return CLIOutput.err(
             command="erdos lean init",
-            error_type="InitError",
-            message=str(e),
+            error_type="Error",
+            message=str(e) or "Unexpected error",
             code=ExitCode.ERROR,
         )
 

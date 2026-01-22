@@ -320,17 +320,29 @@ def convert_pdf(
         )
 
     # Set TORCH_DEVICE env var if specified (Marker uses this for device selection)
-    if config.torch_device is not None:
-        os.environ["TORCH_DEVICE"] = config.torch_device
-        logger.debug("Set TORCH_DEVICE=%s for Marker conversion", config.torch_device)
+    # Save original value to restore after conversion
+    original_torch_device = os.environ.get("TORCH_DEVICE")
+    try:
+        if config.torch_device is not None:
+            os.environ["TORCH_DEVICE"] = config.torch_device
+            logger.debug(
+                "Set TORCH_DEVICE=%s for Marker conversion", config.torch_device
+            )
 
-    # Convert using selected converter
-    if converter == PDFConverter.MARKER:
-        return convert_with_marker(
-            pdf_path,
-            use_llm=config.use_llm,
-            llm_service=config.llm_service,
-            force_ocr=config.force_ocr,
-        )
-    # PDFConverter.PDFPLUMBER (or any future converter)
-    return convert_with_pdfplumber(pdf_path)
+        # Convert using selected converter
+        if converter == PDFConverter.MARKER:
+            return convert_with_marker(
+                pdf_path,
+                use_llm=config.use_llm,
+                llm_service=config.llm_service,
+                force_ocr=config.force_ocr,
+            )
+        # PDFConverter.PDFPLUMBER (or any future converter)
+        return convert_with_pdfplumber(pdf_path)
+    finally:
+        # Restore original TORCH_DEVICE value
+        if config.torch_device is not None:
+            if original_torch_device is None:
+                os.environ.pop("TORCH_DEVICE", None)
+            else:
+                os.environ["TORCH_DEVICE"] = original_torch_device

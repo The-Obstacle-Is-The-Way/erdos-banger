@@ -272,6 +272,22 @@ def convert(
             )
             return
 
+    # Validate --device option
+    allowed_devices = {"cpu", "cuda", "mps"}
+    if device is not None and device.lower() not in allowed_devices:
+        exit_with_result(
+            ctx,
+            CLIOutput.err(
+                command="erdos convert",
+                error_type="UsageError",
+                message=f"Invalid device: {device}. Use: cpu, cuda, mps",
+                code=ExitCode.USAGE_ERROR,
+            ),
+        )
+        return
+    # Normalize device to lowercase
+    device_normalized = device.lower() if device else None
+
     # Check converter availability
     available = get_available_converters()
     if converter not in available:
@@ -298,7 +314,7 @@ def convert(
         use_llm=use_llm,
         llm_service=llm_service_enum,
         force_ocr=force_ocr,
-        torch_device=device,
+        torch_device=device_normalized,
     )
 
     # Show progress

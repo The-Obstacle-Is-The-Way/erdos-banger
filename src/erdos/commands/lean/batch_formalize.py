@@ -219,8 +219,14 @@ def batch_result_to_cli_output(
         data["problem_ids"] = problem_ids
 
     if result.failed_count > 0:
-        output = CLIOutput.ok(command="erdos lean formalize", data=data)
-        output.success = False
-        return output
+        return CLIOutput.err(
+            command="erdos lean formalize",
+            error_type="PartialFailure",
+            message=(
+                f"{result.failed_count} of {result.total} problems failed; "
+                f"failed_ids={result.failed_ids}"
+            ),
+            code=ExitCode.ERROR,
+        )
 
     return CLIOutput.ok(command="erdos lean formalize", data=data)

@@ -32,14 +32,14 @@ def print_human_check_result(result_data: dict[str, Any]) -> None:
 
 def print_human_formalize_result(result_data: dict[str, Any]) -> None:
     """Pretty-print formalize result."""
-    output_file = result_data["file"]
+    output_file = result_data.get("file", "unknown")
     console.print(f"[green]✓[/green] Created {output_file}")
     console.print(f"  Run: erdos lean check {output_file}")
 
 
 def print_human_prove_result(result_data: dict[str, Any]) -> None:
     """Pretty-print Aristotle prove result."""
-    output_file = result_data["output_file"]
+    output_file = result_data.get("output_file", "unknown")
     console.print(f"[green]✓[/green] Proof generated at {output_file}")
     console.print(f"  Run: erdos lean check {output_file}")
 
