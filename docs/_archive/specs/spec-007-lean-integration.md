@@ -601,7 +601,10 @@ def init(
     ] = None,
     no_mathlib: Annotated[
         bool,
-        typer.Option("--no-mathlib", help="Skip fetching mathlib"),
+        typer.Option(
+            "--no-mathlib",
+            help="Initialize a minimal project without mathlib (faster, offline).",
+        ),
     ] = False,
 ) -> None:
     """

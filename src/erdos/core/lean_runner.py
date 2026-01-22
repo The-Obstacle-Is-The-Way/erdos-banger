@@ -145,11 +145,19 @@ class LeanRunner:
             self._toolchain.write_text("leanprover/lean4:v4.12.0\n", encoding="utf-8")
 
         if not self._lakefile.exists():
-            self._lakefile.write_text(self._default_lakefile(), encoding="utf-8")
+            lakefile = (
+                self._default_lakefile() if fetch_mathlib else self._minimal_lakefile()
+            )
+            self._lakefile.write_text(lakefile, encoding="utf-8")
 
         basic_lean = self._project_path / "Erdos" / "Basic.lean"
         if not basic_lean.exists():
-            basic_lean.write_text(self._default_basic_lean(), encoding="utf-8")
+            basic = (
+                self._default_basic_lean()
+                if fetch_mathlib
+                else self._minimal_basic_lean()
+            )
+            basic_lean.write_text(basic, encoding="utf-8")
 
         root_lean = self._project_path / "Erdos.lean"
         if not root_lean.exists():
@@ -372,6 +380,22 @@ lean_lib Erdos where
   globs := #[.submodules `Erdos]
 """
 
+    def _minimal_lakefile(self) -> str:
+        """Return a minimal lakefile.lean without mathlib (used for --no-mathlib)."""
+        return """import Lake
+open Lake DSL
+
+package erdos where
+  leanOptions := #[
+    ⟨`autoImplicit, false⟩,
+    ⟨`pp.unicode.fun, true⟩
+  ]
+
+@[default_target]
+lean_lib Erdos where
+  globs := #[.submodules `Erdos]
+"""
+
     def _default_basic_lean(self) -> str:
         """Return default Erdos/Basic.lean content."""
         return """-- Erdos/Basic.lean
@@ -379,6 +403,19 @@ lean_lib Erdos where
 
 import Mathlib.Data.Nat.Prime.Basic
 import Mathlib.Data.Finset.Basic
+
+-- Marker structure for Erdős problems
+structure ErdosProblem where
+  id : Nat
+  title : String
+  status : String
+  deriving Repr
+"""
+
+    def _minimal_basic_lean(self) -> str:
+        """Return minimal Erdos/Basic.lean content without Mathlib imports."""
+        return """-- Erdos/Basic.lean
+-- Common definitions for Erdős problem formalizations (minimal, no Mathlib).
 
 -- Marker structure for Erdős problems
 structure ErdosProblem where

@@ -34,7 +34,7 @@ class TestLeanRunnerIntegration:
         test_file = tmp_path / "Erdos" / "Test.lean"
         test_file.write_text("theorem simple : 1 + 1 = 2 := rfl\n", encoding="utf-8")
 
-        result = runner.check(test_file)
+        result = runner.check(test_file, timeout=300)
 
         assert result.file == "Erdos/Test.lean"
         assert result.success, f"Lean compile failed:\n{result}"
