@@ -31,7 +31,7 @@ These are the *only* `src/erdos/core/*.py` modules that explicitly declare thems
 rg -l "Backward-compatible shim|BACKWARD COMPATIBILITY SHIM|has been moved to" src/erdos/core/*.py
 ```
 
-Expected output (11 files):
+Expected output (10 files):
 
 - `src/erdos/core/arxiv_client.py` → `erdos.core.clients.arxiv`
 - `src/erdos/core/crossref_client.py` → `erdos.core.clients.crossref`
@@ -43,15 +43,10 @@ Expected output (11 files):
 - `src/erdos/core/patch_validator.py` → `erdos.core.loop.patch_validator`
 - `src/erdos/core/loop_config.py` → `erdos.core.loop.config`
 - `src/erdos/core/loop_verifier.py` → `erdos.core.loop.verifier`
-- `src/erdos/core/batch.py` → **dead/unreachable file** (see note below)
 
 **Important note about `src/erdos/core/batch.py`**
 
-`src/erdos/core/` currently contains both:
-- `src/erdos/core/batch/` (the real package; **this is what `import erdos.core.batch` resolves to**), and
-- `src/erdos/core/batch.py` (a shim file that is **not imported** in practice and would recurse if it were).
-
-This file should be deleted as part of this debt item to eliminate confusion, but it does **not** require import-path updates because the canonical path is already `erdos.core.batch` (the package).
+This shim was already deleted in prior refactors. Keep the acceptance check (`test ! -f src/erdos/core/batch.py`) as a regression guard.
 
 ---
 
