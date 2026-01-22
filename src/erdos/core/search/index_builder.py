@@ -1,17 +1,28 @@
 """Build search index from problem data."""
 
 import logging
+from typing import Protocol
 
-from erdos.core.ports import ProblemRepository, SearchIndexProtocol
+from erdos.core.ports import (
+    ProblemRepository,
+    SearchIndexReadPort,
+    SearchIndexWritePort,
+)
 
 
 logger = logging.getLogger(__name__)
 
 
+class SearchIndexBuildPort(SearchIndexReadPort, SearchIndexWritePort, Protocol):
+    """Interface needed to build or rebuild the search index."""
+
+    ...
+
+
 def build_index(
     *,
     loader: ProblemRepository,
-    index: SearchIndexProtocol,
+    index: SearchIndexBuildPort,
     rebuild: bool = False,
 ) -> dict[str, object]:
     """

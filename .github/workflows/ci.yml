@@ -89,6 +89,7 @@ jobs:
           cache-dependency-glob: |
             uv.lock
             pyproject.toml
+            .python-version
           cache-suffix: mcp
 
       - name: Install Python 3.11
@@ -144,6 +145,7 @@ jobs:
           cache-dependency-glob: |
             uv.lock
             pyproject.toml
+            .python-version
           cache-suffix: lean
 
       - name: Install Python 3.11

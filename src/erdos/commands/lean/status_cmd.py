@@ -146,6 +146,7 @@ def _get_all_problems_status(
                 "total": total,
                 "upstream_formalized": upstream_formalized,
                 "local_exists": local_exists,
+                "checked": {"upstream": check_upstream, "local": check_local},
             }
         },
     )

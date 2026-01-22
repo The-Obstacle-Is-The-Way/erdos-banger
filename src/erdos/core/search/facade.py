@@ -190,14 +190,17 @@ class SearchIndex:
             ).fetchone()[0]
             model, dim = self._embeddings.get_embedding_metadata()
 
+            try:
+                db_size_bytes = self._db.db_path.stat().st_size
+            except FileNotFoundError:
+                db_size_bytes = 0
+
             return {
                 "problems": problems,
                 "chunks": chunks,
                 "chunks_by_source": by_source,
                 "db_path": str(self._db.db_path),
-                "db_size_bytes": self._db.db_path.stat().st_size
-                if self._db.db_path.exists()
-                else 0,
+                "db_size_bytes": db_size_bytes,
                 "embeddings": embedding_count,
                 "embedding_model": model,
                 "embedding_dimension": dim,

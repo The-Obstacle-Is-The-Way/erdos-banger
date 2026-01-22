@@ -363,7 +363,8 @@ class TestOpenAlexClient:
             status=404,
         )
         # Fallback path: search by locations.landing_page_url in /works
-        # (responses matches by URL path; query params are ignored by default)
+        # OpenAlexClient.get_by_arxiv tries 3 landing candidates; responses matches
+        # by URL path (query params are ignored by default).
         for _ in range(3):
             responses.add(
                 responses.GET,

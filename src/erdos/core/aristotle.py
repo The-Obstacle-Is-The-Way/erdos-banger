@@ -23,7 +23,7 @@ import logging
 import os
 import shutil
 import subprocess
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Any
 
@@ -216,11 +216,13 @@ def run_aristotle_prove_from_file(
     Raises:
         AristotleError: On configuration, validation, or timeout errors
     """
-    # Validate configuration first
-    config = validate_aristotle_config()
-    config.timeout = timeout
-    config.informal = informal
-    config.formal_input_context = formal_input_context
+    base_config = validate_aristotle_config()
+    config = replace(
+        base_config,
+        timeout=timeout,
+        informal=informal,
+        formal_input_context=formal_input_context,
+    )
 
     # Validate input file exists
     if not input_file.exists():

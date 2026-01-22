@@ -32,7 +32,7 @@ This command is intentionally deferred because it is high-risk and high-complexi
 ### Command signature
 
 ```text
-erdos loop PROBLEM_ID [OPTIONS]
+erdos loop run PROBLEM_ID [OPTIONS]
 ```
 
 **Arguments**
@@ -42,7 +42,6 @@ erdos loop PROBLEM_ID [OPTIONS]
 **Options**
 
 - `--max-iter, -n INT`: maximum iterations (default: `10`)
-- `--yes, -y`: non-interactive; automatically apply changes
 - `--no-apply`: propose changes only; never write to disk
 - `--timeout SECONDS`: Lean check timeout (default: `120`)
 - `--allow-sorry-increase INT`: allow a patch to increase `sorry` count by up to N (default: `0`)
@@ -60,13 +59,13 @@ erdos loop PROBLEM_ID [OPTIONS]
 
 ```bash
 # Propose-only (safe): no file writes
-uv run erdos loop 6 --no-apply
+uv run erdos loop run 6 --no-apply
 
-# Non-interactive (dangerous): apply up to 3 iterations
-ERDOS_LLM_COMMAND="./scripts/llm.sh" uv run erdos loop 6 --yes --max-iter 3
+# Auto-apply (writes under formal/lean/Erdos/ unless --no-apply)
+ERDOS_LLM_COMMAND="./scripts/llm.sh" uv run erdos loop run 6 --max-iter 3
 
 # Machine output (propose-only)
-uv run erdos --json loop 6 --no-apply
+uv run erdos --json loop run 6 --no-apply
 ```
 
 ---
@@ -86,16 +85,12 @@ At a high level:
      - the current Lean file (or relevant excerpt)
      - Lean errors (from `LeanCheckResult.errors`)
      - the problem statement (`ProblemRecord`)
-     - optional retrieved context (via `SearchIndex.search`)
+   - optional retrieved context (via `SearchIndex.search`)
    - run the external LLM command (subprocess) to propose an edit
-   - show the proposed patch and request confirmation (unless `--yes`)
    - apply the patch (unless `--no-apply`)
    - repeat until success or max iterations reached
 
-**Invariant:** The loop never silently modifies files. Either:
-
-- it prompts the user, or
-- `--yes` is provided.
+**Invariant:** When not in `--no-apply` mode, the loop applies patches automatically.
 
 ---
 
