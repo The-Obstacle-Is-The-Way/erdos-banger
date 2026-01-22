@@ -353,13 +353,13 @@ def run(
     - Rejects patches larger than configured limits
     - Aborts if file shrinks by > 20%
 
-    Example (propose only):
+    Example (propose only; does not write to disk):
 
-        erdos loop 6 --no-apply
+        ERDOS_LLM_COMMAND="./scripts/llm.sh" erdos loop run 6 --no-apply
 
     Example (auto-apply):
 
-        ERDOS_LLM_COMMAND="./scripts/llm.sh" erdos loop 6
+        ERDOS_LLM_COMMAND="./scripts/llm.sh" erdos loop run 6
     """
     with measure_time_ms() as duration:
         app_ctx, app_error = get_app_context(ctx, command="erdos loop")

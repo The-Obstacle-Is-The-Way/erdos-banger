@@ -23,7 +23,14 @@ def check_lean_file(file_path: Path, project_path: Path) -> CLIOutput:
     """Check a Lean file for errors."""
     try:
         runner = LeanRunner(project_path)
-        result = runner.check(file_path)
+        # Normalize to an absolute path so users can pass either:
+        # - a path relative to cwd (e.g., formal/lean/Erdos/Foo.lean), or
+        # - an absolute path.
+        #
+        # LeanRunner treats relative paths as relative to the Lean project root,
+        # so passing a cwd-relative path without normalization would double-join.
+        normalized_file = file_path.resolve()
+        result = runner.check(normalized_file)
         return CLIOutput.ok(
             command="erdos lean check",
             data=result.model_dump(mode="json"),
@@ -78,7 +85,7 @@ def register(app: typer.Typer) -> None:
         """
         Check a Lean file for compilation errors.
 
-        Example: erdos lean check Erdos/Problem006.lean
+        Example: erdos lean check formal/lean/Erdos/Problem006.lean
         """
         with measure_time_ms() as duration:
             path = project_path or Path("formal/lean")
