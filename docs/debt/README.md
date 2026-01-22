@@ -19,7 +19,7 @@ This directory contains technical-debt writeups: spec drift, missing fixtures, i
 | DEBT-062 | `search/service.py` exceeds 500 LOC | P1 | SRP, OCP |
 | DEBT-063 | `MetadataProvider` protocol too broad | P2 | ISP |
 | DEBT-064 | `loop/runner.py` direct LLM coupling | P2 | DIP |
-| DEBT-065 | CLI callbacks too thick | P2 | SRP |
+| DEBT-065 | Command layer contains application orchestration | P2 | SRP |
 
 ## Archived Debt
 

@@ -1,8 +1,8 @@
 # erdos-banger - Ralph Wiggum Progress Tracker
 
 **Last Updated:** 2026-01-22
-**Status:** Ready - Debt First (Shim Removal)
-**Branch:** ralph-wiggum-v2.3 (create from `dev` before starting)
+**Status:** Ready - Debt First (Search/Loop Cleanups)
+**Branch:** ralph-wiggum-v2.4 (create from `dev` before starting)
 **Purpose:** State file for Ralph Wiggum loop (see `docs/_ralphwiggum/protocol.md`)
 
 ---
@@ -33,6 +33,14 @@ Work strictly top-to-bottom unless blocked by dependencies.
   Deck: `docs/_archive/debt/debt-061-remove-core-compatibility-shims.md`
 - [x] **DEBT-060**: Formalize command long Typer callback
   Deck: `docs/_archive/debt/debt-060-formalize-cmd-long-callback.md`
+- [ ] **DEBT-062**: Split `core/search/service.py` god-module (remove stale exemption)
+  Deck: `docs/debt/debt-062-search-service-god-module.md`
+- [ ] **DEBT-064**: Inject LLM executor into loop runner (DIP)
+  Deck: `docs/debt/debt-064-loop-runner-dip.md`
+- [ ] **DEBT-063**: Split `MetadataProvider` protocol (ISP)
+  Deck: `docs/debt/debt-063-metadata-provider-isp.md`
+- [ ] **DEBT-065**: Move loop orchestration out of command layer (SRP)
+  Deck: `docs/debt/debt-065-thick-cli-callbacks.md`
 
 ---
 

@@ -11,8 +11,8 @@
 
 `MetadataProvider` protocol in `src/erdos/core/ports.py` requires all implementers to provide `get_by_doi()`, `get_by_arxiv()`, and `search()` methods. This violates Interface Segregation Principle (ISP) because:
 
-- `ArxivProvider` implements `search()` but returns empty list (never used)
-- `CrossrefProvider` implements `get_by_arxiv()` but always returns None (never used)
+- `ArxivProvider` implements **DOI lookup + search** but cannot fulfill them (returns `None` / `[]`)
+- `CrossrefProvider` implements **arXiv lookup + search** but cannot fulfill them (returns `None` / `[]`)
 - Callers often only need one lookup method
 
 ---
@@ -31,18 +31,20 @@ class MetadataProvider(Protocol):
 
 | Provider | get_by_doi | get_by_arxiv | search |
 |----------|------------|--------------|--------|
-| ArxivProvider | Returns None | ✓ Implemented | Returns [] |
-| CrossrefProvider | ✓ Implemented | Returns None | ✓ Implemented |
+| ArxivProvider | Returns `None` (unsupported) | ✓ Implemented | Returns `[]` (unsupported) |
+| CrossrefProvider | ✓ Implemented | Returns `None` (unsupported) | Returns `[]` (unsupported) |
 | OpenAlexProvider | ✓ Implemented | ✓ Implemented | ✓ Implemented |
 | FallbackProvider | Delegates | Delegates | Delegates |
 
-**ISP violation**: ArxivProvider and CrossrefProvider implement methods they can't fulfill.
+**ISP violation**: `ArxivProvider` and `CrossrefProvider` implement methods they cannot fulfill, and the protocol does not let call sites depend on minimal capabilities.
 
 ---
 
 ## Recommended Fix
 
-Split into focused protocols:
+Split the fat protocol into focused protocols **and update the provider/fallback wiring so unsupported methods disappear**.
+
+Simply adding new Protocols is not sufficient while providers still define stub methods: structural typing will continue to treat them as “implementing” interfaces they shouldn’t. The fix requires removing unsupported methods and updating fallback composition.
 
 ```python
 class DOILookupProvider(Protocol):
@@ -57,33 +59,44 @@ class SearchableMetadataProvider(Protocol):
     """Provider that supports text search."""
     def search(self, query: str, *, limit: int = 25) -> list[ReferenceRecord]: ...
 
-# Composition for providers that support multiple operations
-class FullMetadataProvider(DOILookupProvider, ArxivLookupProvider, SearchableMetadataProvider, Protocol):
-    """Provider supporting all metadata operations."""
-    pass
+class MetadataProvider(DOILookupProvider, ArxivLookupProvider, SearchableMetadataProvider, Protocol):
+    """Full provider supporting all three operations."""
+    @property
+    def provider_name(self) -> str: ...
 ```
 
-1. Update `ArxivProvider` to only implement `ArxivLookupProvider`
-2. Update `CrossrefProvider` to implement `DOILookupProvider` + `SearchableMetadataProvider`
-3. Update `OpenAlexProvider` to implement `FullMetadataProvider`
-4. Update `FallbackProvider` to compose appropriately
-5. Update callers to depend on the minimal interface they need
+Concrete implementation plan:
+
+1. Update providers to only expose supported methods:
+   - `src/erdos/core/providers/arxiv.py`: remove `get_by_doi()` and `search()`
+   - `src/erdos/core/providers/crossref.py`: remove `get_by_arxiv()` and `search()`
+   - `src/erdos/core/providers/openalex.py`: keeps all three
+2. Replace `src/erdos/core/providers/fallback.py` with a small router that composes three independent chains:
+   - DOI chain: list[`DOILookupProvider`]
+   - arXiv chain: list[`ArxivLookupProvider`]
+   - search chain: list[`SearchableMetadataProvider`]
+3. Update `src/erdos/core/context.py::build_metadata_provider()` to build the router with the correct chains:
+   - DOI: OpenAlex → Crossref
+   - arXiv: OpenAlex → Arxiv
+   - search: OpenAlex only (until another search-capable provider exists)
+4. Update call sites to depend on the minimal interface they need (e.g., DOI-only ingest helpers should accept `DOILookupProvider`).
 
 ---
 
 ## Acceptance Criteria
 
 1. [ ] Split `MetadataProvider` into `DOILookupProvider`, `ArxivLookupProvider`, `SearchableMetadataProvider`
-2. [ ] Each provider implements only the protocols it can fulfill
-3. [ ] Callers updated to depend on minimal required protocol
-4. [ ] `FallbackProvider` properly composes protocols
-5. [ ] All existing tests pass
-6. [ ] `make ci` passes
+2. [ ] `src/erdos/core/providers/arxiv.py` no longer defines `get_by_doi()` or `search()`
+3. [ ] `src/erdos/core/providers/crossref.py` no longer defines `get_by_arxiv()` or `search()`
+4. [ ] Fallback composition supports all three operations via dedicated chains (DOI/arXiv/search)
+5. [ ] Call sites depend on the minimal required protocol (mypy enforces this)
+6. [ ] All existing tests pass
+7. [ ] `make ci` passes
 
 ---
 
 ## Non-Goals
 
 - Adding new metadata providers
-- Changing provider implementations (only their type annotations)
+- Changing provider HTTP semantics (requests, parsing, retry/rate-limiting)
 - Modifying CLI interface
