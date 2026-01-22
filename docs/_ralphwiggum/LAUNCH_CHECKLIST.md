@@ -26,7 +26,7 @@ git branch --show-current
 ```
 
 - [ ] Working tree is clean (no uncommitted changes)
-- [ ] You are **not** on `main` or `dev`
+- [ ] You will run the loop on a `ralph-wiggum-*` branch (not on `main`/`dev`)
 - [ ] `PROMPT.md` and `PROGRESS.md` exist
 - [ ] SSOT docs exist for the run:
   - Debt sprint: `docs/debt/README.md` and the referenced `docs/debt/debt-*.md` decks
