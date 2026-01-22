@@ -75,6 +75,29 @@ SAMPLE_OPENALEX_ARXIV_WORK = {
     "cited_by_count": 42,
 }
 
+SAMPLE_OPENALEX_ARXIV_IN_LOCATION_ONLY = {
+    "id": "https://openalex.org/W2626778328",
+    # Canonical DOI is not the arXiv DataCite DOI (OpenAlex may canonicalize differently)
+    "doi": "https://doi.org/10.65215/ctdc8e75",
+    "title": "Attention Is All You Need",
+    "publication_year": 2017,
+    "primary_location": {
+        "landing_page_url": "https://doi.org/10.65215/ctdc8e75",
+        "source": {"display_name": "Some Venue"},
+    },
+    "locations": [
+        {"landing_page_url": "https://doi.org/10.48550/arxiv.1706.03762"},
+        {"landing_page_url": "http://arxiv.org/abs/1706.03762"},
+        {"landing_page_url": "https://arxiv.org/pdf/1706.03762v5"},
+    ],
+    "ids": {
+        "openalex": "https://openalex.org/W2626778328",
+        "doi": "https://doi.org/10.65215/ctdc8e75",
+    },
+    "open_access": {"is_oa": True, "oa_status": "green"},
+    "cited_by_count": 12345,
+}
+
 SAMPLE_OPENALEX_SEARCH_RESPONSE = {
     "meta": {"count": 1, "page": 1, "per_page": 25},
     "results": [SAMPLE_OPENALEX_WORK],
@@ -278,6 +301,11 @@ class TestOpenAlexToReference:
         assert ref.doi == "10.48550/arxiv.1234.5678"
         assert ref.arxiv_id == "1234.5678"
 
+    def test_extracts_arxiv_id_from_non_primary_location(self) -> None:
+        """Extracts arXiv ID when only locations contain an arXiv landing page."""
+        ref = openalex_to_reference(SAMPLE_OPENALEX_ARXIV_IN_LOCATION_ONLY)
+        assert ref.arxiv_id == "1706.03762"
+
 
 class TestOpenAlexClient:
     """Tests for OpenAlex API client."""
@@ -334,12 +362,46 @@ class TestOpenAlexClient:
             "https://api.openalex.org/works/https://doi.org/10.48550/arxiv.9999.99999",
             status=404,
         )
+        # Fallback path: search by locations.landing_page_url in /works
+        # (responses matches by URL path; query params are ignored by default)
+        for _ in range(3):
+            responses.add(
+                responses.GET,
+                "https://api.openalex.org/works",
+                json={"meta": {"count": 0}, "results": []},
+                status=200,
+            )
 
         config = OpenAlexConfig()
         client = OpenAlexClient(config)
 
         with pytest.raises(ValueError, match=r"No work found for arXiv:9999\.99999"):
             client.get_by_arxiv("9999.99999")
+
+    @responses.activate
+    def test_get_by_arxiv_falls_back_to_locations_filter(self) -> None:
+        """Falls back to locations filter when DOI lookup 404s but work exists."""
+        responses.add(
+            responses.GET,
+            "https://api.openalex.org/works/https://doi.org/10.48550/arxiv.1706.03762",
+            status=404,
+        )
+        responses.add(
+            responses.GET,
+            "https://api.openalex.org/works",
+            json={
+                "meta": {"count": 1},
+                "results": [SAMPLE_OPENALEX_ARXIV_IN_LOCATION_ONLY],
+            },
+            status=200,
+        )
+
+        config = OpenAlexConfig()
+        client = OpenAlexClient(config)
+        ref = client.get_by_arxiv("1706.03762v5")
+
+        assert ref.arxiv_id == "1706.03762"
+        assert ref.title == "Attention Is All You Need"
 
     @responses.activate
     def test_search_success(self) -> None:

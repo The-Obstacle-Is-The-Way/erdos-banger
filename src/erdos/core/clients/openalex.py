@@ -110,12 +110,26 @@ def extract_arxiv_id(ids: dict[str, Any]) -> str | None:
 
 
 def _extract_arxiv_id_from_landing_page_url(url: str | None) -> str | None:
-    """Extract arXiv ID from an OpenAlex landing_page_url."""
+    """Extract arXiv ID from an OpenAlex landing_page_url.
+
+    Supports:
+    - arxiv.org/abs/<id>
+    - arxiv.org/pdf/<id>(vN).pdf
+    - doi.org/10.48550/arxiv.<id>
+    """
     if not url or not isinstance(url, str):
         return None
-    match = re.search(r"arxiv\\.org/abs/([^\\s?#]+)", url)
+    if url.lower().startswith(_ARXIV_DOI_PREFIX):
+        return url[len(_ARXIV_DOI_PREFIX) :]
+    match = re.search(r"arxiv\.org/abs/([^\s?#]+)", url)
     if not match:
-        return None
+        match = re.search(r"arxiv\.org/pdf/([^\s?#]+)", url)
+        if not match:
+            return None
+        candidate = match.group(1)
+        if candidate.lower().endswith(".pdf"):
+            candidate = candidate[: -len(".pdf")]
+        return candidate
     return match.group(1)
 
 
@@ -123,9 +137,9 @@ def extract_arxiv_id_from_work(work: dict[str, Any]) -> str | None:
     """Extract arXiv ID from a full OpenAlex work object.
 
     OpenAlex does not provide an `ids.arxiv` field. The arXiv identifier is usually
-    discoverable via either:
+    discoverable via:
     - ids.doi (arXiv DataCite DOI: 10.48550/arxiv.<id>)
-    - primary_location.landing_page_url (arxiv.org/abs/<id>)
+    - landing_page_url in primary_location or locations (arxiv.org/abs/<id> or doi.org/10.48550/arxiv.<id>)
     """
     ids = work.get("ids")
     if isinstance(ids, dict) and (arxiv_id := extract_arxiv_id(ids)):
@@ -134,8 +148,19 @@ def extract_arxiv_id_from_work(work: dict[str, Any]) -> str | None:
     primary_loc = work.get("primary_location")
     if isinstance(primary_loc, dict):
         landing = primary_loc.get("landing_page_url")
-        if isinstance(landing, str):
-            return _extract_arxiv_id_from_landing_page_url(landing)
+        if isinstance(landing, str) and (
+            arxiv_id := _extract_arxiv_id_from_landing_page_url(landing)
+        ):
+            return arxiv_id
+
+    for loc in work.get("locations", []):
+        if not isinstance(loc, dict):
+            continue
+        landing = loc.get("landing_page_url")
+        if isinstance(landing, str) and (
+            arxiv_id := _extract_arxiv_id_from_landing_page_url(landing)
+        ):
+            return arxiv_id
 
     return None
 
@@ -338,9 +363,6 @@ class OpenAlexClient:
         Raises:
             ValueError: If no work found for the arXiv ID.
         """
-        # OpenAlex does not support an ids.arxiv filter. arXiv e-prints are
-        # deterministically addressable via their DataCite DOIs:
-        #   10.48550/arxiv.<arxiv_id_without_version>
         arxiv_id_clean = re.sub(r"v\d+$", "", arxiv_id)
         doi = f"10.48550/arxiv.{arxiv_id_clean}"
 
@@ -348,9 +370,30 @@ class OpenAlexClient:
             ref = self.get_by_doi(doi)
         except requests.HTTPError as e:
             response = getattr(e, "response", None)
-            if response is not None and response.status_code == 404:
+            # Fast-path DOI lookup is not always supported by OpenAlex even when the work
+            # exists (some works have a different canonical DOI and only expose the arXiv
+            # DOI/landing page via locations[*].landing_page_url). Fall back to a locations
+            # filter query when the DOI lookup returns 404.
+            if response is None or response.status_code != 404:
+                raise
+            url = f"{self.BASE_URL}/works"
+            landing_candidates = [
+                f"https://doi.org/{doi}",
+                f"http://arxiv.org/abs/{arxiv_id_clean}",
+                f"https://arxiv.org/abs/{arxiv_id_clean}",
+            ]
+            for landing in landing_candidates:
+                params = self._params(
+                    filter=f"locations.landing_page_url:{landing}",
+                    per_page=1,
+                )
+                payload = self._fetch(url, params)
+                results = payload.get("results", [])
+                if isinstance(results, list) and results:
+                    ref = openalex_to_reference(results[0])
+                    break
+            else:
                 raise ValueError(f"No work found for arXiv:{arxiv_id_clean}") from e
-            raise
 
         # Ensure the arXiv ID is populated consistently.
         ref.arxiv_id = arxiv_id_clean
