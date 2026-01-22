@@ -39,8 +39,9 @@ All bugs below have been fixed and archived to `docs/_archive/bugs/`.
 | BUG-016 | Manifest corruption silently returns None | P2 | Fixed | 1d5bd51 |
 | BUG-018 | OpenAlex client `get_by_arxiv()` broken + wrong test DOIs | P1 | Fixed | b2dcdfe |
 | BUG-019 | `erdos convert --format` is a no-op | P2 | Fixed | b2dcdfe |
+| BUG-020 | OpenAlex `get_by_arxiv()` returns None for real arXiv IDs | P1 | Fixed | fe34ca1 |
 
-**Next Bug ID:** BUG-020
+**Next Bug ID:** BUG-021
 
 ### Archived Bug Decks
 
