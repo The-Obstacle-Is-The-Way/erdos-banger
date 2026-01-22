@@ -46,6 +46,7 @@ literature/cache/
 literature/extracts/
 index/*.sqlite
 logs/ralph/
+logs/ralph_prev_*/
 logs/loop/
 logs/*.yaml
 logs/*.json
