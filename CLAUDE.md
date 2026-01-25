@@ -23,14 +23,19 @@ uv run erdos list --status open --limit 5
 uv run erdos show 6
 
 # Full CI check (run before every commit)
-make ci                    # format-check + lint + typecheck + cov + audit
+make ci                    # fast checks (skips slow/Lean/network tests)
+make ci-full               # full local CI (includes test-all + smoke)
 
 # Individual checks
 make lint                  # ruff check
 make format                # ruff format
 make typecheck             # mypy src/ tests/
-make test                  # pytest (skip Lean + network)
-make test-all              # pytest (all tests)
+make test                  # pytest (fast, skips slow/Lean/network)
+make test-all              # pytest (all tests, includes slow/Lean/network)
+make test-integration      # pytest tests/integration
+make test-e2e              # pytest tests/e2e
+make test-lean             # pytest -m "requires_lean"
+make test-network          # pytest -m "requires_network"
 make smoke                 # CLI smoke test
 make audit                 # LOC guardrails check
 ```
@@ -39,7 +44,7 @@ make audit                 # LOC guardrails check
 
 ```bash
 # Fast tests (default, excludes Lean and network)
-uv run pytest -m "not requires_lean and not requires_network"
+uv run pytest -m "not requires_lean and not requires_network and not slow"
 
 # Single test file
 uv run pytest tests/unit/test_models.py
@@ -52,6 +57,17 @@ uv run pytest --cov=erdos --cov-fail-under=80 -m "not requires_lean and not requ
 
 # Run Lean-dependent tests (requires elan installed)
 uv run pytest -m "requires_lean"
+```
+
+### Lean Notes
+
+If `make test-all` fails on `tests/integration/test_lean_runner.py::TestLeanRunnerIntegration::test_check_formal_project_compiles`,
+pre-cache mathlib:
+
+```bash
+cd formal/lean
+lake update
+lake exe cache get
 ```
 
 ## Architecture

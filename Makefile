@@ -15,14 +15,14 @@ CLEAN_DIRS := .pytest_cache .mypy_cache .ruff_cache .coverage htmlcov dist build
 	format format-check \
 	lint lint-fix \
 	typecheck \
-	test test-all cov watch \
+	test test-all test-integration test-e2e test-lean test-network cov watch \
 	pre-commit hooks \
 	smoke \
 	check fix \
 	security \
 	audit \
 	clean reset \
-	ci
+	ci ci-full
 
 ##@ Getting Started
 
@@ -88,6 +88,18 @@ test: ## Run tests (skip Lean + network)
 test-all: ## Run all tests
 	$(RUN) pytest
 
+test-integration: ## Run integration tests
+	$(RUN) pytest tests/integration
+
+test-e2e: ## Run end-to-end tests
+	$(RUN) pytest tests/e2e
+
+test-lean: ## Run Lean-dependent tests (requires Lean installed)
+	$(RUN) pytest -m "requires_lean"
+
+test-network: ## Run network-dependent tests
+	$(RUN) pytest -m "requires_network"
+
 cov: ## Coverage (skip Lean + network)
 	$(RUN) pytest --cov=erdos --cov-fail-under=80 -m "$(PYTEST_FAST_MARKERS)"
 
@@ -135,3 +147,8 @@ audit: ## Check code health (LOC guardrails)
 ##@ CI
 
 ci: format-check lint typecheck cov audit ## Run CI-equivalent checks
+	@echo ""
+	@echo "NOTE: 'make ci' skips slow/Lean/network tests."
+	@echo "      Run 'make test-all' (or 'make ci-full') before merging large refactors."
+
+ci-full: ci test-all smoke ## Full CI (includes slow/Lean/network tests)
