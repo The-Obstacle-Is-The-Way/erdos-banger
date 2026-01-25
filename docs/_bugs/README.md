@@ -52,8 +52,9 @@ All bugs below have been fixed and archived to `docs/_archive/bugs/`.
 | BUG-028 | Batch commands accept negative `--limit` values | P3 | Fixed | d9ebff4 |
 | BUG-029 | zbMATH commands accept invalid pagination/year ranges | P2 | Fixed | 4f46d48 |
 | BUG-030 | `erdos ingest` accepts invalid numeric values | P2 | Fixed | 4f46d48 |
+| BUG-031 | `make smoke` fails when Lean installed but mathlib is not | P2 | Fixed | e7029e0 |
 
-**Next Bug ID:** BUG-031
+**Next Bug ID:** BUG-032
 
 ### Archived Bug Decks
 
@@ -90,6 +91,7 @@ All bugs below have been fixed and archived to `docs/_archive/bugs/`.
 - `docs/_archive/bugs/bug-028-batch-limit-negative-values-accepted.md`
 - `docs/_archive/bugs/bug-029-zbmath-validation-missing.md`
 - `docs/_archive/bugs/bug-030-ingest-numeric-validation-missing.md`
+- `docs/_archive/bugs/bug-031-smoke-test-lean-check-no-mathlib.md`
 
 ### Active Bug Decks
 
