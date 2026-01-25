@@ -48,7 +48,6 @@ EXEMPTED_MODULES: dict[str, str] = {}
 #       not business logic. We exempt them as FALSE POSITIVES (see DEBT-086).
 EXEMPTED_FUNCTIONS: dict[tuple[str, str], str] = {
     # FALSE POSITIVES: Typer CLI boilerplate, not business logic complexity
-    ("src/erdos/commands/search.py", "search"): "DEBT-043",  # 140 LOC, ~35 LOC logic
     ("src/erdos/commands/ingest.py", "ingest"): "DEBT-052",  # 157 LOC, ~45 LOC logic
     ("src/erdos/commands/convert.py", "convert"): "DEBT-036",  # 171 LOC, ~40 LOC logic
     ("src/erdos/commands/loop.py", "run"): "DEBT-065",  # 145 LOC, ~37 LOC logic
