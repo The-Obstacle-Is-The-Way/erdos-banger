@@ -6,6 +6,7 @@ This directory contains bug reports, adversarial code reviews, and quality audit
 
 | Date | Type | Summary | Status |
 |------|------|---------|--------|
+| 2026-01-25 | Adversarial Review | Post-refactor CLI stress test (no new bugs; expanded regression tests) | Archived |
 | 2026-01-25 | Adversarial Review | CLI stress test, input validation audit (6 bugs fixed in d9ebff4) | Archived |
 | 2026-01-25 | Adversarial Review | Follow-up stress test (2 bugs fixed in 4f46d48) | Archived |
 | 2026-01-22 | Adversarial Review | Post v2.1 architecture audit (loop/search SRP hotspots) | Archived |
@@ -73,6 +74,7 @@ All bugs below have been fixed and archived to `docs/_archive/bugs/`.
 - `docs/_archive/bugs/adversarial-review-2026-01-22.md`
 - `docs/_archive/bugs/adversarial-review-2026-01-25.md`
 - `docs/_archive/bugs/adversarial-review-2026-01-25-followup.md`
+- `docs/_archive/bugs/adversarial-review-2026-01-25-post-refactor-stress.md`
 - `docs/_archive/bugs/bug-002-search-build-index-json-stdout.md`
 - `docs/_archive/bugs/bug-003-search-fts-loader-missing.md`
 - `docs/_archive/bugs/bug-004-iter-problems-duplicate-ids.md`
