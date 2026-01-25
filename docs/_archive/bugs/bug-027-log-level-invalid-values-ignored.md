@@ -19,7 +19,7 @@ The global `--log-level` flag accepts arbitrary invalid values like `INVALID`, `
 
 A validation error like:
 ```
-Invalid value for '--log-level': 'INVALID' is not one of 'DEBUG', 'INFO', 'WARN', 'ERROR'.
+Invalid value for '--log-level': 'INVALID' is not one of 'debug', 'info', 'warn', 'error'.
 ```
 
 ## Actual Behavior
@@ -41,7 +41,9 @@ class LogLevel(str, Enum):
     WARN = "WARN"
     ERROR = "ERROR"
 
-log_level: Annotated[LogLevel, typer.Option("--log-level")] = LogLevel.INFO
+log_level: Annotated[
+    LogLevel, typer.Option("--log-level", case_sensitive=False)
+] = LogLevel.INFO
 ```
 
 ## Related

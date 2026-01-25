@@ -18,7 +18,7 @@ The `erdos refs s2 citations` (and other s2 subcommands) accept `--limit 0` with
 
 A validation error like:
 ```
-Invalid value for '--limit': 0 is not in the range x>=1.
+Invalid value for '--limit': 0 is not in the range 1<=x<=1000.
 ```
 
 ## Actual Behavior
