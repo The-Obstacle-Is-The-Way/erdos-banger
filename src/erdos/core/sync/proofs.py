@@ -1,40 +1,48 @@
 """Proof repository verification (SPEC-035).
 
-# exempt: DEBT-092 (626 LOC; verification pipeline with 7 bounded contexts:
-#   config, result types, env sanitization, git clone, Lean verification,
-#   main verify, provenance management)
-
-This module handles cloning and verifying Lean proofs from external repositories.
-
 SECURITY WARNING: Verification runs untrusted build tooling (`lake build`).
-Only use with explicit --verify flag after user consent.
+Only use with explicit --verify after user consent.
 
-Guardrails (per SPEC-035):
-1. Verification is opt-in (--verify flag)
-2. Runs in temp directory (never modifies working tree)
-3. Sanitizes environment (no API keys passed)
-4. Bounded logs (truncated stdout/stderr)
-5. Never runs git hooks or recursive submodule updates
+Guardrails:
+- Opt-in (--verify)
+- Runs in a temp directory (never modifies working tree)
+- Sanitizes environment (no API keys passed)
+- Truncates logs (bounded stdout/stderr)
+- Never runs git hooks or recursive submodule updates
 """
 
 from __future__ import annotations
 
-import json
 import logging
 import os
 import shutil
 import subprocess
 import tempfile
-from dataclasses import dataclass, field
-from datetime import UTC, datetime
 from pathlib import Path
 
-from erdos.core.sync.models import (
-    ProofLink,
-    ProofProvenance,
-    VerificationStatus,
-    VerificationStrength,
+from erdos.core.sync.models import ProofLink, VerificationStatus, VerificationStrength
+from erdos.core.sync.proofs_provenance import (
+    create_provenance,
+    save_provenance,
+    save_verification_log,
 )
+from erdos.core.sync.proofs_types import CloneResult, VerificationResult
+
+
+__all__ = [
+    "CloneResult",
+    "VerificationResult",
+    "_find_problem_files",
+    "_read_toolchain",
+    "_sanitize_env",
+    "_truncate_log",
+    "check_no_sorries",
+    "clone_repository",
+    "create_provenance",
+    "save_provenance",
+    "save_verification_log",
+    "verify_proof",
+]
 
 
 logger = logging.getLogger(__name__)
@@ -66,35 +74,6 @@ STRIPPED_ENV_VARS = frozenset(
         "SECRET_KEY",
     }
 )
-
-
-# =============================================================================
-# Result types
-# =============================================================================
-
-
-@dataclass
-class VerificationResult:
-    """Result of verifying a proof repository."""
-
-    status: VerificationStatus
-    strength: VerificationStrength
-    error: str | None = None
-    repo_commit: str | None = None
-    toolchain: str | None = None
-    verified_files: list[str] = field(default_factory=list)
-    log_content: str = ""
-    verification_command: str | None = None
-
-
-@dataclass
-class CloneResult:
-    """Result of cloning a repository."""
-
-    success: bool
-    path: Path | None = None
-    commit: str | None = None
-    error: str | None = None
 
 
 # =============================================================================
@@ -501,126 +480,3 @@ def verify_proof(
                 shutil.rmtree(work_dir)
             except OSError:
                 logger.debug("Failed to clean up temp directory: %s", work_dir)
-
-
-# =============================================================================
-# Provenance management
-# =============================================================================
-
-
-def create_provenance(
-    problem_id: int,
-    link: ProofLink,
-    verification: VerificationResult | None = None,
-) -> ProofProvenance:
-    """Create a provenance record for a proof.
-
-    Args:
-        problem_id: Problem ID
-        link: The proof link
-        verification: Optional verification result
-
-    Returns:
-        ProofProvenance record
-    """
-    now = datetime.now(UTC)
-
-    if verification is None:
-        return ProofProvenance(
-            problem_id=problem_id,
-            forum_thread_url=f"https://www.erdosproblems.com/forum/thread/{problem_id}",
-            extracted_at=now,
-            repo_url=link.url,
-            posted_by=link.author,
-            posted_at=link.posted_at,
-        )
-
-    return ProofProvenance(
-        problem_id=problem_id,
-        forum_thread_url=f"https://www.erdosproblems.com/forum/thread/{problem_id}",
-        extracted_at=now,
-        repo_url=link.url,
-        repo_commit=verification.repo_commit,
-        posted_by=link.author,
-        posted_at=link.posted_at,
-        verification_status=verification.status,
-        verification_strength=verification.strength,
-        verification_error=verification.error,
-        verified_at=now
-        if verification.status != VerificationStatus.UNVERIFIED
-        else None,
-        verification_command=verification.verification_command,
-        toolchain=verification.toolchain,
-        verified_files=verification.verified_files,
-    )
-
-
-def save_provenance(
-    provenance: ProofProvenance,
-    *,
-    cache_dir: Path | None = None,
-) -> Path:
-    """Save provenance record to disk.
-
-    Creates: <cache_dir>/<problem_id>/provenance.json
-
-    Args:
-        provenance: ProofProvenance to save
-        cache_dir: Base cache directory
-
-    Returns:
-        Path to saved file
-    """
-    if cache_dir is None:
-        cache_dir = Path("data/sync_cache/proofs")
-
-    problem_dir = cache_dir / str(provenance.problem_id)
-    problem_dir.mkdir(parents=True, exist_ok=True)
-
-    output_path = problem_dir / "provenance.json"
-
-    # Serialize with Pydantic
-    data = provenance.model_dump(mode="json")
-
-    # Atomic write
-    tmp_path = output_path.with_suffix(".json.tmp")
-    with tmp_path.open("w", encoding="utf-8") as f:
-        json.dump(data, f, indent=2, default=str)
-    tmp_path.replace(output_path)
-
-    return output_path
-
-
-def save_verification_log(
-    problem_id: int,
-    log_content: str,
-    *,
-    cache_dir: Path | None = None,
-) -> Path:
-    """Save verification log to disk.
-
-    Creates: <cache_dir>/<problem_id>/verify.log
-
-    Args:
-        problem_id: Problem ID
-        log_content: Log content to save
-        cache_dir: Base cache directory
-
-    Returns:
-        Path to saved file
-    """
-    if cache_dir is None:
-        cache_dir = Path("data/sync_cache/proofs")
-
-    problem_dir = cache_dir / str(problem_id)
-    problem_dir.mkdir(parents=True, exist_ok=True)
-
-    output_path = problem_dir / "verify.log"
-
-    # Atomic write
-    tmp_path = output_path.with_suffix(".log.tmp")
-    with tmp_path.open("w", encoding="utf-8") as f:
-        f.write(log_content)
-    tmp_path.replace(output_path)
-
-    return output_path

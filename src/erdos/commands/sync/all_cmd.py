@@ -10,11 +10,11 @@ import typer
 
 from erdos.commands.lean.import_cmd import import_upstream_formalization
 from erdos.commands.presenter import console, exit_with_result
-from erdos.commands.sync.proof_cmd import sync_proof_links
 from erdos.commands.sync.submodule_cmd import sync_submodule
 from erdos.commands.sync.website_cmd import sync_website_problem
 from erdos.core.exit_codes import ExitCode
 from erdos.core.models import CLIOutput
+from erdos.core.sync.proof_service import sync_proof_links
 from erdos.core.timing import measure_time_ms
 
 

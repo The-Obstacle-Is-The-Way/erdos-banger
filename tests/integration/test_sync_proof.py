@@ -14,7 +14,7 @@ import pytest
 from typer.testing import CliRunner
 
 from erdos.cli import app
-from erdos.commands.sync.proof_cmd import sync_proof_links
+from erdos.core.sync.proof_service import sync_proof_links
 
 
 # =============================================================================
@@ -47,7 +47,7 @@ class TestProofSyncNetwork:
         from unittest.mock import patch
 
         with patch(
-            "erdos.commands.sync.proof_cmd.DEFAULT_CACHE_PATH", tmp_path / "proofs"
+            "erdos.core.sync.proof_service.DEFAULT_CACHE_PATH", tmp_path / "proofs"
         ):
             result = sync_proof_links(1)  # Problem #1
 
@@ -63,7 +63,7 @@ class TestProofSyncNetwork:
         from unittest.mock import patch
 
         with patch(
-            "erdos.commands.sync.proof_cmd.DEFAULT_CACHE_PATH", tmp_path / "proofs"
+            "erdos.core.sync.proof_service.DEFAULT_CACHE_PATH", tmp_path / "proofs"
         ):
             result = runner.invoke(app, ["--json", "sync", "proof", "1"])
 
@@ -79,7 +79,7 @@ class TestProofSyncNetwork:
         from unittest.mock import patch
 
         with patch(
-            "erdos.commands.sync.proof_cmd.DEFAULT_CACHE_PATH", tmp_path / "proofs"
+            "erdos.core.sync.proof_service.DEFAULT_CACHE_PATH", tmp_path / "proofs"
         ):
             # Use a very high problem number that shouldn't exist
             result = runner.invoke(app, ["--json", "sync", "proof", "99999"])

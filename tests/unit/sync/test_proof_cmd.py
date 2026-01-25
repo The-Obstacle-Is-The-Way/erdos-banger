@@ -11,8 +11,8 @@ import pytest
 from typer.testing import CliRunner
 
 from erdos.cli import app
-from erdos.commands.sync.proof_cmd import sync_proof_links
 from erdos.core.exit_codes import ExitCode
+from erdos.core.sync.proof_service import sync_proof_links
 
 
 # =============================================================================
@@ -65,10 +65,11 @@ class TestSyncProofLinks:
         self, html_thread_with_github: str, tmp_path: Path
     ) -> None:
         """Extract GitHub link from forum HTML."""
-        with patch(
-            "erdos.commands.sync.proof_cmd.DEFAULT_CACHE_PATH", tmp_path / "proofs"
-        ):
-            result = sync_proof_links(347, html_content=html_thread_with_github)
+        result = sync_proof_links(
+            347,
+            html_content=html_thread_with_github,
+            cache_path=tmp_path / "proofs",
+        )
 
         assert result.success is True
         assert result.data is not None
@@ -83,20 +84,22 @@ class TestSyncProofLinks:
         self, html_thread_multiple_links: str, tmp_path: Path
     ) -> None:
         """Extract multiple links from forum HTML."""
-        with patch(
-            "erdos.commands.sync.proof_cmd.DEFAULT_CACHE_PATH", tmp_path / "proofs"
-        ):
-            result = sync_proof_links(100, html_content=html_thread_multiple_links)
+        result = sync_proof_links(
+            100,
+            html_content=html_thread_multiple_links,
+            cache_path=tmp_path / "proofs",
+        )
 
         assert result.success is True
         assert result.data["links_count"] == 3
 
     def test_handles_no_links(self, html_thread_no_links: str, tmp_path: Path) -> None:
         """Handle forum with no proof links gracefully."""
-        with patch(
-            "erdos.commands.sync.proof_cmd.DEFAULT_CACHE_PATH", tmp_path / "proofs"
-        ):
-            result = sync_proof_links(50, html_content=html_thread_no_links)
+        result = sync_proof_links(
+            50,
+            html_content=html_thread_no_links,
+            cache_path=tmp_path / "proofs",
+        )
 
         assert result.success is True
         assert result.data["links_count"] == 0
@@ -106,12 +109,12 @@ class TestSyncProofLinks:
         self, html_thread_with_github: str, tmp_path: Path
     ) -> None:
         """Dry run mode does not write files."""
-        with patch(
-            "erdos.commands.sync.proof_cmd.DEFAULT_CACHE_PATH", tmp_path / "proofs"
-        ):
-            result = sync_proof_links(
-                347, html_content=html_thread_with_github, dry_run=True
-            )
+        result = sync_proof_links(
+            347,
+            html_content=html_thread_with_github,
+            cache_path=tmp_path / "proofs",
+            dry_run=True,
+        )
 
         assert result.success is True
         # Cache directory should not exist
@@ -121,10 +124,11 @@ class TestSyncProofLinks:
         self, html_thread_with_github: str, tmp_path: Path
     ) -> None:
         """Sync writes links.json to cache directory."""
-        with patch(
-            "erdos.commands.sync.proof_cmd.DEFAULT_CACHE_PATH", tmp_path / "proofs"
-        ):
-            result = sync_proof_links(347, html_content=html_thread_with_github)
+        result = sync_proof_links(
+            347,
+            html_content=html_thread_with_github,
+            cache_path=tmp_path / "proofs",
+        )
 
         assert result.success is True
         links_path = tmp_path / "proofs" / "347" / "links.json"
@@ -140,10 +144,11 @@ class TestSyncProofLinks:
         self, html_thread_with_github: str, tmp_path: Path
     ) -> None:
         """Discover-only mode records provenance.json (best-effort)."""
-        with patch(
-            "erdos.commands.sync.proof_cmd.DEFAULT_CACHE_PATH", tmp_path / "proofs"
-        ):
-            result = sync_proof_links(347, html_content=html_thread_with_github)
+        result = sync_proof_links(
+            347,
+            html_content=html_thread_with_github,
+            cache_path=tmp_path / "proofs",
+        )
 
         assert result.success is True
         provenance_path = tmp_path / "proofs" / "347" / "provenance.json"
@@ -159,10 +164,11 @@ class TestSyncProofLinks:
         self, html_thread_with_github: str, tmp_path: Path
     ) -> None:
         """Verify JSON output matches spec contract."""
-        with patch(
-            "erdos.commands.sync.proof_cmd.DEFAULT_CACHE_PATH", tmp_path / "proofs"
-        ):
-            result = sync_proof_links(347, html_content=html_thread_with_github)
+        result = sync_proof_links(
+            347,
+            html_content=html_thread_with_github,
+            cache_path=tmp_path / "proofs",
+        )
 
         assert result.success is True
         data = result.data
@@ -201,9 +207,9 @@ class TestProofCLI:
     ) -> None:
         """JSON output mode works correctly."""
         with (
-            patch("erdos.commands.sync.proof_cmd.fetch_and_parse_forum") as mock_fetch,
+            patch("erdos.core.sync.proof_service.fetch_and_parse_forum") as mock_fetch,
             patch(
-                "erdos.commands.sync.proof_cmd.DEFAULT_CACHE_PATH", tmp_path / "proofs"
+                "erdos.core.sync.proof_service.DEFAULT_CACHE_PATH", tmp_path / "proofs"
             ),
         ):
             # Mock to return parsed data from fixture
@@ -224,9 +230,9 @@ class TestProofCLI:
     ) -> None:
         """--dry-run option prevents file writes."""
         with (
-            patch("erdos.commands.sync.proof_cmd.fetch_and_parse_forum") as mock_fetch,
+            patch("erdos.core.sync.proof_service.fetch_and_parse_forum") as mock_fetch,
             patch(
-                "erdos.commands.sync.proof_cmd.DEFAULT_CACHE_PATH", tmp_path / "proofs"
+                "erdos.core.sync.proof_service.DEFAULT_CACHE_PATH", tmp_path / "proofs"
             ),
         ):
             from erdos.core.sync.forum import parse_forum_html
@@ -244,9 +250,9 @@ class TestProofCLI:
         from erdos.core.sync.forum import ForumFetchError
 
         with (
-            patch("erdos.commands.sync.proof_cmd.fetch_and_parse_forum") as mock_fetch,
+            patch("erdos.core.sync.proof_service.fetch_and_parse_forum") as mock_fetch,
             patch(
-                "erdos.commands.sync.proof_cmd.DEFAULT_CACHE_PATH", tmp_path / "proofs"
+                "erdos.core.sync.proof_service.DEFAULT_CACHE_PATH", tmp_path / "proofs"
             ),
         ):
             mock_fetch.side_effect = ForumFetchError("Connection refused")
@@ -263,9 +269,9 @@ class TestProofCLI:
         from erdos.core.sync.forum import ForumFetchError
 
         with (
-            patch("erdos.commands.sync.proof_cmd.fetch_and_parse_forum") as mock_fetch,
+            patch("erdos.core.sync.proof_service.fetch_and_parse_forum") as mock_fetch,
             patch(
-                "erdos.commands.sync.proof_cmd.DEFAULT_CACHE_PATH", tmp_path / "proofs"
+                "erdos.core.sync.proof_service.DEFAULT_CACHE_PATH", tmp_path / "proofs"
             ),
         ):
             mock_fetch.side_effect = ForumFetchError(
@@ -329,12 +335,12 @@ class TestProofVerification:
         )
 
         with (
-            patch("erdos.commands.sync.proof_cmd.fetch_and_parse_forum") as mock_fetch,
+            patch("erdos.core.sync.proof_service.fetch_and_parse_forum") as mock_fetch,
             patch(
-                "erdos.commands.sync.proof_cmd.DEFAULT_CACHE_PATH", tmp_path / "proofs"
+                "erdos.core.sync.proof_service.DEFAULT_CACHE_PATH", tmp_path / "proofs"
             ),
             patch(
-                "erdos.commands.sync.proof_cmd.verify_proof", return_value=mock_result
+                "erdos.core.sync.proof_service.verify_proof", return_value=mock_result
             ),
         ):
             mock_fetch.return_value = parse_forum_html(html_thread_with_github, 347)
@@ -365,12 +371,12 @@ class TestProofVerification:
         )
 
         with (
-            patch("erdos.commands.sync.proof_cmd.fetch_and_parse_forum") as mock_fetch,
+            patch("erdos.core.sync.proof_service.fetch_and_parse_forum") as mock_fetch,
             patch(
-                "erdos.commands.sync.proof_cmd.DEFAULT_CACHE_PATH", tmp_path / "proofs"
+                "erdos.core.sync.proof_service.DEFAULT_CACHE_PATH", tmp_path / "proofs"
             ),
             patch(
-                "erdos.commands.sync.proof_cmd.verify_proof", return_value=mock_result
+                "erdos.core.sync.proof_service.verify_proof", return_value=mock_result
             ),
         ):
             mock_fetch.return_value = parse_forum_html(html_thread_with_github, 347)
@@ -406,12 +412,12 @@ class TestProofVerification:
         )
 
         with (
-            patch("erdos.commands.sync.proof_cmd.fetch_and_parse_forum") as mock_fetch,
+            patch("erdos.core.sync.proof_service.fetch_and_parse_forum") as mock_fetch,
             patch(
-                "erdos.commands.sync.proof_cmd.DEFAULT_CACHE_PATH", tmp_path / "proofs"
+                "erdos.core.sync.proof_service.DEFAULT_CACHE_PATH", tmp_path / "proofs"
             ),
             patch(
-                "erdos.commands.sync.proof_cmd.verify_proof", return_value=mock_result
+                "erdos.core.sync.proof_service.verify_proof", return_value=mock_result
             ),
         ):
             mock_fetch.return_value = parse_forum_html(html_thread_with_github, 347)
@@ -440,12 +446,12 @@ class TestProofVerification:
         )
 
         with (
-            patch("erdos.commands.sync.proof_cmd.fetch_and_parse_forum") as mock_fetch,
+            patch("erdos.core.sync.proof_service.fetch_and_parse_forum") as mock_fetch,
             patch(
-                "erdos.commands.sync.proof_cmd.DEFAULT_CACHE_PATH", tmp_path / "proofs"
+                "erdos.core.sync.proof_service.DEFAULT_CACHE_PATH", tmp_path / "proofs"
             ),
             patch(
-                "erdos.commands.sync.proof_cmd.verify_proof", return_value=mock_result
+                "erdos.core.sync.proof_service.verify_proof", return_value=mock_result
             ),
         ):
             mock_fetch.return_value = parse_forum_html(html_thread_with_github, 347)
@@ -475,12 +481,12 @@ class TestProofVerification:
         )
 
         with (
-            patch("erdos.commands.sync.proof_cmd.fetch_and_parse_forum") as mock_fetch,
+            patch("erdos.core.sync.proof_service.fetch_and_parse_forum") as mock_fetch,
             patch(
-                "erdos.commands.sync.proof_cmd.DEFAULT_CACHE_PATH", tmp_path / "proofs"
+                "erdos.core.sync.proof_service.DEFAULT_CACHE_PATH", tmp_path / "proofs"
             ),
             patch(
-                "erdos.commands.sync.proof_cmd.verify_proof", return_value=mock_result
+                "erdos.core.sync.proof_service.verify_proof", return_value=mock_result
             ),
         ):
             mock_fetch.return_value = parse_forum_html(html_thread_with_github, 347)
