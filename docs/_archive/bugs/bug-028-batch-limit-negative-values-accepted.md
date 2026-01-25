@@ -1,10 +1,10 @@
 # Bug: Batch commands accept negative `--limit` values
 
 **Priority:** P3
-**Status:** Open
+**Status:** Fixed
 **Found:** 2026-01-25
-**Fixed:** (not yet)
-**Commit:** (pending)
+**Fixed:** 2026-01-25
+**Commit:** d9ebff4
 
 ## Description
 
@@ -41,7 +41,7 @@ The commands succeed but the behavior with negative limits is unpredictable - so
 
 ## Root Cause
 
-In `src/erdos/commands/ingest.py` lines 194-196:
+In `src/erdos/commands/ingest.py` (batch mode):
 
 ```python
 limit: Annotated[
@@ -50,7 +50,7 @@ limit: Annotated[
 ] = None,
 ```
 
-And in `src/erdos/commands/lean/formalize_cmd.py` lines 238-240:
+And in `src/erdos/commands/lean/formalize_cmd.py` (batch mode):
 
 ```python
 limit: Annotated[
@@ -58,7 +58,9 @@ limit: Annotated[
 ] = None,
 ```
 
-Neither has validation constraints. The `int | None` type allows None for "no limit", but when an integer is provided, it should be validated as positive.
+Neither had validation constraints. The `int | None` type allows None for "no limit", but when an integer is provided, it should be validated as positive.
+
+Downstream, the batch filter logic applies `results[:limit]` (Python slicing) in `src/erdos/core/batch/models.py`, so negative limits produce surprising subsets (e.g., “all but last N”).
 
 ## Fix
 
@@ -75,6 +77,6 @@ Note: Typer's `min=1` should work with `Optional[int]` - it only validates when 
 
 ## Related
 
-- `src/erdos/commands/ingest.py:194-196`
-- `src/erdos/commands/lean/formalize_cmd.py:238-240`
-- `src/erdos/core/batch/filters.py` (where filtering happens)
+- `src/erdos/commands/ingest.py`
+- `src/erdos/commands/lean/formalize_cmd.py`
+- `src/erdos/core/batch/models.py` (filtering/slicing)

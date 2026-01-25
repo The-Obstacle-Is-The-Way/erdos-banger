@@ -1,10 +1,10 @@
 # Bug: `--log-level` accepts invalid values without error
 
 **Priority:** P3
-**Status:** Open
+**Status:** Fixed
 **Found:** 2026-01-25
-**Fixed:** (not yet)
-**Commit:** (pending)
+**Fixed:** 2026-01-25
+**Commit:** d9ebff4
 
 ## Description
 
@@ -28,29 +28,11 @@ The command runs successfully without any error or warning, presumably using the
 
 ## Root Cause
 
-The `--log-level` flag in `src/erdos/cli.py` or the app callback doesn't validate that the value is one of the documented valid options (DEBUG, INFO, WARN, ERROR). It likely passes the invalid value to Python's logging module which ignores unrecognized levels.
+The `--log-level` flag was a plain string. `_configure_logging()` mapped known values and fell back to `INFO` for unknown values, so invalid inputs were silently ignored.
 
 ## Fix
 
-Add validation using Typer's `enum` or `click.Choice`:
-
-```python
-log_level: Annotated[
-    str,
-    typer.Option(
-        "--log-level",
-        help="Logging level: DEBUG, INFO, WARN, ERROR.",
-        case_sensitive=False,
-    ),
-] = "INFO",
-
-# In the callback:
-valid_levels = {"DEBUG", "INFO", "WARN", "WARNING", "ERROR"}
-if log_level.upper() not in valid_levels:
-    raise typer.BadParameter(f"Invalid log level: {log_level}")
-```
-
-Or use an enum:
+Use a Typer enum so Click validates the value:
 
 ```python
 class LogLevel(str, Enum):
@@ -65,4 +47,3 @@ log_level: Annotated[LogLevel, typer.Option("--log-level")] = LogLevel.INFO
 ## Related
 
 - `src/erdos/cli.py` (global options)
-- Help text: `--log-level TEXT  Logging level: DEBUG, INFO, WARN, ERROR.`

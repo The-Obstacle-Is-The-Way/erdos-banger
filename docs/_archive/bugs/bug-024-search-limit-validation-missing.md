@@ -1,14 +1,14 @@
 # Bug: `erdos search --limit` crashes with traceback for invalid values
 
 **Priority:** P2
-**Status:** Open
+**Status:** Fixed
 **Found:** 2026-01-25
-**Fixed:** (not yet)
-**Commit:** (pending)
+**Fixed:** 2026-01-25
+**Commit:** d9ebff4
 
 ## Description
 
-The `erdos search` command shows an ugly Python traceback when `--limit 0` or `--limit -1` (or other invalid values) is provided, instead of showing a user-friendly validation error like the `erdos list` command does.
+The `erdos search` command showed a traceback when `--limit 0` or `--limit -1` (or other invalid values) was provided, instead of a user-friendly validation error like `erdos list` does.
 
 ## Steps to Reproduce
 
@@ -36,7 +36,7 @@ ValueError: limit must be greater than 0
 
 ## Root Cause
 
-In `src/erdos/commands/search.py` lines 330-333:
+In `src/erdos/commands/search.py`, the `limit` option had no Typer constraints:
 
 ```python
 limit: Annotated[
@@ -45,22 +45,7 @@ limit: Annotated[
 ] = DEFAULT_SEARCH_LIMIT,
 ```
 
-The `limit` parameter lacks Typer validation constraints (`min=1`, `max=1000`).
-
-Compare to `src/erdos/commands/list_cmd.py` lines 153-162 which correctly validates:
-
-```python
-limit: Annotated[
-    int,
-    typer.Option(
-        "--limit",
-        "-n",
-        help="Maximum number of results",
-        min=1,
-        max=1000,
-    ),
-] = 100,
-```
+Invalid values then reached `SearchOptions.__post_init__()`, which raised `ValueError`, surfacing as a traceback.
 
 ## Fix
 
@@ -75,6 +60,6 @@ limit: Annotated[
 
 ## Related
 
-- `src/erdos/commands/search.py:330-333`
-- `src/erdos/commands/list_cmd.py:153-162` (correct pattern)
-- `src/erdos/core/search/options.py:30-33` (late validation)
+- `src/erdos/commands/search.py`
+- `src/erdos/commands/list_cmd.py` (reference pattern)
+- `src/erdos/core/search/options.py` (late validation)

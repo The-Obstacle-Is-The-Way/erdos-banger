@@ -1,10 +1,10 @@
 # Bug: `erdos refs s2 --limit 0` causes cryptic API error
 
 **Priority:** P2
-**Status:** Open
+**Status:** Fixed
 **Found:** 2026-01-25
-**Fixed:** (not yet)
-**Commit:** (pending)
+**Fixed:** 2026-01-25
+**Commit:** d9ebff4
 
 ## Description
 
@@ -41,7 +41,7 @@ limit: Annotated[
 ] = 10,
 ```
 
-No `min=1` constraint is applied. The invalid value passes through to the API call, which rejects it.
+No `min=1` constraint was applied. The invalid value passed through to the API call, which rejected it.
 
 ## Fix
 
@@ -50,13 +50,11 @@ Add Typer validation constraints to all three limit parameters:
 ```python
 limit: Annotated[
     int,
-    typer.Option("--limit", help="Maximum citations to return.", min=1),
+    typer.Option("--limit", help="Maximum citations to return.", min=1, max=1000),
 ] = 10,
 ```
 
 ## Related
 
-- `src/erdos/commands/refs_s2.py:178-181` (citations)
-- `src/erdos/commands/refs_s2.py:245-248` (cited-by)
-- `src/erdos/commands/refs_s2.py:320-323` (references)
-- `src/erdos/commands/list_cmd.py:153-162` (correct pattern)
+- `src/erdos/commands/refs_s2.py` (citations/cited-by/references)
+- `src/erdos/commands/list_cmd.py` (reference pattern)

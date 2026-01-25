@@ -1,14 +1,14 @@
 # Bug: `erdos ask --limit` accepts invalid values (0, negative) silently
 
 **Priority:** P2
-**Status:** Open
+**Status:** Fixed
 **Found:** 2026-01-25
-**Fixed:** (not yet)
-**Commit:** (pending)
+**Fixed:** 2026-01-25
+**Commit:** d9ebff4
 
 ## Description
 
-The `erdos ask` command accepts `--limit 0` and negative values without error, silently returning zero sources instead of validating the input.
+The `erdos ask` command accepted `--limit 0` and negative values without error, silently returning zero sources instead of validating the input.
 
 ## Steps to Reproduce
 
@@ -62,10 +62,10 @@ Add Typer validation to the limit parameter:
 limit: Annotated[int, typer.Option("--limit", "-n", min=1)] = DEFAULT_RAG_LIMIT,
 ```
 
-And remove the defensive `max(limit, 0)` in retrieval.py since validation will prevent invalid values.
+Note: The defensive `max(limit, 0)` in `retrieval.py` can remain as a core-level guard; the CLI validation prevents invalid user input.
 
 ## Related
 
-- `src/erdos/commands/ask.py:156`
-- `src/erdos/core/ask/retrieval.py:136` (defensive workaround)
-- `src/erdos/commands/list_cmd.py:153-162` (correct pattern)
+- `src/erdos/commands/ask.py`
+- `src/erdos/core/ask/retrieval.py` (defensive workaround)
+- `src/erdos/commands/list_cmd.py` (reference pattern)

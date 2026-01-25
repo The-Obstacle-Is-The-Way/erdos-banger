@@ -15,12 +15,6 @@ This directory contains bug reports, adversarial code reviews, and quality audit
 
 | ID | Title | Priority | Status |
 |----|-------|----------|--------|
-| BUG-023 | `erdos lean import` path duplication causes crash | P1 | Open |
-| BUG-024 | `erdos search --limit` crashes with traceback for invalid values | P2 | Open |
-| BUG-025 | `erdos ask --limit` accepts invalid values silently | P2 | Open |
-| BUG-026 | `erdos refs s2 --limit 0` causes cryptic API error | P2 | Open |
-| BUG-027 | `--log-level` accepts invalid values without error | P3 | Open |
-| BUG-028 | Batch commands accept negative `--limit` values | P3 | Open |
 
 *Note: BUG-013 was invalidated as a false positive. BUG-015 and BUG-017 were review findings that were invalidated before standalone bug decks were created.*
 
@@ -50,6 +44,12 @@ All bugs below have been fixed and archived to `docs/_archive/bugs/`.
 | BUG-020 | OpenAlex `get_by_arxiv()` returns None for real arXiv IDs | P1 | Fixed | fe34ca1 |
 | BUG-021 | `erdos ingest` ignores `--mailto`/`--timeout` for OpenAlex requests | P2 | Fixed | 853dde8 |
 | BUG-022 | `erdos ingest --pdf` flags silently ignored | P2 | Fixed | 1c8889e |
+| BUG-023 | `erdos lean import` path duplication causes crash | P1 | Fixed | d9ebff4 |
+| BUG-024 | `erdos search --limit` crashes with traceback for invalid values | P2 | Fixed | d9ebff4 |
+| BUG-025 | `erdos ask --limit` accepts invalid values silently | P2 | Fixed | d9ebff4 |
+| BUG-026 | `erdos refs s2 --limit 0` causes cryptic API error | P2 | Fixed | d9ebff4 |
+| BUG-027 | `--log-level` accepts invalid values without error | P3 | Fixed | d9ebff4 |
+| BUG-028 | Batch commands accept negative `--limit` values | P3 | Fixed | d9ebff4 |
 
 **Next Bug ID:** BUG-029
 
@@ -78,15 +78,16 @@ All bugs below have been fixed and archived to `docs/_archive/bugs/`.
 - `docs/_archive/bugs/bug-020-openalex-get-by-arxiv-returns-none.md`
 - `docs/_archive/bugs/bug-021-ingest-openalex-mailto-timeout-ignored.md`
 - `docs/_archive/bugs/bug-022-ingest-pdf-flags-silently-ignored.md`
+- `docs/_archive/bugs/bug-023-lean-import-path-duplication.md`
+- `docs/_archive/bugs/bug-024-search-limit-validation-missing.md`
+- `docs/_archive/bugs/bug-025-ask-limit-validation-missing.md`
+- `docs/_archive/bugs/bug-026-refs-s2-limit-validation-missing.md`
+- `docs/_archive/bugs/bug-027-log-level-invalid-values-ignored.md`
+- `docs/_archive/bugs/bug-028-batch-limit-negative-values-accepted.md`
 
 ### Active Bug Decks
 
-- `docs/_bugs/bug-023-lean-import-path-duplication.md`
-- `docs/_bugs/bug-024-search-limit-validation-missing.md`
-- `docs/_bugs/bug-025-ask-limit-validation-missing.md`
-- `docs/_bugs/bug-026-refs-s2-limit-validation-missing.md`
-- `docs/_bugs/bug-027-log-level-invalid-values-ignored.md`
-- `docs/_bugs/bug-028-batch-limit-negative-values-accepted.md`
+None.
 
 ## Bug Priority Definitions
 
