@@ -1,0 +1,78 @@
+"""Integration tests for Typer validation on common CLI options."""
+
+from __future__ import annotations
+
+from erdos.cli import app
+from tests.cli_runner import make_cli_runner
+
+
+runner = make_cli_runner()
+
+
+def _combined_output(result: object) -> str:
+    stdout = getattr(result, "stdout", "")
+    stderr = getattr(result, "stderr", "")
+    output = f"{stdout}{stderr}"
+    if output:
+        return output
+    return getattr(result, "output", "")
+
+
+def test_search_limit_rejects_zero(strip_ansi) -> None:
+    result = runner.invoke(app, ["search", "test", "--limit", "0"])
+    assert result.exit_code == 2
+    output = strip_ansi(_combined_output(result))
+    assert "Invalid value for '--limit'" in output
+
+
+def test_search_limit_rejects_negative(strip_ansi) -> None:
+    result = runner.invoke(app, ["search", "test", "--limit", "-1"])
+    assert result.exit_code == 2
+    output = strip_ansi(_combined_output(result))
+    assert "Invalid value for '--limit'" in output
+
+
+def test_ask_limit_rejects_zero(strip_ansi) -> None:
+    result = runner.invoke(app, ["ask", "6", "test", "--no-llm", "--limit", "0"])
+    assert result.exit_code == 2
+    output = strip_ansi(_combined_output(result))
+    assert "Invalid value for '--limit'" in output
+
+
+def test_ask_limit_rejects_negative(strip_ansi) -> None:
+    result = runner.invoke(app, ["ask", "6", "test", "--no-llm", "--limit", "-1"])
+    assert result.exit_code == 2
+    output = strip_ansi(_combined_output(result))
+    assert "Invalid value for '--limit'" in output
+
+
+def test_refs_s2_limit_rejects_zero(strip_ansi) -> None:
+    result = runner.invoke(
+        app, ["refs", "s2", "citations", "10.1234/test", "--limit", "0"]
+    )
+    assert result.exit_code == 2
+    output = strip_ansi(_combined_output(result))
+    assert "Invalid value for '--limit'" in output
+
+
+def test_global_log_level_rejects_invalid_value(strip_ansi) -> None:
+    result = runner.invoke(app, ["--log-level", "INVALID", "list", "--limit", "1"])
+    assert result.exit_code == 2
+    output = strip_ansi(_combined_output(result))
+    assert "Invalid value for '--log-level'" in output
+
+
+def test_ingest_batch_limit_rejects_negative(strip_ansi) -> None:
+    result = runner.invoke(app, ["ingest", "--all", "--limit", "-5", "--dry-run"])
+    assert result.exit_code == 2
+    output = strip_ansi(_combined_output(result))
+    assert "Invalid value for '--limit'" in output
+
+
+def test_lean_formalize_batch_limit_rejects_negative(strip_ansi) -> None:
+    result = runner.invoke(
+        app, ["lean", "formalize", "--all", "--limit", "-1", "--dry-run"]
+    )
+    assert result.exit_code == 2
+    output = strip_ansi(_combined_output(result))
+    assert "Invalid value for '--limit'" in output
