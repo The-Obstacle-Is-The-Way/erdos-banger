@@ -4,7 +4,7 @@
 **Status:** Fixed
 **Found:** 2026-01-25
 **Fixed:** 2026-01-25
-**Commit:** e49d9c1
+**Commit:** 3ab5c5c
 
 ## Description
 
@@ -39,7 +39,7 @@ value (e.g., `foo`) was accepted and then treated as `unknown`. This produced a 
 
 ## Fix
 
-Implemented in commit `e49d9c1`:
+Implemented in commit `3ab5c5c`:
 
 - Add Click `Choice` validation for `--status` in:
   - `erdos ingest`
@@ -51,4 +51,3 @@ Implemented in commit `e49d9c1`:
 - `src/erdos/core/models/problem.py` (`ProblemStatus.from_string`)
 - `src/erdos/core/batch/models.py` (`filter_problem_ids`)
 - `tests/integration/test_cli_validation.py`
-

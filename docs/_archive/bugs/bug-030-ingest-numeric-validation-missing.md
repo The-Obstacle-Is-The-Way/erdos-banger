@@ -4,7 +4,7 @@
 **Status:** Fixed
 **Found:** 2026-01-25
 **Fixed:** 2026-01-25
-**Commit:** 4f46d48
+**Commit:** 6c7eef2
 
 ## Description
 
@@ -55,7 +55,7 @@ In `src/erdos/commands/ingest.py`, the Typer options for `--delay`, `--timeout`,
 
 ## Fix
 
-Implemented in commit `4f46d48`:
+Implemented in commit `6c7eef2`:
 
 - Added CLI validation for:
   - `--delay` (must be `>= 0`)

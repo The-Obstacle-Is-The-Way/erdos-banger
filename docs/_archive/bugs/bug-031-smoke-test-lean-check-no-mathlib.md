@@ -4,7 +4,7 @@
 **Status:** Fixed
 **Found:** 2026-01-25
 **Fixed:** 2026-01-25
-**Commit:** e7029e0
+**Commit:** 83bf9f6
 
 ## Description
 
@@ -33,7 +33,7 @@ The generated `Problem006.lean` imports `Mathlib.*`, which is unavailable in a `
 
 ## Fix
 
-Implemented in commit `e7029e0`:
+Implemented in commit `83bf9f6`:
 
 - Always compile `Erdos/Basic.lean` (works without mathlib).
 - Only compile `Erdos/Problem006.lean` when mathlib exists in the project (`.lake/packages/mathlib` or `lake-packages/mathlib`).

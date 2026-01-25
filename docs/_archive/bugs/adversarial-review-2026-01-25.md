@@ -10,7 +10,7 @@ Comprehensive stress test of all CLI commands and flags. Found **6 bugs** (1 P1,
 
 ## Resolution
 
-All six bugs (BUG-023..BUG-028) were fixed in commit `d9ebff4` and their bug decks archived under `docs/_archive/bugs/`.
+All six bugs (BUG-023..BUG-028) were fixed in commit `92039ca` and their bug decks archived under `docs/_archive/bugs/`.
 
 ## Bugs Found
 

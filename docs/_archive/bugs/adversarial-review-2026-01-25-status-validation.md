@@ -6,14 +6,14 @@
 ## Summary
 
 Found **1 bug** where invalid `--status` values were accepted in batch commands and
-misclassified as `NotFoundError` instead of a usage error. Fixed in `e49d9c1` with
+misclassified as `NotFoundError` instead of a usage error. Fixed in `3ab5c5c` with
 regression tests.
 
 ## Bug Found
 
 | ID | Title | Priority | Fix |
 |----|-------|----------|-----|
-| BUG-032 | Batch `--status` accepts invalid values (misclassified as NotFound) | P3 | `e49d9c1` |
+| BUG-032 | Batch `--status` accepts invalid values (misclassified as NotFound) | P3 | `3ab5c5c` |
 
 ## Commands Tested
 
@@ -24,4 +24,3 @@ regression tests.
 
 - `make ci` ✅
 - `make smoke` ✅
-

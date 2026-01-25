@@ -4,7 +4,7 @@
 **Status:** Fixed
 **Found:** 2026-01-24
 **Fixed:** 2026-01-25
-**Fixed In:** 104b7b4
+**Fixed In:** 534802f
 
 ## Description
 
@@ -79,7 +79,7 @@ However, the current structure works and the violation is marginal (+39 LOC).
 
 ## Resolution
 
-Fixed in `104b7b4` by:
+Fixed in `534802f` by:
 - Extracting orchestration to `src/erdos/core/sync/proof_service.py`
 - Splitting provenance + dataclasses to:
   - `src/erdos/core/sync/proofs_provenance.py`

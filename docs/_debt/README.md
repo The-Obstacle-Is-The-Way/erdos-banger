@@ -118,8 +118,8 @@ All debt below has been resolved and archived to `docs/_archive/debt/`.
 | DEBT-089 | Ingest/fetch long parameter lists | P1 | Fixed | 22f14f6 |
 | DEBT-090 | Cyclomatic complexity violations (C901) | P2 | Fixed | 22f14f6 |
 | DEBT-091 | Blind exception catches (BLE001) | P3 | Fixed | 22f14f6 |
-| DEBT-092 | Proof verification module LOC violations | P3 | Fixed | 104b7b4 |
-| DEBT-096 | Search command module LOC violation (post-MSC growth) | P3 | Fixed | 1a5e29a |
+| DEBT-092 | Proof verification module LOC violations | P3 | Fixed | 534802f |
+| DEBT-096 | Search command module LOC violation (post-MSC growth) | P3 | Fixed | 4a21f0b |
 | DEBT-097 | Test suite ANSI handling inconsistency | P2 | Fixed | 3d19c58 |
 | DEBT-098 | Test references deprecated std4 repository | P1 | Fixed | e49696e |
 | DEBT-099 | Lean test fixture lakefile syntax outdated | P2 | Fixed | (this PR) |

@@ -7,11 +7,11 @@
 
 This pass re-ran a focused CLI stress test after the DEBT-092/DEBT-096 refactors:
 
-- Proof sync orchestration extracted to core (`refactor(sync): extract proof sync service`, `104b7b4`)
-- `erdos search` split into thin adapter + impl/output modules (`refactor(commands): split search implementation`, `1a5e29a`)
-- DEBT-092 and DEBT-096 archived (`docs(debt): archive DEBT-092 and DEBT-096`, `9a25083`)
+- Proof sync orchestration extracted to core (`refactor(sync): extract proof sync service`, `534802f`)
+- `erdos search` split into thin adapter + impl/output modules (`refactor(commands): split search implementation`, `4a21f0b`)
+- DEBT-092 and DEBT-096 archived (`docs(debt): archive DEBT-092 and DEBT-096`, `41c3e8d`)
 
-Separately, BUG-023..BUG-028 were previously fixed in `d9ebff4`.
+Separately, BUG-023..BUG-028 were previously fixed in `92039ca`.
 
 ## Verification (BUG-023..BUG-028)
 
@@ -42,4 +42,3 @@ Expanded CLI validation tests to cover additional edge cases:
 ## New Bugs Found
 
 None in this pass.
-

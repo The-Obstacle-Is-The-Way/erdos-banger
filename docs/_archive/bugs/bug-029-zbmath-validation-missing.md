@@ -4,7 +4,7 @@
 **Status:** Fixed
 **Found:** 2026-01-25
 **Fixed:** 2026-01-25
-**Commit:** 4f46d48
+**Commit:** 6c7eef2
 
 ## Description
 
@@ -49,7 +49,7 @@ In `src/erdos/commands/refs_zbmath.py`, `--limit` has no Typer constraints and t
 
 ## Fix
 
-Implemented in commit `4f46d48`:
+Implemented in commit `6c7eef2`:
 
 1. Added Typer validation constraints to `erdos refs zbmath --limit` (`min=1, max=1000`).
 2. Validated `--year-min/--year-max` ordering when `--msc` is used (reject `year_min > year_max`) in:

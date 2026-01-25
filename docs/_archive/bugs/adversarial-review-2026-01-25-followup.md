@@ -5,11 +5,11 @@
 
 ## Summary
 
-Follow-up stress testing after fixing BUG-023..028 (commit `d9ebff4`) found additional input-validation gaps, primarily in zbMATH and ingest.
+Follow-up stress testing after fixing BUG-023..028 (commit `92039ca`) found additional input-validation gaps, primarily in zbMATH and ingest.
 
 ## Resolution
 
-BUG-029..030 were fixed in commit `4f46d48` and their bug decks archived under `docs/_archive/bugs/`.
+BUG-029..030 were fixed in commit `6c7eef2` and their bug decks archived under `docs/_archive/bugs/`.
 
 ## Bugs Found
 

@@ -4,7 +4,7 @@
 **Status:** Fixed
 **Found:** 2026-01-24
 **Fixed:** 2026-01-25
-**Fixed In:** 1a5e29a
+**Fixed In:** 4a21f0b
 
 ## Description
 
@@ -90,7 +90,7 @@ Currently the cognitive overhead of splitting doesn't justify the LOC savings.
 
 ## Resolution
 
-Fixed in `1a5e29a` by:
+Fixed in `4a21f0b` by:
 - Splitting orchestration to `src/erdos/commands/search_impl.py`
 - Splitting human rendering to `src/erdos/commands/search_output.py`
 - Keeping `src/erdos/commands/search.py` as a thin Typer adapter (currently 102 LOC)

@@ -6,10 +6,10 @@ This directory contains bug reports, adversarial code reviews, and quality audit
 
 | Date | Type | Summary | Status |
 |------|------|---------|--------|
-| 2026-01-25 | Adversarial Review | Status filter validation audit (1 bug fixed in e49d9c1) | Archived |
+| 2026-01-25 | Adversarial Review | Status filter validation audit (1 bug fixed in 3ab5c5c) | Archived |
 | 2026-01-25 | Adversarial Review | Post-refactor CLI stress test (no new bugs; expanded regression tests) | Archived |
-| 2026-01-25 | Adversarial Review | CLI stress test, input validation audit (6 bugs fixed in d9ebff4) | Archived |
-| 2026-01-25 | Adversarial Review | Follow-up stress test (2 bugs fixed in 4f46d48) | Archived |
+| 2026-01-25 | Adversarial Review | CLI stress test, input validation audit (6 bugs fixed in 92039ca) | Archived |
+| 2026-01-25 | Adversarial Review | Follow-up stress test (2 bugs fixed in 6c7eef2) | Archived |
 | 2026-01-22 | Adversarial Review | Post v2.1 architecture audit (loop/search SRP hotspots) | Archived |
 | 2026-01-21 | Adversarial Review | Full codebase audit for bugs, debt, anti-patterns | Archived |
 | 2026-01-17 | Adversarial Review | Full codebase audit covering specs 003-006 | Archived |
@@ -46,16 +46,16 @@ All bugs below have been fixed and archived to `docs/_archive/bugs/`.
 | BUG-020 | OpenAlex `get_by_arxiv()` returns None for real arXiv IDs | P1 | Fixed | fe34ca1 |
 | BUG-021 | `erdos ingest` ignores `--mailto`/`--timeout` for OpenAlex requests | P2 | Fixed | 853dde8 |
 | BUG-022 | `erdos ingest --pdf` flags silently ignored | P2 | Fixed | 1c8889e |
-| BUG-023 | `erdos lean import` path duplication causes crash | P1 | Fixed | d9ebff4 |
-| BUG-024 | `erdos search --limit` crashes with traceback for invalid values | P2 | Fixed | d9ebff4 |
-| BUG-025 | `erdos ask --limit` accepts invalid values silently | P2 | Fixed | d9ebff4 |
-| BUG-026 | `erdos refs s2 --limit 0` causes cryptic API error | P2 | Fixed | d9ebff4 |
-| BUG-027 | `--log-level` accepts invalid values without error | P3 | Fixed | d9ebff4 |
-| BUG-028 | Batch commands accept negative `--limit` values | P3 | Fixed | d9ebff4 |
-| BUG-029 | zbMATH commands accept invalid pagination/year ranges | P2 | Fixed | 4f46d48 |
-| BUG-030 | `erdos ingest` accepts invalid numeric values | P2 | Fixed | 4f46d48 |
-| BUG-031 | `make smoke` fails when Lean installed but mathlib is not | P2 | Fixed | e7029e0 |
-| BUG-032 | Batch `--status` accepts invalid values (misclassified as NotFound) | P3 | Fixed | e49d9c1 |
+| BUG-023 | `erdos lean import` path duplication causes crash | P1 | Fixed | 92039ca |
+| BUG-024 | `erdos search --limit` crashes with traceback for invalid values | P2 | Fixed | 92039ca |
+| BUG-025 | `erdos ask --limit` accepts invalid values silently | P2 | Fixed | 92039ca |
+| BUG-026 | `erdos refs s2 --limit 0` causes cryptic API error | P2 | Fixed | 92039ca |
+| BUG-027 | `--log-level` accepts invalid values without error | P3 | Fixed | 92039ca |
+| BUG-028 | Batch commands accept negative `--limit` values | P3 | Fixed | 92039ca |
+| BUG-029 | zbMATH commands accept invalid pagination/year ranges | P2 | Fixed | 6c7eef2 |
+| BUG-030 | `erdos ingest` accepts invalid numeric values | P2 | Fixed | 6c7eef2 |
+| BUG-031 | `make smoke` fails when Lean installed but mathlib is not | P2 | Fixed | 83bf9f6 |
+| BUG-032 | Batch `--status` accepts invalid values (misclassified as NotFound) | P3 | Fixed | 3ab5c5c |
 
 **Next Bug ID:** BUG-033
 
