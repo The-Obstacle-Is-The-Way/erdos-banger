@@ -40,8 +40,17 @@ ${UV_RUN} erdos lean formalize 6 --path "${LEAN_DIR}" > /dev/null
 
 echo "[5/5] Checking Lean (optional)..."
 if command -v lean &> /dev/null && command -v lake &> /dev/null; then
-  echo "      Lean found, running compilation check..."
-  ${UV_RUN} erdos lean check "${LEAN_DIR}/Erdos/Problem006.lean" --path "${LEAN_DIR}" > /dev/null
+  echo "      Lean found, checking minimal project..."
+  ${UV_RUN} erdos lean check "${LEAN_DIR}/Erdos/Basic.lean" --path "${LEAN_DIR}" > /dev/null
+
+  # `--no-mathlib` intentionally avoids fetching mathlib for a fast, offline smoke test.
+  # Only run Problem006 compilation when mathlib is present in the project.
+  if [[ -d "${LEAN_DIR}/.lake/packages/mathlib" || -d "${LEAN_DIR}/lake-packages/mathlib" ]]; then
+    echo "      mathlib found, checking generated skeleton..."
+    ${UV_RUN} erdos lean check "${LEAN_DIR}/Erdos/Problem006.lean" --path "${LEAN_DIR}" > /dev/null
+  else
+    echo "      mathlib not installed, skipping skeleton compilation"
+  fi
 else
   echo "      Lean not installed, skipping"
 fi
