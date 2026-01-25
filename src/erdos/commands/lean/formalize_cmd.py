@@ -236,7 +236,7 @@ def register(app: typer.Typer) -> None:
             typer.Option("--tag", help="Filter by tag (can be repeated)"),
         ] = None,
         limit: Annotated[
-            int | None, typer.Option("--limit", help="Max problems to process")
+            int | None, typer.Option("--limit", help="Max problems to process", min=1)
         ] = None,
         skip_existing: Annotated[
             bool,

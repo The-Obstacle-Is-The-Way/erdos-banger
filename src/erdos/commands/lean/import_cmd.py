@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+from contextlib import suppress
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Annotated, Any
@@ -39,7 +40,18 @@ def _validate_imported_file(
         return False
     try:
         runner = LeanRunner(project_path)
-        check_result = runner.check(local_path)
+        # LeanRunner treats relative paths as relative to the Lean project root.
+        # Our local file path is typically computed as `project_path / ...`,
+        # which (when project_path is relative) looks like a cwd-relative path
+        # that already includes the project prefix (e.g., formal/lean/Erdos/Foo.lean).
+        # Passing that directly would cause LeanRunner to prepend project_path again.
+        path_for_check = local_path
+        if not path_for_check.is_absolute():
+            # local_path may already include the project prefix (e.g.,
+            # formal/lean/Erdos/Foo.lean). If so, strip it.
+            with suppress(ValueError):
+                path_for_check = path_for_check.relative_to(project_path)
+        check_result = runner.check(path_for_check)
         if not check_result.success:
             return CLIOutput.err(
                 command="erdos lean import",

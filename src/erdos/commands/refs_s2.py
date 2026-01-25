@@ -177,7 +177,7 @@ def citations(
     ],
     limit: Annotated[
         int,
-        typer.Option("--limit", help="Maximum citations to return."),
+        typer.Option("--limit", help="Maximum citations to return.", min=1, max=1000),
     ] = 10,
 ) -> None:
     """Get citation contexts for a paper.
@@ -244,7 +244,9 @@ def cited_by(
     ],
     limit: Annotated[
         int,
-        typer.Option("--limit", help="Maximum citing papers to return."),
+        typer.Option(
+            "--limit", help="Maximum citing papers to return.", min=1, max=1000
+        ),
     ] = 10,
 ) -> None:
     """List papers that cite the given paper (no context snippets).
@@ -319,7 +321,7 @@ def references(
     ],
     limit: Annotated[
         int,
-        typer.Option("--limit", help="Maximum references to return."),
+        typer.Option("--limit", help="Maximum references to return.", min=1, max=1000),
     ] = 10,
 ) -> None:
     """List papers referenced by the given paper (outgoing citations).

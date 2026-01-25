@@ -312,6 +312,50 @@ class TestLeanImportCommand:
                 os.chdir(old_cwd)
 
     @responses.activate
+    def test_import_relative_project_path_does_not_duplicate_paths(
+        self,
+        tmp_path: Path,
+        enriched_yaml: Path,
+        lean_project: Path,
+    ) -> None:
+        """Import with a relative --path should not double-prepend formal/lean."""
+        lean_content = b"-- Problem 6 formalization\ntheorem problem_6 := sorry"
+        url = f"{FORMAL_CONJECTURES_BASE_URL}FormalConjectures/ErdosProblems/6.lean"
+        responses.add(responses.GET, url, body=lean_content, status=200)
+
+        with patch.dict(
+            os.environ,
+            {
+                "ERDOS_DATA_PATH": str(enriched_yaml),
+            },
+        ):
+            old_cwd = os.getcwd()
+            os.chdir(tmp_path)
+            try:
+                with patch("erdos.core.lean.runner.shutil.which", return_value=None):
+                    result = runner.invoke(
+                        app,
+                        [
+                            "--json",
+                            "lean",
+                            "import",
+                            "6",
+                            "--path",
+                            "formal/lean",
+                        ],
+                    )
+                if "No such command" in result.stdout:
+                    pytest.skip("import command not implemented yet")
+
+                assert result.exit_code == 0
+                data = json.loads(result.stdout)
+                assert data["success"] is True
+                assert data["data"]["written"] is True
+                assert data["data"]["lean_validated"] is False
+            finally:
+                os.chdir(old_cwd)
+
+    @responses.activate
     def test_import_conflict_without_force(
         self, tmp_path: Path, enriched_yaml: Path, lean_project: Path
     ) -> None:

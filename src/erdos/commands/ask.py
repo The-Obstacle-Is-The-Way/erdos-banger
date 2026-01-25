@@ -153,7 +153,15 @@ def ask(
     ctx: typer.Context,
     problem_id: Annotated[int, typer.Argument(help="Problem ID", min=1)],
     question_arg: Annotated[str, typer.Argument(help="Question or '-' for stdin")],
-    limit: Annotated[int, typer.Option("--limit", "-n")] = DEFAULT_RAG_LIMIT,
+    limit: Annotated[
+        int,
+        typer.Option(
+            "--limit",
+            "-n",
+            help="Maximum sources to retrieve",
+            min=1,
+        ),
+    ] = DEFAULT_RAG_LIMIT,
     build_index: Annotated[bool, typer.Option("--build-index")] = False,
     no_llm: Annotated[bool, typer.Option("--no-llm")] = False,
     llm_cmd: Annotated[

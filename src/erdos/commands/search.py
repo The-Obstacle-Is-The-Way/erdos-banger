@@ -329,7 +329,13 @@ def search(
     ] = None,
     limit: Annotated[
         int,
-        typer.Option("--limit", "-n", help="Maximum results to return"),
+        typer.Option(
+            "--limit",
+            "-n",
+            help="Maximum results to return",
+            min=1,
+            max=1000,
+        ),
     ] = DEFAULT_SEARCH_LIMIT,
     problem_filter: Annotated[
         int | None,

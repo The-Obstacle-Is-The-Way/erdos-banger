@@ -193,7 +193,7 @@ def ingest(
     ] = None,
     limit: Annotated[
         int | None,
-        typer.Option("--limit", help="Max problems to process"),
+        typer.Option("--limit", help="Max problems to process", min=1),
     ] = None,
     skip: Annotated[
         int | None,
