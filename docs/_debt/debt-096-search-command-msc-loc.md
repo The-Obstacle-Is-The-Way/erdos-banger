@@ -11,17 +11,17 @@ The search command module exceeds LOC thresholds after MSC search mode was added
 
 | Module | LOC | Threshold | Delta |
 |--------|-----|-----------|-------|
-| `src/erdos/commands/search.py` | 509 | 400 | +109 |
+| `src/erdos/commands/search.py` | 525 | 400 | +125 |
 
 | Function | LOC | Threshold | Delta |
 |----------|-----|-----------|-------|
-| `search()` (line 322) | 188 | 120 | +68 |
+| `search()` (line 330) | 196 | 120 | +76 |
 
-**Note:** The inline exemption marker claims 517 LOC, which is inaccurate.
+**Note:** The inline exemption marker should be kept in sync with audit output.
 
 ## History
 
-DEBT-043 previously reduced this module from 791→334 LOC by extracting orchestration logic to `core/search/service.py`. The module has since grown 175 LOC (52% increase) due to MSC search mode (SPEC-031/3):
+DEBT-043 previously reduced this module from 791→334 LOC by extracting orchestration logic to `core/search/service.py`. The module has since grown 191 LOC (57% increase) due to MSC search mode (SPEC-031/3):
 
 | Component | Added LOC |
 |-----------|-----------|
@@ -34,7 +34,7 @@ DEBT-043 previously reduced this module from 791→334 LOC by extracting orchest
 
 ## Analysis
 
-### Function Size (188 LOC)
+### Function Size (196 LOC)
 
 The `search()` callback appears long but the breakdown reveals:
 - **~80 LOC:** Typer parameter declarations (framework-required boilerplate)
@@ -43,7 +43,7 @@ The `search()` callback appears long but the breakdown reveals:
 
 The actual logic is well-delegated to helper functions (`_validate_mode_flags()`, `_execute_msc_search()`, `_handle_index_build()`, `_handle_embeddings_build()`) and the service layer (`execute_search()`).
 
-### Module Size (509 LOC)
+### Module Size (525 LOC)
 
 Breakdown by responsibility:
 - **Imports/setup:** ~46 LOC
@@ -53,7 +53,7 @@ Breakdown by responsibility:
 - **MSC execution:** ~55 LOC (`_execute_msc_search()`)
 - **Index/embeddings handlers:** ~64 LOC (`_handle_index_build()`, `_handle_embeddings_build()`)
 - **Mode selection:** ~8 LOC (`_get_search_mode()`)
-- **Typer callback:** ~188 LOC (`search()`)
+- **Typer callback:** ~196 LOC (`search()`)
 
 ## Justification for Exemption
 
@@ -94,10 +94,10 @@ Currently the cognitive overhead of splitting doesn't justify the LOC savings.
 Exempted via inline marker:
 
 ```python
-# exempt: DEBT-096 (517 LOC; CLI + multiple search modes including MSC/zbMATH)
+# exempt: DEBT-096 (525 LOC; CLI + multiple search modes including MSC/zbMATH)
 ```
 
-The function-level violation (188 LOC) is also exempted via the existing DEBT-043 marker in the audit exemptions.
+The function-level violation (196 LOC) is also exempted via the existing DEBT-043 marker in the audit exemptions.
 
 ## Acceptance Criteria (If Opened)
 

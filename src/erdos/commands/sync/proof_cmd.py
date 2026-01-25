@@ -1,6 +1,6 @@
 """erdos sync proof - extract proof links from forum threads (SPEC-035).
 
-# exempt: DEBT-092 (441 LOC; CLI + verification orchestration with human output)
+# exempt: DEBT-092 (439 LOC; CLI + verification orchestration with human output)
 """
 
 from __future__ import annotations

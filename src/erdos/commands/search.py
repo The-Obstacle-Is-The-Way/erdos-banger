@@ -1,6 +1,6 @@
 """erdos search - search problem statements.
 
-# exempt: DEBT-096 (509 LOC; CLI + multiple search modes including MSC/zbMATH)
+# exempt: DEBT-096 (525 LOC; CLI + multiple search modes including MSC/zbMATH)
 
 This module is a thin CLI adapter that parses Typer flags and delegates
 to the core search service (erdos.core.search.service).
