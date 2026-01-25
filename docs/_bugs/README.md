@@ -6,13 +6,21 @@ This directory contains bug reports, adversarial code reviews, and quality audit
 
 | Date | Type | Summary | Status |
 |------|------|---------|--------|
+| 2026-01-25 | Adversarial Review | CLI stress test, input validation audit (6 bugs: 1 P1, 3 P2, 2 P3) | Active |
 | 2026-01-22 | Adversarial Review | Post v2.1 architecture audit (loop/search SRP hotspots) | Archived |
 | 2026-01-21 | Adversarial Review | Full codebase audit for bugs, debt, anti-patterns | Archived |
 | 2026-01-17 | Adversarial Review | Full codebase audit covering specs 003-006 | Archived |
 
 ## Active Bugs
 
-*None currently active.*
+| ID | Title | Priority | Status |
+|----|-------|----------|--------|
+| BUG-023 | `erdos lean import` path duplication causes crash | P1 | Open |
+| BUG-024 | `erdos search --limit` crashes with traceback for invalid values | P2 | Open |
+| BUG-025 | `erdos ask --limit` accepts invalid values silently | P2 | Open |
+| BUG-026 | `erdos refs s2 --limit 0` causes cryptic API error | P2 | Open |
+| BUG-027 | `--log-level` accepts invalid values without error | P3 | Open |
+| BUG-028 | Batch commands accept negative `--limit` values | P3 | Open |
 
 *Note: BUG-013 was invalidated as a false positive. BUG-015 and BUG-017 were review findings that were invalidated before standalone bug decks were created.*
 
@@ -43,7 +51,7 @@ All bugs below have been fixed and archived to `docs/_archive/bugs/`.
 | BUG-021 | `erdos ingest` ignores `--mailto`/`--timeout` for OpenAlex requests | P2 | Fixed | 853dde8 |
 | BUG-022 | `erdos ingest --pdf` flags silently ignored | P2 | Fixed | 1c8889e |
 
-**Next Bug ID:** BUG-023
+**Next Bug ID:** BUG-029
 
 ### Archived Bug Decks
 
@@ -70,6 +78,15 @@ All bugs below have been fixed and archived to `docs/_archive/bugs/`.
 - `docs/_archive/bugs/bug-020-openalex-get-by-arxiv-returns-none.md`
 - `docs/_archive/bugs/bug-021-ingest-openalex-mailto-timeout-ignored.md`
 - `docs/_archive/bugs/bug-022-ingest-pdf-flags-silently-ignored.md`
+
+### Active Bug Decks
+
+- `docs/_bugs/bug-023-lean-import-path-duplication.md`
+- `docs/_bugs/bug-024-search-limit-validation-missing.md`
+- `docs/_bugs/bug-025-ask-limit-validation-missing.md`
+- `docs/_bugs/bug-026-refs-s2-limit-validation-missing.md`
+- `docs/_bugs/bug-027-log-level-invalid-values-ignored.md`
+- `docs/_bugs/bug-028-batch-limit-negative-values-accepted.md`
 
 ## Bug Priority Definitions
 
