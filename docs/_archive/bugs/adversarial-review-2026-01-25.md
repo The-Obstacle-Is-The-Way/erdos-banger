@@ -8,6 +8,10 @@
 
 Comprehensive stress test of all CLI commands and flags. Found **6 bugs** (1 P1, 3 P2, 2 P3), all related to missing input validation. The codebase is generally robust - 1555 unit tests pass, linting and type checking clean.
 
+## Resolution
+
+All six bugs (BUG-023..BUG-028) were fixed in commit `d9ebff4` and their bug decks archived under `docs/_archive/bugs/`.
+
 ## Bugs Found
 
 ### P1 (High Priority)

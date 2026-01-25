@@ -6,15 +6,15 @@ This directory contains bug reports, adversarial code reviews, and quality audit
 
 | Date | Type | Summary | Status |
 |------|------|---------|--------|
-| 2026-01-25 | Adversarial Review | CLI stress test, input validation audit (6 bugs: 1 P1, 3 P2, 2 P3) | Active |
+| 2026-01-25 | Adversarial Review | CLI stress test, input validation audit (6 bugs fixed in d9ebff4) | Archived |
+| 2026-01-25 | Adversarial Review | Follow-up stress test (2 bugs fixed in 4f46d48) | Archived |
 | 2026-01-22 | Adversarial Review | Post v2.1 architecture audit (loop/search SRP hotspots) | Archived |
 | 2026-01-21 | Adversarial Review | Full codebase audit for bugs, debt, anti-patterns | Archived |
 | 2026-01-17 | Adversarial Review | Full codebase audit covering specs 003-006 | Archived |
 
 ## Active Bugs
 
-| ID | Title | Priority | Status |
-|----|-------|----------|--------|
+None.
 
 *Note: BUG-013 was invalidated as a false positive. BUG-015 and BUG-017 were review findings that were invalidated before standalone bug decks were created.*
 
@@ -50,8 +50,10 @@ All bugs below have been fixed and archived to `docs/_archive/bugs/`.
 | BUG-026 | `erdos refs s2 --limit 0` causes cryptic API error | P2 | Fixed | d9ebff4 |
 | BUG-027 | `--log-level` accepts invalid values without error | P3 | Fixed | d9ebff4 |
 | BUG-028 | Batch commands accept negative `--limit` values | P3 | Fixed | d9ebff4 |
+| BUG-029 | zbMATH commands accept invalid pagination/year ranges | P2 | Fixed | 4f46d48 |
+| BUG-030 | `erdos ingest` accepts invalid numeric values | P2 | Fixed | 4f46d48 |
 
-**Next Bug ID:** BUG-029
+**Next Bug ID:** BUG-031
 
 ### Archived Bug Decks
 
@@ -68,6 +70,8 @@ All bugs below have been fixed and archived to `docs/_archive/bugs/`.
 - `docs/_archive/bugs/adversarial-review-2026-01-17.md`
 - `docs/_archive/bugs/adversarial-review-2026-01-21.md`
 - `docs/_archive/bugs/adversarial-review-2026-01-22.md`
+- `docs/_archive/bugs/adversarial-review-2026-01-25.md`
+- `docs/_archive/bugs/adversarial-review-2026-01-25-followup.md`
 - `docs/_archive/bugs/bug-002-search-build-index-json-stdout.md`
 - `docs/_archive/bugs/bug-003-search-fts-loader-missing.md`
 - `docs/_archive/bugs/bug-004-iter-problems-duplicate-ids.md`
@@ -84,6 +88,8 @@ All bugs below have been fixed and archived to `docs/_archive/bugs/`.
 - `docs/_archive/bugs/bug-026-refs-s2-limit-validation-missing.md`
 - `docs/_archive/bugs/bug-027-log-level-invalid-values-ignored.md`
 - `docs/_archive/bugs/bug-028-batch-limit-negative-values-accepted.md`
+- `docs/_archive/bugs/bug-029-zbmath-validation-missing.md`
+- `docs/_archive/bugs/bug-030-ingest-numeric-validation-missing.md`
 
 ### Active Bug Decks
 
