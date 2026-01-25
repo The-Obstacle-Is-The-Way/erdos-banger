@@ -146,6 +146,18 @@ def _show_progress_message(problem_id: int | None, json_output: bool) -> None:
     print_if_human("Starting batch ingest...", json_output=json_output)
 
 
+def _validate_timeout(
+    _ctx: typer.Context,
+    _param: Any,
+    value: float | None,
+) -> float | None:
+    if value is None:
+        return None
+    if value <= 0:
+        raise typer.BadParameter("timeout must be > 0")
+    return value
+
+
 @app.callback(invoke_without_command=True)
 def ingest(
     ctx: typer.Context,
@@ -156,8 +168,10 @@ def ingest(
     force: Annotated[bool, typer.Option("--force", "-f")] = False,
     no_download: Annotated[bool, typer.Option("--no-download")] = False,
     no_network: Annotated[bool, typer.Option("--no-network")] = False,
-    timeout: Annotated[float | None, typer.Option("--timeout")] = None,
-    delay: Annotated[float, typer.Option("--delay")] = API_RATE_LIMIT_DELAY,
+    timeout: Annotated[
+        float | None, typer.Option("--timeout", callback=_validate_timeout)
+    ] = None,
+    delay: Annotated[float, typer.Option("--delay", min=0.0)] = API_RATE_LIMIT_DELAY,
     mailto: Annotated[str, typer.Option("--mailto")] = "",
     source: Annotated[
         MetadataSource,
@@ -197,7 +211,7 @@ def ingest(
     ] = None,
     skip: Annotated[
         int | None,
-        typer.Option("--skip", help="Skip first N problems"),
+        typer.Option("--skip", help="Skip first N problems", min=0),
     ] = None,
     resume: Annotated[
         bool,

@@ -143,6 +143,8 @@ def _validate_mode_flags(
     bm25_only: bool,
     alpha: float | None,
     msc: str | None = None,
+    year_min: int | None = None,
+    year_max: int | None = None,
     build_index_flag: bool = False,
     build_embeddings_flag: bool = False,
 ) -> CLIOutput | None:
@@ -169,6 +171,13 @@ def _validate_mode_flags(
                     "(MSC search queries zbMATH API)"
                 )
                 break
+        if (
+            error_message is None
+            and year_min is not None
+            and year_max is not None
+            and year_min > year_max
+        ):
+            error_message = "--year-min must be <= --year-max"
     elif sum([semantic, hybrid, bm25_only]) > 1:
         error_message = (
             "Flags --semantic, --hybrid, and --bm25-only are mutually exclusive"
@@ -438,6 +447,8 @@ def search(
             bm25_only,
             alpha,
             msc=msc,
+            year_min=year_min,
+            year_max=year_max,
             build_index_flag=build_index_flag,
             build_embeddings_flag=build_embeddings_flag,
         )

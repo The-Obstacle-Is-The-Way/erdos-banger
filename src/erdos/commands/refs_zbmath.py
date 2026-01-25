@@ -276,7 +276,12 @@ def zbmath(
     ] = None,
     limit: Annotated[
         int,
-        typer.Option("--limit", help="Maximum results for search."),
+        typer.Option(
+            "--limit",
+            help="Maximum results for search.",
+            min=1,
+            max=1000,
+        ),
     ] = 20,
     year_min: Annotated[
         int | None,
@@ -312,6 +317,23 @@ def zbmath(
         title=title,
         msc=msc,
     ):
+        return
+
+    if (
+        msc is not None
+        and year_min is not None
+        and year_max is not None
+        and year_min > year_max
+    ):
+        exit_with_result(
+            ctx,
+            CLIOutput.err(
+                command=command,
+                error_type="UsageError",
+                message="--year-min must be <= --year-max",
+                code=ExitCode.USAGE_ERROR,
+            ),
+        )
         return
 
     with measure_time_ms() as duration:
