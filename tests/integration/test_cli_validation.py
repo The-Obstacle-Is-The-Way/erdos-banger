@@ -181,6 +181,14 @@ def test_ingest_delay_rejects_negative(strip_ansi) -> None:
     assert "Traceback" not in output
 
 
+def test_ingest_status_rejects_invalid_value(strip_ansi) -> None:
+    result = runner.invoke(app, ["ingest", "--all", "--status", "foo", "--dry-run"])
+    assert result.exit_code == 2
+    output = strip_ansi(_combined_output(result))
+    assert "Invalid value for '--status'" in output
+    assert "Traceback" not in output
+
+
 def test_ingest_timeout_rejects_zero(strip_ansi) -> None:
     result = runner.invoke(app, ["ingest", "1", "--timeout", "0"])
     assert result.exit_code == 2
@@ -204,4 +212,14 @@ def test_lean_formalize_batch_limit_rejects_zero(strip_ansi) -> None:
     assert result.exit_code == 2
     output = strip_ansi(_combined_output(result))
     assert "Invalid value for '--limit'" in output
+    assert "Traceback" not in output
+
+
+def test_lean_formalize_status_rejects_invalid_value(strip_ansi) -> None:
+    result = runner.invoke(
+        app, ["lean", "formalize", "--all", "--status", "foo", "--dry-run"]
+    )
+    assert result.exit_code == 2
+    output = strip_ansi(_combined_output(result))
+    assert "Invalid value for '--status'" in output
     assert "Traceback" not in output

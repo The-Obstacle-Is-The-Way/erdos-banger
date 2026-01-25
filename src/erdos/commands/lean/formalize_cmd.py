@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING, Annotated
 
+import click
 import typer
 
 
@@ -31,11 +32,12 @@ from erdos.core.batch import (
     filter_problem_ids,
 )
 from erdos.core.exit_codes import ExitCode
-from erdos.core.models import CLIOutput
+from erdos.core.models import CLIOutput, ProblemStatus
 from erdos.core.timing import measure_time_ms
 
 
 _COMMAND = "erdos lean formalize"
+_PROBLEM_STATUS_CHOICES = [status.value for status in ProblemStatus]
 
 
 @dataclass
@@ -228,6 +230,7 @@ def register(app: typer.Typer) -> None:
             str | None,
             typer.Option(
                 "--status",
+                click_type=click.Choice(_PROBLEM_STATUS_CHOICES, case_sensitive=False),
                 help="Filter by status: open, proved, disproved, partially_solved, unknown",
             ),
         ] = None,

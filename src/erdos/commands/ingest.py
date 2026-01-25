@@ -10,6 +10,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Annotated, Any
 
+import click
 import typer
 from rich.table import Table
 
@@ -22,6 +23,7 @@ from erdos.core.ingest import (
     MetadataSource,
     execute_ingest,
 )
+from erdos.core.models import ProblemStatus
 from erdos.core.timing import measure_time_ms
 
 
@@ -35,6 +37,8 @@ app = typer.Typer(
     help="Ingest literature metadata and cache.",
     context_settings={"allow_interspersed_args": True},
 )
+
+_PROBLEM_STATUS_CHOICES = [status.value for status in ProblemStatus]
 
 
 def _print_human(result_data: dict[str, Any]) -> None:
@@ -190,6 +194,7 @@ def ingest(
         str | None,
         typer.Option(
             "--status",
+            click_type=click.Choice(_PROBLEM_STATUS_CHOICES, case_sensitive=False),
             help="Filter by status: open, proved, disproved, partially_solved, unknown",
         ),
     ] = None,
