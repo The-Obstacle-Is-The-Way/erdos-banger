@@ -1,13 +1,14 @@
 # DEBT-096: Search Command Module LOC Violation (Post-MSC Growth)
 
 **Priority:** P3 (Minor; clean up when touching nearby code)
-**Status:** Exempted
+**Status:** Fixed
 **Found:** 2026-01-24
-**Exempted:** 2026-01-24 (re-evaluated 2026-01-24)
+**Fixed:** 2026-01-25
+**Fixed In:** 1a5e29a
 
 ## Description
 
-The search command module exceeds LOC thresholds after MSC search mode was added (SPEC-031/3):
+At time found, the search command module exceeded LOC thresholds after MSC search mode was added (SPEC-031/3):
 
 | Module | LOC | Threshold | Delta |
 |--------|-----|-----------|-------|
@@ -16,8 +17,6 @@ The search command module exceeds LOC thresholds after MSC search mode was added
 | Function | LOC | Threshold | Delta |
 |----------|-----|-----------|-------|
 | `search()` (line 330) | 196 | 120 | +76 |
-
-**Note:** The inline exemption marker should be kept in sync with audit output.
 
 ## History
 
@@ -91,20 +90,18 @@ Currently the cognitive overhead of splitting doesn't justify the LOC savings.
 
 ## Resolution
 
-Exempted via inline marker:
-
-```python
-# exempt: DEBT-096 (525 LOC; CLI + multiple search modes including MSC/zbMATH)
-```
-
-The function-level violation (196 LOC) is also exempted via the existing DEBT-043 marker in the audit exemptions.
+Fixed in `1a5e29a` by:
+- Splitting orchestration to `src/erdos/commands/search_impl.py`
+- Splitting human rendering to `src/erdos/commands/search_output.py`
+- Keeping `src/erdos/commands/search.py` as a thin Typer adapter (currently 102 LOC)
+- Removing the audit exemption for `commands/search.py:search`
 
 ## Acceptance Criteria (If Opened)
 
 If this debt is opened for work:
 
-1. [ ] Module reduced to ≤400 LOC
-2. [ ] `search()` function reduced to ≤120 LOC
-3. [ ] All search modes remain accessible via `erdos search --help`
-4. [ ] `make ci` passes
-5. [ ] No functional regression in search behavior
+1. [x] Module reduced to ≤400 LOC
+2. [x] `search()` function reduced to ≤120 LOC
+3. [x] All search modes remain accessible via `erdos search --help`
+4. [x] `make ci` passes
+5. [x] No functional regression in search behavior

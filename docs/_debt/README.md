@@ -14,10 +14,7 @@ This directory contains technical-debt writeups: spec drift, missing fixtures, i
 
 ## Active Debt
 
-| ID | Title | Priority | Status |
-|----|-------|----------|--------|
-| DEBT-092 | [Proof verification module LOC violations](./debt-092-proof-verification-loc.md) | P3 | Exempted |
-| DEBT-096 | [Search command module LOC violation](./debt-096-search-command-msc-loc.md) | P3 | Exempted |
+None.
 
 ### Note on Audit False Positives (DEBT-068 through DEBT-071)
 
@@ -121,6 +118,8 @@ All debt below has been resolved and archived to `docs/_archive/debt/`.
 | DEBT-089 | Ingest/fetch long parameter lists | P1 | Fixed | 22f14f6 |
 | DEBT-090 | Cyclomatic complexity violations (C901) | P2 | Fixed | 22f14f6 |
 | DEBT-091 | Blind exception catches (BLE001) | P3 | Fixed | 22f14f6 |
+| DEBT-092 | Proof verification module LOC violations | P3 | Fixed | 104b7b4 |
+| DEBT-096 | Search command module LOC violation (post-MSC growth) | P3 | Fixed | 1a5e29a |
 | DEBT-097 | Test suite ANSI handling inconsistency | P2 | Fixed | 3d19c58 |
 | DEBT-098 | Test references deprecated std4 repository | P1 | Fixed | e49696e |
 | DEBT-099 | Lean test fixture lakefile syntax outdated | P2 | Fixed | (this PR) |
@@ -140,6 +139,8 @@ All debt below has been resolved and archived to `docs/_archive/debt/`.
 
 ### Archived Debt Decks
 
+- `docs/_archive/debt/debt-092-proof-verification-loc.md`
+- `docs/_archive/debt/debt-096-search-command-msc-loc.md`
 - `docs/_archive/debt/debt-102-console-dry-violation.md`
 - `docs/_archive/debt/debt-103-c901-complexity-violations.md`
 - `docs/_archive/debt/debt-104-error-type-naming-inconsistency.md`
