@@ -15,7 +15,7 @@ import typer
 from rich.table import Table
 
 from erdos.commands.app_context import get_app_context
-from erdos.commands.cli_helpers import print_if_human
+from erdos.commands.cli_helpers import PROBLEM_STATUS_CHOICES, print_if_human
 from erdos.commands.presenter import console, err_console, exit_with_result
 from erdos.core.constants import API_RATE_LIMIT_DELAY, TITLE_TRUNCATION
 from erdos.core.ingest import (
@@ -23,7 +23,6 @@ from erdos.core.ingest import (
     MetadataSource,
     execute_ingest,
 )
-from erdos.core.models import ProblemStatus
 from erdos.core.timing import measure_time_ms
 
 
@@ -37,8 +36,6 @@ app = typer.Typer(
     help="Ingest literature metadata and cache.",
     context_settings={"allow_interspersed_args": True},
 )
-
-_PROBLEM_STATUS_CHOICES = [status.value for status in ProblemStatus]
 
 
 def _print_human(result_data: dict[str, Any]) -> None:
@@ -194,7 +191,7 @@ def ingest(
         str | None,
         typer.Option(
             "--status",
-            click_type=click.Choice(_PROBLEM_STATUS_CHOICES, case_sensitive=False),
+            click_type=click.Choice(PROBLEM_STATUS_CHOICES, case_sensitive=False),
             help="Filter by status: open, proved, disproved, partially_solved, unknown",
         ),
     ] = None,

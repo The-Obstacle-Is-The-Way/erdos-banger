@@ -27,21 +27,21 @@
 
 `erdos ingest 1 --delay -1 ...`:
 
-```
+```text
 Traceback ...
 ValueError: delay must be >= 0
 ```
 
 `erdos ingest 1 --timeout 0 ...`:
 
-```
+```text
 Traceback ...
 ValueError: timeout must be > 0
 ```
 
 `erdos ingest --all --skip -1 --dry-run`:
 
-```
+```text
 Dry run: Would process 1 problems
   Problem IDs: [<last problem id>]
 ```

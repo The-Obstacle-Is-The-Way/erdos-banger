@@ -783,8 +783,10 @@ uv run python scripts/generate_cli_reference.py
 │                                                 '11B05').                    │
 │ --limit             INTEGER RANGE [1<=x<=1000]  Maximum results for search.  │
 │                                                 [default: 20]                │
-│ --year-min          INTEGER                     Minimum publication year.    │
-│ --year-max          INTEGER                     Maximum publication year.    │
+│ --year-min          INTEGER                     Minimum publication year     │
+│                                                 (requires --msc).            │
+│ --year-max          INTEGER                     Maximum publication year     │
+│                                                 (requires --msc).            │
 │ --help      -h                                  Show this message and exit.  │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ```

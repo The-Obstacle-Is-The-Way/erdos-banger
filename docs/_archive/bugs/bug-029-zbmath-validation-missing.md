@@ -29,13 +29,13 @@ This affects:
 
 `erdos refs zbmath --msc "11B05" --limit 0`:
 
-```
+```text
 Error: zbMATH API error: 400 Client Error: Bad Request for url: ...results_per_page=0
 ```
 
 `erdos refs zbmath --msc "11B05" --year-min 2020 --year-max 2010 --limit 1`:
 
-```
+```text
 Error: zbMATH API error: 404 Client Error: Not Found for url: ...search_string=...py:2020-2010...
 ```
 

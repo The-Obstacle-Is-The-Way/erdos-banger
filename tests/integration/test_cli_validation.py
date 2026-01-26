@@ -2,14 +2,19 @@
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from erdos.cli import app
 from tests.cli_runner import make_cli_runner
 
 
 runner = make_cli_runner()
 
+if TYPE_CHECKING:
+    from click.testing import Result
 
-def _combined_output(result: object) -> str:
+
+def _combined_output(result: Result) -> str:
     stdout = getattr(result, "stdout", "")
     stderr = getattr(result, "stderr", "")
     output = f"{stdout}{stderr}"
@@ -173,6 +178,24 @@ def test_refs_zbmath_year_range_rejects_invalid_order(strip_ansi) -> None:
     assert result.exit_code == 2
     output = strip_ansi(_combined_output(result))
     assert "--year-min must be <= --year-max" in output
+    assert "Traceback" not in output
+
+
+def test_refs_zbmath_year_filters_require_msc(strip_ansi) -> None:
+    result = runner.invoke(
+        app,
+        [
+            "refs",
+            "zbmath",
+            "--title",
+            "primes arithmetic progressions",
+            "--year-min",
+            "2020",
+        ],
+    )
+    assert result.exit_code == 2
+    output = strip_ansi(_combined_output(result))
+    assert "--year-min/--year-max require --msc" in output
     assert "Traceback" not in output
 
 

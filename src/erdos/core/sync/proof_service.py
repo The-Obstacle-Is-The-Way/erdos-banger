@@ -70,6 +70,13 @@ def _run_verification(
     best_result = None
     best_link = None
 
+    priority = {
+        VerificationStatus.VERIFIED: 4,
+        VerificationStatus.INCONCLUSIVE: 3,
+        VerificationStatus.FAILED: 2,
+        VerificationStatus.SOURCE_UNAVAILABLE: 1,
+        VerificationStatus.UNVERIFIED: 0,
+    }
     for link in cache.links:
         logger.info("Verifying %s", link.url)
         result = verify_proof(link, problem_id)
@@ -83,13 +90,6 @@ def _run_verification(
             best_link = link
             break
 
-        priority = {
-            VerificationStatus.VERIFIED: 4,
-            VerificationStatus.INCONCLUSIVE: 3,
-            VerificationStatus.FAILED: 2,
-            VerificationStatus.SOURCE_UNAVAILABLE: 1,
-            VerificationStatus.UNVERIFIED: 0,
-        }
         if priority.get(result.status, 0) > priority.get(best_result.status, 0):
             best_result = result
             best_link = link

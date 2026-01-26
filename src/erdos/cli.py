@@ -38,7 +38,6 @@ def _configure_logging(level: str) -> None:
         "DEBUG": logging.DEBUG,
         "INFO": logging.INFO,
         "WARN": logging.WARNING,
-        "WARNING": logging.WARNING,
         "ERROR": logging.ERROR,
     }
     log_level = level_map.get(level.upper(), logging.INFO)

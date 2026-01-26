@@ -18,21 +18,24 @@ The batch modes of `erdos ingest` and `erdos lean formalize` accept negative `--
 ## Expected Behavior
 
 A validation error like:
-```
+
+```text
 Invalid value for '--limit': -5 is not in the range x>=1.
 ```
 
 ## Actual Behavior
 
 For `ingest --all --limit -5`:
-```
+
+```text
 Starting batch ingest...
 Dry run: Would process 1 problems
   Problem IDs: [1]
 ```
 
 For `formalize --all --limit -1`:
-```
+
+```text
 Dry run: Would formalize 5 problems
   Problem IDs: [1, 6, 42, 100, 316]
 ```

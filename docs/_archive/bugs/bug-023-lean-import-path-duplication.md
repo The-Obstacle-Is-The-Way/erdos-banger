@@ -22,7 +22,7 @@ The command should either:
 
 ## Actual Behavior
 
-```
+```text
 FileNotFoundError: Lean file not found: formal/lean/formal/lean/Erdos/Problem042.lean
 Error: Lean file not found: formal/lean/formal/lean/Erdos/Problem042.lean
 ```

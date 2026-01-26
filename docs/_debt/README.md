@@ -139,14 +139,6 @@ All debt below has been resolved and archived to `docs/_archive/debt/`.
 
 ### Archived Debt Decks
 
-- `docs/_archive/debt/debt-092-proof-verification-loc.md`
-- `docs/_archive/debt/debt-096-search-command-msc-loc.md`
-- `docs/_archive/debt/debt-102-console-dry-violation.md`
-- `docs/_archive/debt/debt-103-c901-complexity-violations.md`
-- `docs/_archive/debt/debt-104-error-type-naming-inconsistency.md`
-- `docs/_archive/debt/debt-105-print-statements-in-core.md`
-- `docs/_archive/debt/debt-106-broad-exception-catches.md`
-- `docs/_archive/debt/debt-107-missing-public-docstrings.md`
 - `docs/_archive/debt/debt-001-spec-005-ssot-drift.md`
 - `docs/_archive/debt/debt-013-spec-010-scope.md`
 - `docs/_archive/debt/debt-011-spec-020-not-implemented.md`
@@ -234,11 +226,19 @@ All debt below has been resolved and archived to `docs/_archive/debt/`.
 - `docs/_archive/debt/debt-089-ingest-fetch-parameter-objects.md`
 - `docs/_archive/debt/debt-090-cyclomatic-complexity-violations.md`
 - `docs/_archive/debt/debt-091-blind-exception-catches.md`
+- `docs/_archive/debt/debt-092-proof-verification-loc.md`
 - `docs/_archive/debt/debt-093-exa-client-loc.md`
 - `docs/_archive/debt/debt-094-semantic-scholar-client-loc.md`
 - `docs/_archive/debt/debt-095-zbmath-client-loc.md`
+- `docs/_archive/debt/debt-096-search-command-msc-loc.md`
 - `docs/_archive/debt/debt-097-test-suite-consistency.md`
 - `docs/_archive/debt/debt-098-std4-repo-rename.md`
 - `docs/_archive/debt/debt-099-lean-fixture-lakefile-syntax.md`
 - `docs/_archive/debt/debt-100-test-env-file-loading.md`
 - `docs/_archive/debt/debt-101-lean-mathlib-version-upgrade.md`
+- `docs/_archive/debt/debt-102-console-dry-violation.md`
+- `docs/_archive/debt/debt-103-c901-complexity-violations.md`
+- `docs/_archive/debt/debt-104-error-type-naming-inconsistency.md`
+- `docs/_archive/debt/debt-105-print-statements-in-core.md`
+- `docs/_archive/debt/debt-106-broad-exception-catches.md`
+- `docs/_archive/debt/debt-107-missing-public-docstrings.md`

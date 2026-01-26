@@ -32,10 +32,6 @@ from erdos.core.sync.proofs_types import CloneResult, VerificationResult
 __all__ = [
     "CloneResult",
     "VerificationResult",
-    "_find_problem_files",
-    "_read_toolchain",
-    "_sanitize_env",
-    "_truncate_log",
     "check_no_sorries",
     "clone_repository",
     "create_provenance",

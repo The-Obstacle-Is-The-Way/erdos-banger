@@ -15,6 +15,7 @@ if TYPE_CHECKING:
     from erdos.core.ports import ProblemRepository
 
 from erdos.commands.app_context import get_app_context
+from erdos.commands.cli_helpers import PROBLEM_STATUS_CHOICES
 from erdos.commands.lean.batch_formalize import (
     batch_formalize,
     batch_result_to_cli_output,
@@ -32,12 +33,11 @@ from erdos.core.batch import (
     filter_problem_ids,
 )
 from erdos.core.exit_codes import ExitCode
-from erdos.core.models import CLIOutput, ProblemStatus
+from erdos.core.models import CLIOutput
 from erdos.core.timing import measure_time_ms
 
 
 _COMMAND = "erdos lean formalize"
-_PROBLEM_STATUS_CHOICES = [status.value for status in ProblemStatus]
 
 
 @dataclass
@@ -230,7 +230,7 @@ def register(app: typer.Typer) -> None:
             str | None,
             typer.Option(
                 "--status",
-                click_type=click.Choice(_PROBLEM_STATUS_CHOICES, case_sensitive=False),
+                click_type=click.Choice(PROBLEM_STATUS_CHOICES, case_sensitive=False),
                 help="Filter by status: open, proved, disproved, partially_solved, unknown",
             ),
         ] = None,

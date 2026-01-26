@@ -285,11 +285,11 @@ def zbmath(
     ] = 20,
     year_min: Annotated[
         int | None,
-        typer.Option("--year-min", help="Minimum publication year."),
+        typer.Option("--year-min", help="Minimum publication year (requires --msc)."),
     ] = None,
     year_max: Annotated[
         int | None,
-        typer.Option("--year-max", help="Maximum publication year."),
+        typer.Option("--year-max", help="Maximum publication year (requires --msc)."),
     ] = None,
 ) -> None:
     """Look up zbMATH entries or search by MSC code.
@@ -319,12 +319,19 @@ def zbmath(
     ):
         return
 
-    if (
-        msc is not None
-        and year_min is not None
-        and year_max is not None
-        and year_min > year_max
-    ):
+    if msc is None and (year_min is not None or year_max is not None):
+        exit_with_result(
+            ctx,
+            CLIOutput.err(
+                command=command,
+                error_type="UsageError",
+                message="--year-min/--year-max require --msc",
+                code=ExitCode.USAGE_ERROR,
+            ),
+        )
+        return
+
+    if year_min is not None and year_max is not None and year_min > year_max:
         exit_with_result(
             ctx,
             CLIOutput.err(

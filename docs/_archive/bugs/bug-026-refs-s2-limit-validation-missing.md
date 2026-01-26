@@ -17,13 +17,15 @@ The `erdos refs s2 citations` (and other s2 subcommands) accept `--limit 0` with
 ## Expected Behavior
 
 A validation error like:
-```
+
+```text
 Invalid value for '--limit': 0 is not in the range 1<=x<=1000.
 ```
 
 ## Actual Behavior
 
-```
+
+```text
 Error: Semantic Scholar API error: 400 Client Error: Bad Request for url:
 https://api.semanticscholar.org/graph/v1/paper/.../citations?...&limit=0
 ```
