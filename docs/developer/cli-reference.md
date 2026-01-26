@@ -82,16 +82,20 @@ uv run python scripts/generate_cli_reference.py
  CLI toolkit for Erdős problem research.
 
 ╭─ Options ────────────────────────────────────────────────────────────────────╮
-│ --version             -v            Show version and exit.                   │
-│ --json                              Output as JSON for machine consumption.  │
-│ --log-level                   TEXT  Logging level: DEBUG, INFO, WARN, ERROR. │
-│                                     [default: INFO]                          │
-│ --install-completion                Install completion for the current       │
-│                                     shell.                                   │
-│ --show-completion                   Show completion for the current shell,   │
-│                                     to copy it or customize the              │
-│                                     installation.                            │
-│ --help                -h            Show this message and exit.              │
+│ --version             -v                             Show version and exit.  │
+│ --json                                               Output as JSON for      │
+│                                                      machine consumption.    │
+│ --log-level                   [debug|info|warn|erro  Logging level: DEBUG,   │
+│                               r]                     INFO, WARN, ERROR.      │
+│                                                      [default: INFO]         │
+│ --install-completion                                 Install completion for  │
+│                                                      the current shell.      │
+│ --show-completion                                    Show completion for the │
+│                                                      current shell, to copy  │
+│                                                      it or customize the     │
+│                                                      installation.           │
+│ --help                -h                             Show this message and   │
+│                                                      exit.                   │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭─ Commands ───────────────────────────────────────────────────────────────────╮
 │ list        List Erdős problems with optional filters.                       │
@@ -124,13 +128,17 @@ uv run python scripts/generate_cli_reference.py
 │ *    question_arg      TEXT           Question or '-' for stdin [required]   │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭─ Options ────────────────────────────────────────────────────────────────────╮
-│ --limit        -n      INTEGER  [default: 5]                                 │
+│ --limit        -n      INTEGER RANGE              Maximum sources to         │
+│                        [1<=x<=1000]               retrieve                   │
+│                                                   [default: 5]               │
 │ --build-index                                                                │
 │ --no-llm                                                                     │
-│ --llm-cmd              TEXT     Override LLM command (default: from          │
-│                                 ERDOS_LLM_COMMAND). Pass an empty value to   │
-│                                 disable.                                     │
-│ --help         -h               Show this message and exit.                  │
+│ --llm-cmd              TEXT                       Override LLM command       │
+│                                                   (default: from             │
+│                                                   ERDOS_LLM_COMMAND). Pass   │
+│                                                   an empty value to disable. │
+│ --help         -h                                 Show this message and      │
+│                                                   exit.                      │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ```
 
@@ -208,41 +216,43 @@ uv run python scripts/generate_cli_reference.py
 │ --no-download                                                                │
 │ --no-network                                                                 │
 │ --timeout                 FLOAT                                              │
-│ --delay                   FLOAT                    [default: 3.0]            │
+│ --delay                   FLOAT RANGE [x>=0.0]      [default: 3.0]           │
 │ --mailto                  TEXT                                               │
-│ --source                  [openalex|arxiv|crossre  Metadata source: openalex │
-│                           f]                       (default), arxiv, or      │
-│                                                    crossref                  │
-│                                                    [default: openalex]       │
-│ --all                                              Process all problems      │
-│                                                    (batch mode)              │
-│ --status                  TEXT                     Filter by status: open,   │
-│                                                    proved, disproved,        │
-│                                                    partially_solved, unknown │
-│ --prize-min               INTEGER                  Minimum prize amount      │
-│ --prize-max               INTEGER                  Maximum prize amount      │
-│ --tag                     TEXT                     Filter by tag (can be     │
-│                                                    repeated)                 │
-│ --limit                   INTEGER                  Max problems to process   │
-│ --skip                    INTEGER                  Skip first N problems     │
-│ --resume                                           Resume from last          │
-│                                                    incomplete batch          │
-│ --dry-run                                          Show what would be        │
-│                                                    processed                 │
-│ --max-concurrent          INTEGER                  Max parallel operations   │
-│                                                    (ingest: 1)               │
-│                                                    [default: 1]              │
-│ --pdf                                              Enable PDF conversion for │
-│                                                    non-arXiv references      │
-│ --no-pdf                                           Skip PDFs entirely        │
-│                                                    (metadata only)           │
-│ --pdf-converter           TEXT                     PDF converter: marker     │
-│                                                    (default), pdfplumber     │
-│                                                    [default: marker]         │
-│ --use-llm                                          Enable LLM-enhanced PDF   │
-│                                                    extraction                │
-│ --help            -h                               Show this message and     │
-│                                                    exit.                     │
+│ --source                  [openalex|arxiv|crossref  Metadata source:         │
+│                           ]                         openalex (default),      │
+│                                                     arxiv, or crossref       │
+│                                                     [default: openalex]      │
+│ --all                                               Process all problems     │
+│                                                     (batch mode)             │
+│ --status                  [open|proved|disproved|p  Filter by status: open,  │
+│                           artially_solved|unknown]  proved, disproved,       │
+│                                                     partially_solved,        │
+│                                                     unknown                  │
+│ --prize-min               INTEGER                   Minimum prize amount     │
+│ --prize-max               INTEGER                   Maximum prize amount     │
+│ --tag                     TEXT                      Filter by tag (can be    │
+│                                                     repeated)                │
+│ --limit                   INTEGER RANGE             Max problems to process  │
+│                           [1<=x<=1000]                                       │
+│ --skip                    INTEGER RANGE [x>=0]      Skip first N problems    │
+│ --resume                                            Resume from last         │
+│                                                     incomplete batch         │
+│ --dry-run                                           Show what would be       │
+│                                                     processed                │
+│ --max-concurrent          INTEGER                   Max parallel operations  │
+│                                                     (ingest: 1)              │
+│                                                     [default: 1]             │
+│ --pdf                                               Enable PDF conversion    │
+│                                                     for non-arXiv references │
+│ --no-pdf                                            Skip PDFs entirely       │
+│                                                     (metadata only)          │
+│ --pdf-converter           TEXT                      PDF converter: marker    │
+│                                                     (default), pdfplumber    │
+│                                                     [default: marker]        │
+│ --use-llm                                           Enable LLM-enhanced PDF  │
+│                                                     extraction               │
+│ --help            -h                                Show this message and    │
+│                                                     exit.                    │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ```
 
@@ -350,24 +360,35 @@ uv run python scripts/generate_cli_reference.py
 │                                 mode).                                       │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭─ Options ────────────────────────────────────────────────────────────────────╮
-│ --path             -p      PATH     Path to Lean project (default:           │
-│                                     formal/lean/)                            │
-│ --force            -f               Overwrite existing file                  │
-│ --import-upstream                   Import upstream formalization instead of │
-│                                     generating skeleton                      │
-│ --no-network                        Use cached upstream file only (requires  │
-│                                     --import-upstream)                       │
-│ --all                               Process all problems (batch mode)        │
-│ --status                   TEXT     Filter by status: open, proved,          │
-│                                     disproved, partially_solved, unknown     │
-│ --tag                      TEXT     Filter by tag (can be repeated)          │
-│ --limit                    INTEGER  Max problems to process                  │
-│ --skip-existing                     Skip problems with existing Lean files   │
-│ --dry-run                           Show what would be processed             │
-│ --max-concurrent           INTEGER  Max parallel Lean compilations (default: │
-│                                     4)                                       │
-│                                     [default: 4]                             │
-│ --help             -h               Show this message and exit.              │
+│ --path             -p      PATH                     Path to Lean project     │
+│                                                     (default: formal/lean/)  │
+│ --force            -f                               Overwrite existing file  │
+│ --import-upstream                                   Import upstream          │
+│                                                     formalization instead of │
+│                                                     generating skeleton      │
+│ --no-network                                        Use cached upstream file │
+│                                                     only (requires           │
+│                                                     --import-upstream)       │
+│ --all                                               Process all problems     │
+│                                                     (batch mode)             │
+│ --status                   [open|proved|disproved|  Filter by status: open,  │
+│                            partially_solved|unknow  proved, disproved,       │
+│                            n]                       partially_solved,        │
+│                                                     unknown                  │
+│ --tag                      TEXT                     Filter by tag (can be    │
+│                                                     repeated)                │
+│ --limit                    INTEGER RANGE            Max problems to process  │
+│                            [1<=x<=1000]                                      │
+│ --skip-existing                                     Skip problems with       │
+│                                                     existing Lean files      │
+│ --dry-run                                           Show what would be       │
+│                                                     processed                │
+│ --max-concurrent           INTEGER                  Max parallel Lean        │
+│                                                     compilations (default:   │
+│                                                     4)                       │
+│                                                     [default: 4]             │
+│ --help             -h                               Show this message and    │
+│                                                     exit.                    │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ```
 
@@ -687,8 +708,9 @@ uv run python scripts/generate_cli_reference.py
 │ *    identifier      TEXT  DOI, arXiv ID, or S2 paper ID. [required]         │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭─ Options ────────────────────────────────────────────────────────────────────╮
-│ --limit          INTEGER  Maximum citations to return. [default: 10]         │
-│ --help   -h               Show this message and exit.                        │
+│ --limit          INTEGER RANGE [1<=x<=1000]  Maximum citations to return.    │
+│                                              [default: 10]                   │
+│ --help   -h                                  Show this message and exit.     │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ```
 
@@ -710,8 +732,10 @@ uv run python scripts/generate_cli_reference.py
 │ *    identifier      TEXT  DOI, arXiv ID, or S2 paper ID. [required]         │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭─ Options ────────────────────────────────────────────────────────────────────╮
-│ --limit          INTEGER  Maximum citing papers to return. [default: 10]     │
-│ --help   -h               Show this message and exit.                        │
+│ --limit          INTEGER RANGE [1<=x<=1000]  Maximum citing papers to        │
+│                                              return.                         │
+│                                              [default: 10]                   │
+│ --help   -h                                  Show this message and exit.     │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ```
 
@@ -733,8 +757,9 @@ uv run python scripts/generate_cli_reference.py
 │ *    identifier      TEXT  DOI, arXiv ID, or S2 paper ID. [required]         │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭─ Options ────────────────────────────────────────────────────────────────────╮
-│ --limit          INTEGER  Maximum references to return. [default: 10]        │
-│ --help   -h               Show this message and exit.                        │
+│ --limit          INTEGER RANGE [1<=x<=1000]  Maximum references to return.   │
+│                                              [default: 10]                   │
+│ --help   -h                                  Show this message and exit.     │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ```
 
@@ -751,13 +776,16 @@ uv run python scripts/generate_cli_reference.py
 │                                 '10.4007/annals.2008.167.481').              │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭─ Options ────────────────────────────────────────────────────────────────────╮
-│ --zbl               TEXT     zbMATH ID (e.g., '1191.11025').                 │
-│ --title             TEXT     Title keywords to search.                       │
-│ --msc               TEXT     MSC code to search (e.g., '11B05').             │
-│ --limit             INTEGER  Maximum results for search. [default: 20]       │
-│ --year-min          INTEGER  Minimum publication year.                       │
-│ --year-max          INTEGER  Maximum publication year.                       │
-│ --help      -h               Show this message and exit.                     │
+│ --zbl               TEXT                        zbMATH ID (e.g.,             │
+│                                                 '1191.11025').               │
+│ --title             TEXT                        Title keywords to search.    │
+│ --msc               TEXT                        MSC code to search (e.g.,    │
+│                                                 '11B05').                    │
+│ --limit             INTEGER RANGE [1<=x<=1000]  Maximum results for search.  │
+│                                                 [default: 20]                │
+│ --year-min          INTEGER                     Minimum publication year.    │
+│ --year-max          INTEGER                     Maximum publication year.    │
+│ --help      -h                                  Show this message and exit.  │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ```
 
@@ -1268,40 +1296,36 @@ uv run python scripts/generate_cli_reference.py
 │                       Not required when using --msc.                         │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭─ Options ────────────────────────────────────────────────────────────────────╮
-│ --limit             -n      INTEGER                  Maximum results to      │
-│                                                      return                  │
-│                                                      [default: 10]           │
-│ --problem           -p      INTEGER                  Filter to specific      │
-│                                                      problem ID              │
-│ --build-index                                        Build/rebuild the       │
-│                                                      search index before     │
-│                                                      searching               │
-│ --semantic          -s                               Use semantic (vector)   │
-│                                                      search instead of BM25  │
-│ --hybrid                                             Combine BM25 and        │
-│                                                      semantic scores         │
-│ --bm25-only                                          Force BM25-only search  │
-│                                                      (no vectors)            │
-│ --alpha                     FLOAT RANGE              Hybrid weight (0.0=BM25 │
-│                             [0.0<=x<=1.0]            only, 1.0=semantic      │
-│                                                      only, default: 0.5)     │
-│ --build-embeddings                                   Build/rebuild           │
-│                                                      embeddings (requires    │
-│                                                      embeddings optional     │
-│                                                      deps)                   │
-│ --embedding-model           TEXT                     Embedding model name    │
-│                                                      [default:               │
-│                                                      sentence-transformers/… │
-│ --msc                       TEXT                     Search zbMATH by MSC    │
-│                                                      code (e.g., '11B05').   │
-│                                                      Incompatible with other │
-│                                                      search modes.           │
-│ --year-min                  INTEGER                  Minimum publication     │
-│                                                      year (for --msc mode)   │
-│ --year-max                  INTEGER                  Maximum publication     │
-│                                                      year (for --msc mode)   │
-│ --help              -h                               Show this message and   │
-│                                                      exit.                   │
+│ --limit             -n      INTEGER RANGE           Maximum results to       │
+│                             [1<=x<=1000]            return                   │
+│                                                     [default: 10]            │
+│ --problem           -p      INTEGER                 Filter to a specific     │
+│                                                     problem ID               │
+│ --build-index                                       Build/rebuild the search │
+│                                                     index                    │
+│ --semantic          -s                              Use semantic (vector)    │
+│                                                     search                   │
+│ --hybrid                                            Hybrid search            │
+│ --bm25-only                                         Force BM25-only search   │
+│                                                     (no vectors)             │
+│ --alpha                     FLOAT RANGE             Hybrid weight (0.0=BM25  │
+│                             [0.0<=x<=1.0]           only, 1.0=semantic only, │
+│                                                     default: 0.5)            │
+│ --build-embeddings                                  Build/rebuild semantic   │
+│                                                     embeddings               │
+│ --embedding-model           TEXT                    Embedding model name     │
+│                                                     [default:                │
+│                                                     sentence-transformers/a… │
+│ --msc                       TEXT                    Search zbMATH by MSC     │
+│                                                     code (e.g., '11B05').    │
+│                                                     Incompatible with other  │
+│                                                     modes.                   │
+│ --year-min                  INTEGER                 Minimum publication year │
+│                                                     (for --msc mode)         │
+│ --year-max                  INTEGER                 Maximum publication year │
+│                                                     (for --msc mode)         │
+│ --help              -h                              Show this message and    │
+│                                                     exit.                    │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ```
 
@@ -1336,7 +1360,8 @@ uv run python scripts/generate_cli_reference.py
 │ submodule    Update the teorth/erdosproblems submodule to latest remote.     │
 │ website      Fetch structured data from erdosproblems.com and update local   │
 │              dataset.                                                        │
-│ proof        Extract proof repository links from the forum thread.           │
+│ proof        Extract proof repository links from the forum thread            │
+│              (optionally verify).                                            │
 │ statements   Sync Lean statement from DeepMind formal-conjectures.           │
 │ all          Run all sync operations in sequence.                            │
 ╰──────────────────────────────────────────────────────────────────────────────╯
@@ -1388,28 +1413,14 @@ uv run python scripts/generate_cli_reference.py
 
  Usage: erdos sync proof [OPTIONS] PROBLEM_ID
 
- Extract proof repository links from the forum thread.
-
- Fetches the forum thread for the given problem and extracts GitHub/GitLab
- repository links. Writes the results to
- data/sync_cache/proofs/<id>/links.json.
-
- By default, this command only extracts and records links. Use --verify to
- also clone repositories and run `lake build` to verify Lean proofs.
-
- ⚠️  WARNING: --verify runs untrusted code from external repositories.
-
- Example:
-     erdos sync proof 347
-     erdos sync proof 347 --verify
-     erdos sync proof 347 --dry-run
+ Extract proof repository links from the forum thread (optionally verify).
 
 ╭─ Arguments ──────────────────────────────────────────────────────────────────╮
 │ *    problem_id      INTEGER RANGE  Problem ID to extract proof links for    │
 │                                     [required]                               │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭─ Options ────────────────────────────────────────────────────────────────────╮
-│ --dry-run            Show what would be extracted without writing to disk    │
+│ --dry-run            Show what would be extracted without writing            │
 │ --verify             Clone and verify proofs (runs untrusted build tooling)  │
 │ --help     -h        Show this message and exit.                             │
 ╰──────────────────────────────────────────────────────────────────────────────╯

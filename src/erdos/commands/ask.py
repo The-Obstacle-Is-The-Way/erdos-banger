@@ -160,6 +160,7 @@ def ask(
             "-n",
             help="Maximum sources to retrieve",
             min=1,
+            max=1000,
         ),
     ] = DEFAULT_RAG_LIMIT,
     build_index: Annotated[bool, typer.Option("--build-index")] = False,

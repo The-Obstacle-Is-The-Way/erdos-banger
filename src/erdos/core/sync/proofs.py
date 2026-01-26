@@ -39,6 +39,7 @@ __all__ = [
     "check_no_sorries",
     "clone_repository",
     "create_provenance",
+    "run_lake_build",
     "save_provenance",
     "save_verification_log",
     "verify_proof",
