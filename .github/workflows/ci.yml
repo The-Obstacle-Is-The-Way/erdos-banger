@@ -74,6 +74,36 @@ jobs:
           files: coverage.xml
           token: ${{ secrets.CODECOV_TOKEN }}
 
+  docs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: recursive
+
+      - uses: astral-sh/setup-uv@v7
+        with:
+          python-version: "3.11"
+          enable-cache: true
+          cache-dependency-glob: |
+            uv.lock
+            pyproject.toml
+            .python-version
+          cache-suffix: docs
+
+      - name: Install Python 3.11
+        run: uv python install 3.11
+
+      - name: Verify lockfile is up-to-date
+        run: uv lock --check
+
+      - name: Install docs dependencies
+        run: uv sync --frozen --extra docs
+
+      - name: Build docs (strict)
+        run: uv run --frozen mkdocs build --strict
+
   test-mcp:
     runs-on: ubuntu-latest
 
