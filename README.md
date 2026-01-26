@@ -135,12 +135,14 @@ make ci-full
 
 ## Documentation
 
+- Hosted docs: https://the-obstacle-is-the-way.github.io/erdos-banger/
 - [Docs Index](docs/INDEX.md) — start here
 - [Quickstart](docs/getting-started/quickstart.md)
 - [Usage](docs/getting-started/usage.md)
 - [CLI Reference](docs/developer/cli-reference.md)
 - [Configuration](docs/developer/configuration.md)
 - [Testing](docs/developer/testing.md)
+- [E2E Testing](docs/developer/e2e-testing.md)
 - [Architecture Overview](docs/architecture/overview.md)
 
 Process docs (for contributors/maintainers):

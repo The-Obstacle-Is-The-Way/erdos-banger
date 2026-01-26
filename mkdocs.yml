@@ -103,6 +103,8 @@ nav:
   - Developer Guide:
       - Configuration: developer/configuration.md
       - Testing: developer/testing.md
+      - E2E Testing: developer/e2e-testing.md
+      - PDF Conversion: developer/pdf-conversion.md
       - CLI Reference: developer/cli-reference.md
   - Future:
       - Ideations: future/future-ideations.md
