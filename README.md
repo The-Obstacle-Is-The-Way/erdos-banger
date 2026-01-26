@@ -135,7 +135,7 @@ make ci-full
 
 ## Documentation
 
-- Hosted docs: https://the-obstacle-is-the-way.github.io/erdos-banger/
+- [Hosted docs](https://the-obstacle-is-the-way.github.io/erdos-banger/)
 - [Docs Index](docs/INDEX.md) — start here
 - [Quickstart](docs/getting-started/quickstart.md)
 - [Usage](docs/getting-started/usage.md)

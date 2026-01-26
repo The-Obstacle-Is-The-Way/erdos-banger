@@ -17,8 +17,6 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      UV_PYTHON: "3.11"
     steps:
       - uses: actions/checkout@v6
         with:
@@ -47,7 +45,7 @@ jobs:
         run: uv run --frozen mkdocs build --strict
 
       - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v4
         with:
           path: site
 
