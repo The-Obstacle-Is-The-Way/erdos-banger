@@ -52,7 +52,12 @@ def _validate_repo_url(url: str) -> tuple[bool, str | None]:
     if not parsed.netloc:
         return False, "URL must have a valid host"
 
-    host = parsed.netloc.lower()
+    # Reject URLs with embedded credentials (security risk)
+    if parsed.username or parsed.password:
+        return False, "Credentials are not allowed in repository URLs"
+
+    # Use hostname (not netloc) to avoid port/credential edge cases
+    host = (parsed.hostname or "").lower()
     if host not in ALLOWED_HOSTS:
         return False, f"Only {', '.join(sorted(ALLOWED_HOSTS))} repositories are allowed"
 
