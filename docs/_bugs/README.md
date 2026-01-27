@@ -21,6 +21,8 @@ This directory contains bug reports, adversarial code reviews, and quality audit
 | ID | Title | Priority | Status | Component |
 |----|-------|----------|--------|-----------|
 | BUG-039 | Ingest cannot discover papers - only fetches pre-defined refs | P2 | Phase 1 Fixed | `erdos ingest` |
+| BUG-047 | PDF converter thread-unsafe env mutation | P1 | Open | `erdos convert` |
+| BUG-048 | Subprocess calls missing timeouts | P2 | Open | `erdos sync` |
 
 **Note:** BUG-039 core workflow (`erdos refs add` + `erdos ingest`) works. Remaining phases (auto-discovery) are feature requests tracked in DEBT-110.
 
@@ -108,11 +110,13 @@ All bugs below have been fixed and archived to `docs/_archive/bugs/`.
 
 *Naming: GH-XXX = also tracked on GitHub Issues. BUG-XXX = local docs only. Both systems maintained in parallel.*
 
-**Next Bug ID:** BUG-047 (or GH-XXX if filing on GitHub)
+**Next Bug ID:** BUG-049 (or GH-XXX if filing on GitHub)
 
 ### Active Bug Decks
 
 - `docs/_bugs/bug-039-ingest-no-search-discovery.md` (BUG-039)
+- `docs/_bugs/bug-047-pdf-converter-thread-unsafe-env.md` (BUG-047)
+- `docs/_bugs/bug-048-subprocess-missing-timeouts.md` (BUG-048)
 
 ### Archived Bug Decks
 

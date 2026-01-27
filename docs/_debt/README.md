@@ -17,10 +17,30 @@ This directory contains technical-debt writeups: spec drift, missing fixtures, i
 | ID | Title | Priority | Status |
 |----|-------|----------|--------|
 | DEBT-114 | Hardcoded relative paths across codebase | P2 | Open |
+| DEBT-115 | formal/lean relative paths in Lean commands | P2 | Open |
+| DEBT-116 | Timeout constants fragmented across codebase | P3 | Open |
+| DEBT-117 | Database connection error handling fragile | P2 | Open |
+| DEBT-118 | Proof repository URL validation incomplete | P1 | Open |
 
-### DEBT-114: Hardcoded Relative Paths
+### DEBT-114: Hardcoded Relative Paths (Core)
 
 GH-036/PR#40 fixed only ONE instance (`logs/loop` in runner.py). Audit found **13+ similar hardcoded relative paths** across the codebase that break when running from subdirectories. See `debt-114-hardcoded-relative-paths.md` for full analysis.
+
+### DEBT-115: Lean Command Paths
+
+9 Lean-related commands use `Path("formal/lean")` hardcoded. Subset of DEBT-114 but tracked separately due to different module layer.
+
+### DEBT-116: Timeout Fragmentation
+
+Timeout values scattered across codebase (constants.py, inline, class defaults). Makes global tuning impossible.
+
+### DEBT-117: DB Connection Handling
+
+`SearchDatabase.connect()` has fragile finally block that can raise secondary exceptions.
+
+### DEBT-118: Proof URL Validation (P1)
+
+Proof repository URL validation only checks `https://` prefix. Should validate host against allowlist.
 
 ### Note on Audit False Positives (DEBT-068 through DEBT-071)
 
@@ -147,7 +167,7 @@ All debt below has been resolved and archived to `docs/_archive/debt/`.
 | DEBT-095 | zbMATH client LOC violation | P3 | Superseded | 9f10546 |
 | DEBT-110 | Add paper discovery mode to ingest | P2 | Superseded | SPEC-036 |
 
-**Next Debt ID:** DEBT-115
+**Next Debt ID:** DEBT-119
 
 ### Archived Debt Decks
 
