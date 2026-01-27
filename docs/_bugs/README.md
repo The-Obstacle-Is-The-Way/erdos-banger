@@ -22,7 +22,7 @@ This directory contains bug reports, adversarial code reviews, and quality audit
 |----|-------|----------|--------|-----------|
 | BUG-039 | Ingest cannot discover papers - only fetches pre-defined refs | P2 | Phase 1 Fixed | `erdos ingest` |
 | BUG-047 | PDF converter thread-unsafe env mutation | P1 | Open | `erdos convert` |
-| BUG-048 | Subprocess calls missing timeouts | P2 | Open | `erdos sync` |
+| BUG-048 | Subprocess calls missing timeouts | P2 | Fixed | `erdos sync` |
 
 **Note:** BUG-039 core workflow (`erdos refs add` + `erdos ingest`) works. Remaining phases (auto-discovery) are feature requests tracked in DEBT-110.
 

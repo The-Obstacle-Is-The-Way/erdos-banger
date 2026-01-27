@@ -21,6 +21,7 @@ from typing import Any
 import yaml
 
 from erdos.core.config import AppConfig
+from erdos.core.constants import GIT_FETCH_TIMEOUT, GIT_OP_TIMEOUT
 from erdos.core.sync.models import SubmoduleProblemData, SubmoduleSyncStatus
 
 
@@ -49,6 +50,10 @@ class SubmoduleFetchError(SubmoduleError):
 
 class SubmoduleCheckError(SubmoduleError):
     """Raised when staleness check fails."""
+
+
+class SubmoduleTimeoutError(SubmoduleError):
+    """Raised when a git operation times out."""
 
 
 # =============================================================================
@@ -121,8 +126,13 @@ def get_submodule_commit(submodule_path: Path) -> str:
             capture_output=True,
             text=True,
             check=True,
+            timeout=GIT_OP_TIMEOUT,
         )
         return result.stdout.strip()
+    except subprocess.TimeoutExpired as e:
+        raise SubmoduleTimeoutError(
+            f"Git rev-parse timed out after {GIT_OP_TIMEOUT}s for {submodule_path}"
+        ) from e
     except subprocess.CalledProcessError as e:
         raise SubmoduleError(
             f"Failed to get commit hash for {submodule_path}: {e.stderr}"
@@ -157,6 +167,7 @@ def check_submodule_staleness(submodule_path: Path) -> bool:
             capture_output=True,
             text=True,
             check=True,
+            timeout=GIT_FETCH_TIMEOUT,
         )
 
         # Count commits we're behind
@@ -166,11 +177,16 @@ def check_submodule_staleness(submodule_path: Path) -> bool:
             capture_output=True,
             text=True,
             check=True,
+            timeout=GIT_OP_TIMEOUT,
         )
 
         behind_count = int(result.stdout.strip())
         return behind_count > 0
 
+    except subprocess.TimeoutExpired as e:
+        raise SubmoduleTimeoutError(
+            f"Git operation timed out for {submodule_path}: {e.cmd}"
+        ) from e
     except subprocess.CalledProcessError as e:
         raise SubmoduleCheckError(
             f"Failed to check submodule staleness (network/fetch error): {e.stderr}"
@@ -228,6 +244,7 @@ def update_submodule(
             capture_output=True,
             text=True,
             check=True,
+            timeout=GIT_FETCH_TIMEOUT,
         )
 
         # Checkout latest
@@ -237,8 +254,13 @@ def update_submodule(
             capture_output=True,
             text=True,
             check=True,
+            timeout=GIT_OP_TIMEOUT,
         )
 
+    except subprocess.TimeoutExpired as e:
+        raise SubmoduleTimeoutError(
+            f"Git operation timed out for {submodule_path}: {e.cmd}"
+        ) from e
     except subprocess.CalledProcessError as e:
         raise SubmoduleFetchError(
             f"Failed to update submodule (network/fetch error): {e.stderr}"

@@ -1,8 +1,9 @@
 # BUG-048: Subprocess Calls Missing Timeouts in submodule.py
 
 **Priority:** P2
-**Status:** Open
+**Status:** Fixed
 **Found:** 2026-01-27
+**Fixed:** 2026-01-27
 **Component:** `src/erdos/core/sync/submodule.py`
 
 ## Description

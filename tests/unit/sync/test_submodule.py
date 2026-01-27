@@ -22,6 +22,7 @@ from erdos.core.sync.submodule import (
     SubmoduleError,
     SubmoduleFetchError,
     SubmoduleNotInitializedError,
+    SubmoduleTimeoutError,
     check_submodule_staleness,
     get_submodule_commit,
     get_submodule_path,
@@ -226,6 +227,13 @@ class TestGetSubmoduleCommit:
             with pytest.raises(SubmoduleError, match="Failed to get"):
                 get_submodule_commit(mock_submodule_dir)
 
+    def test_raises_on_timeout(self, mock_submodule_dir: Path) -> None:
+        """Raises SubmoduleTimeoutError when git times out (BUG-048)."""
+        with patch("erdos.core.sync.submodule.subprocess.run") as mock_run:
+            mock_run.side_effect = subprocess.TimeoutExpired("git", 30)
+            with pytest.raises(SubmoduleTimeoutError, match="timed out"):
+                get_submodule_commit(mock_submodule_dir)
+
 
 # =============================================================================
 # load_submodule_problems tests
@@ -303,6 +311,13 @@ class TestCheckSubmoduleStaleness:
             with pytest.raises(SubmoduleCheckError, match=r"network|fetch"):
                 check_submodule_staleness(mock_submodule_dir)
 
+    def test_raises_on_timeout(self, mock_submodule_dir: Path) -> None:
+        """Raises SubmoduleTimeoutError when git fetch times out (BUG-048)."""
+        with patch("erdos.core.sync.submodule.subprocess.run") as mock_run:
+            mock_run.side_effect = subprocess.TimeoutExpired("git fetch", 120)
+            with pytest.raises(SubmoduleTimeoutError, match="timed out"):
+                check_submodule_staleness(mock_submodule_dir)
+
 
 # =============================================================================
 # update_submodule tests
@@ -360,6 +375,15 @@ class TestUpdateSubmodule:
 
         assert status.stale is False
         assert status.commit_hash == "abc123"
+
+    def test_raises_on_timeout(self, mock_submodule_dir: Path) -> None:
+        """Raises SubmoduleTimeoutError when git operations time out (BUG-048)."""
+        with patch("erdos.core.sync.submodule.subprocess.run") as mock_run:
+            mock_run.side_effect = subprocess.TimeoutExpired("git fetch", 120)
+            with patch("erdos.core.sync.submodule.get_submodule_commit") as mock_commit:
+                mock_commit.return_value = "abc123"
+                with pytest.raises(SubmoduleTimeoutError, match="timed out"):
+                    update_submodule(mock_submodule_dir)
 
 
 # =============================================================================

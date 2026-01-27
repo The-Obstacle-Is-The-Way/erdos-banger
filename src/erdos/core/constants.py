@@ -34,6 +34,12 @@ LAKE_UPDATE_TIMEOUT = 600
 LLM_COMMAND_TIMEOUT = 300
 """Timeout for external LLM command execution (5 minutes)."""
 
+GIT_OP_TIMEOUT = 30
+"""Timeout for fast git operations (rev-parse, status, rev-list)."""
+
+GIT_FETCH_TIMEOUT = 120
+"""Timeout for git network operations (fetch, clone, checkout)."""
+
 # --- Rate limiting ---
 
 API_RATE_LIMIT_DELAY = 3.0
