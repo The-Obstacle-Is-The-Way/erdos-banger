@@ -365,6 +365,45 @@ class TestRunLoop:
         assert result.run_log_path.parent == log_dir
         assert result.run_log_path.exists()
 
+    def test_default_log_dir_is_absolute(
+        self,
+        tmp_path: Path,
+        mock_lean_runner: MagicMock,
+        sample_problem: ProblemRecord,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """run_loop default log_dir should be absolute, not relative (GH-036).
+
+        This prevents broken logs when running from a different working directory.
+        """
+        erdos_dir = tmp_path / "formal" / "lean" / "Erdos"
+        erdos_dir.mkdir(parents=True)
+        lean_file = erdos_dir / "Problem006.lean"
+        lean_file.write_text("theorem foo : True := sorry\n", encoding="utf-8")
+
+        # Run from a different working directory (simulates running from subdir)
+        subdir = tmp_path / "some" / "subdir"
+        subdir.mkdir(parents=True)
+        monkeypatch.chdir(subdir)
+
+        config = LoopConfig(max_iterations=1)
+        result = run_loop(
+            problem=sample_problem,
+            file_path=lean_file,
+            config=config,
+            lean_runner=mock_lean_runner,
+            llm_command=None,
+            no_apply=True,
+            # Note: log_dir not provided - tests the fallback
+        )
+
+        assert result.run_log_path is not None
+        # The log path should be absolute
+        assert result.run_log_path.is_absolute()
+        # And it should end with logs/loop/<run_id>.jsonl
+        assert result.run_log_path.parent.name == "loop"
+        assert result.run_log_path.parent.parent.name == "logs"
+
     def test_applies_patch_and_checks(
         self,
         tmp_path: Path,

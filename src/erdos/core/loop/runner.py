@@ -6,7 +6,6 @@ Per spec-012-loop-command.md execution model.
 from __future__ import annotations
 
 import logging
-from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 from erdos.core.ask.llm import execute_llm as default_execute_llm
@@ -14,9 +13,12 @@ from erdos.core.loop.iteration import _IterationRunner
 from erdos.core.loop.logging import LoopLogger, generate_run_id
 from erdos.core.loop.result import IterationRecord, LoopResult, LoopStatus
 from erdos.core.loop.verifier import count_admits, count_sorries
+from erdos.core.repo_root import resolve_repo_root
 
 
 if TYPE_CHECKING:
+    from pathlib import Path
+
     from erdos.core.lean import LeanRunner
     from erdos.core.loop.config import LoopConfig
     from erdos.core.models import LeanCheckResult, ProblemRecord
@@ -91,8 +93,10 @@ def run_loop(
     if llm_execute is None:
         llm_execute = default_execute_llm
 
-    # Set up logging
-    effective_log_dir = log_dir if log_dir is not None else Path("logs/loop")
+    # Set up logging - use repo root to ensure absolute path (GH-036)
+    effective_log_dir = (
+        log_dir if log_dir is not None else resolve_repo_root(None) / "logs" / "loop"
+    )
     log_path = effective_log_dir / f"{generate_run_id()}.jsonl"
     with LoopLogger(log_path) as loop_logger:
         iterations: list[IterationRecord] = []
