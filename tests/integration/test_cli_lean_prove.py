@@ -357,11 +357,13 @@ class TestLeanProveCommandOptions:
     def test_formal_input_context_flag_passed_to_aristotle(
         self, tmp_path: Path, monkeypatch: MonkeyPatch
     ) -> None:
-        """--formal-input-context flag is passed to Aristotle subprocess."""
+        """--formal-input-context flag with path is passed to Aristotle subprocess."""
         monkeypatch.setenv("ARISTOTLE_API_KEY", "test-key")
         input_file = tmp_path / "input.lean"
         input_file.write_text("-- test", encoding="utf-8")
         output = tmp_path / "output.lean"
+        context_file = tmp_path / "context.lean"
+        context_file.write_text("-- context file", encoding="utf-8")
 
         mock_result = MagicMock()
         mock_result.returncode = 0
@@ -382,11 +384,14 @@ class TestLeanProveCommandOptions:
                     "--output",
                     str(output),
                     "--formal-input-context",
+                    str(context_file),
                 ],
             )
 
         call_args = mock_run.call_args[0][0]
         assert "--formal-input-context" in call_args
+        # Verify the path is also in the command
+        assert str(context_file) in call_args
 
     def test_custom_timeout_passed_to_subprocess(
         self, tmp_path: Path, monkeypatch: MonkeyPatch
@@ -468,7 +473,7 @@ class TestLeanProveCommandJsonOutput:
         assert "aristotle" in data["data"]
         assert data["data"]["aristotle"]["exit_code"] == 0
         assert data["data"]["aristotle"]["informal"] is False
-        assert data["data"]["aristotle"]["formal_input_context"] is False
+        assert data["data"]["aristotle"]["formal_input_context"] is None
         assert "timeout_s" in data["data"]["aristotle"]
 
     def test_stdout_clean_in_json_mode(

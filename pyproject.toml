@@ -55,6 +55,11 @@ explore = [
     "sympy>=1.13",      # Symbolic math: primes, factorization, number theory
     "networkx>=3.4",    # Graph theory: chromatic numbers, planarity, etc.
 ]
+aristotle = [
+    # Harmonic Aristotle prover integration (paid API)
+    # See: docs/_vendor-docs/harmonic-aristotle/README.md
+    "aristotlelib>=0.7.0",
+]
 
 [project.scripts]
 erdos = "erdos.cli:app"

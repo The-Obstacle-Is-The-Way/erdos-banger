@@ -55,7 +55,7 @@ class AristotleConfig:
     command: str = "aristotle"
     timeout: int = LAKE_UPDATE_TIMEOUT
     informal: bool = False
-    formal_input_context: bool = False
+    formal_input_context: Path | None = None  # Path to Lean file with formal context
 
 
 @dataclass
@@ -71,7 +71,7 @@ class AristotleResult:
     stderr: str
     timeout: int
     informal: bool
-    formal_input_context: bool
+    formal_input_context: Path | None
 
     def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary for JSON serialization.
@@ -85,7 +85,9 @@ class AristotleResult:
             "aristotle": {
                 "command": self.command,
                 "informal": self.informal,
-                "formal_input_context": self.formal_input_context,
+                "formal_input_context": str(self.formal_input_context)
+                if self.formal_input_context
+                else None,
                 "timeout_s": self.timeout,
                 "exit_code": self.exit_code,
             },
@@ -209,8 +211,8 @@ def build_aristotle_command(
     if config.informal:
         cmd.append("--informal")
 
-    if config.formal_input_context:
-        cmd.append("--formal-input-context")
+    if config.formal_input_context is not None:
+        cmd.extend(["--formal-input-context", str(config.formal_input_context)])
 
     return cmd
 
@@ -223,7 +225,7 @@ def run_aristotle_prove_from_file(
     command: str | None = None,
     timeout: int = LAKE_UPDATE_TIMEOUT,
     informal: bool = False,
-    formal_input_context: bool = False,
+    formal_input_context: Path | None = None,
 ) -> AristotleResult:
     """Run Aristotle prove-from-file command.
 
@@ -234,7 +236,7 @@ def run_aristotle_prove_from_file(
         command: Explicit command path (falls back to ERDOS_ARISTOTLE_COMMAND env var)
         timeout: Maximum seconds to wait for completion (default: LAKE_UPDATE_TIMEOUT)
         informal: Pass --informal flag to Aristotle
-        formal_input_context: Pass --formal-input-context flag to Aristotle
+        formal_input_context: Path to Lean file with formal context (optional)
 
     Returns:
         AristotleResult with execution details

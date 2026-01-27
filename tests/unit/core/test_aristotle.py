@@ -38,20 +38,21 @@ class TestAristotleConfig:
         assert config.command == "aristotle"
         assert config.timeout == 600
         assert config.informal is False
-        assert config.formal_input_context is False
+        assert config.formal_input_context is None
 
-    def test_config_custom_values(self) -> None:
+    def test_config_custom_values(self, tmp_path: Path) -> None:
         """Test custom configuration values."""
+        context_file = tmp_path / "context.lean"
         config = AristotleConfig(
             command="/usr/local/bin/aristotle",
             timeout=300,
             informal=True,
-            formal_input_context=True,
+            formal_input_context=context_file,
         )
         assert config.command == "/usr/local/bin/aristotle"
         assert config.timeout == 300
         assert config.informal is True
-        assert config.formal_input_context is True
+        assert config.formal_input_context == context_file
 
 
 class TestValidateAristotleConfig:
@@ -172,31 +173,38 @@ class TestBuildAristotleCommand:
         assert "--informal" in cmd
 
     def test_command_with_formal_input_context_flag(self, tmp_path: Path) -> None:
-        """Test command with --formal-input-context flag."""
+        """Test command with --formal-input-context flag and path argument."""
         input_file = tmp_path / "input.lean"
         output_file = tmp_path / "output.lean"
+        context_file = tmp_path / "context.lean"
         config = AristotleConfig(
-            command="/usr/bin/aristotle", formal_input_context=True
+            command="/usr/bin/aristotle", formal_input_context=context_file
         )
 
         cmd = build_aristotle_command(config, input_file, output_file)
 
         assert "--formal-input-context" in cmd
+        # Path should follow the flag
+        context_idx = cmd.index("--formal-input-context")
+        assert cmd[context_idx + 1] == str(context_file)
 
     def test_command_with_all_flags(self, tmp_path: Path) -> None:
         """Test command with all optional flags."""
         input_file = tmp_path / "input.lean"
         output_file = tmp_path / "output.lean"
+        context_file = tmp_path / "context.lean"
         config = AristotleConfig(
             command="/usr/bin/aristotle",
             informal=True,
-            formal_input_context=True,
+            formal_input_context=context_file,
         )
 
         cmd = build_aristotle_command(config, input_file, output_file)
 
         assert "--informal" in cmd
         assert "--formal-input-context" in cmd
+        context_idx = cmd.index("--formal-input-context")
+        assert cmd[context_idx + 1] == str(context_file)
 
 
 # =============================================================================
@@ -402,11 +410,13 @@ class TestRunAristotleProveFromFileExecution:
     def test_formal_input_context_flag_passed_to_command(
         self, tmp_path: Path, monkeypatch: MonkeyPatch
     ) -> None:
-        """Formal input context flag is included in subprocess command."""
+        """Formal input context flag and path are included in subprocess command."""
         monkeypatch.setenv("ARISTOTLE_API_KEY", "test-key")
         input_file = tmp_path / "input.lean"
         input_file.write_text("-- test", encoding="utf-8")
         output_file = tmp_path / "output.lean"
+        context_file = tmp_path / "context.lean"
+        context_file.write_text("-- context", encoding="utf-8")
 
         mock_result = MagicMock()
         mock_result.returncode = 0
@@ -418,11 +428,13 @@ class TestRunAristotleProveFromFileExecution:
             patch("subprocess.run", return_value=mock_result) as mock_run,
         ):
             run_aristotle_prove_from_file(
-                input_file, output_file, formal_input_context=True
+                input_file, output_file, formal_input_context=context_file
             )
 
         call_args = mock_run.call_args[0][0]
         assert "--formal-input-context" in call_args
+        context_idx = call_args.index("--formal-input-context")
+        assert call_args[context_idx + 1] == str(context_file)
 
 
 # =============================================================================
@@ -445,7 +457,7 @@ class TestAristotleResult:
             stderr="",
             timeout=600,
             informal=False,
-            formal_input_context=False,
+            formal_input_context=None,
         )
 
         data = result.to_dict()
@@ -456,10 +468,11 @@ class TestAristotleResult:
         assert data["aristotle"]["exit_code"] == 0
         assert data["aristotle"]["timeout_s"] == 600
         assert data["aristotle"]["informal"] is False
-        assert data["aristotle"]["formal_input_context"] is False
+        assert data["aristotle"]["formal_input_context"] is None
 
     def test_result_to_dict_with_flags(self, tmp_path: Path) -> None:
         """Test result dict includes flag values."""
+        context_file = tmp_path / "context.lean"
         result = AristotleResult(
             success=False,
             input_file=tmp_path / "input.lean",
@@ -470,13 +483,13 @@ class TestAristotleResult:
             stderr="Error",
             timeout=300,
             informal=True,
-            formal_input_context=True,
+            formal_input_context=context_file,
         )
 
         data = result.to_dict()
 
         assert data["aristotle"]["informal"] is True
-        assert data["aristotle"]["formal_input_context"] is True
+        assert data["aristotle"]["formal_input_context"] == str(context_file)
         assert data["aristotle"]["timeout_s"] == 300
 
 

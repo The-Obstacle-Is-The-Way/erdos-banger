@@ -208,6 +208,29 @@ Try again: uv run erdos lean check formal/lean/Erdos/Problem006.lean
 | Automated but costly | Interactive but free |
 | Limited iterations | Unlimited iterations |
 
+## Alternative: Aristotle API (Paid)
+
+If you prefer hands-off automated proving via Harmonic's Aristotle API:
+
+```bash
+# 1. Install aristotlelib
+uv sync --extra aristotle
+
+# 2. Set API key (use export for direct CLI calls)
+export ARISTOTLE_API_KEY=arstl-your-key
+
+# 3. Run via erdos wrapper (recommended - auto-loads .env)
+uv run erdos lean prove formal/lean/Erdos/Problem006.lean \
+    --output formal/lean/Erdos/Problem006_aristotle.lean
+
+# Or direct CLI (requires exported env var)
+uv run aristotle prove-from-file \
+    formal/lean/Erdos/Problem006.lean \
+    --output-file formal/lean/Erdos/Problem006_aristotle.lean
+```
+
+**Cost:** Paid per-problem. Use the subscription workflow above for unlimited iterations.
+
 ## Ready to Begin?
 
 Tell me to start and I'll begin Step 1: reading and understanding Problem $ARGUMENTS.

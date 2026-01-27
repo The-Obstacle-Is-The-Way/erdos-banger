@@ -27,7 +27,7 @@ def prove_with_aristotle(
     *,
     timeout: int = LAKE_UPDATE_TIMEOUT,
     informal: bool = False,
-    formal_input_context: bool = False,
+    formal_input_context: Path | None = None,
 ) -> CLIOutput:
     """Run Aristotle prove-from-file command.
 
@@ -36,7 +36,7 @@ def prove_with_aristotle(
         output_file: Path for the output Lean file
         timeout: Maximum seconds to wait for completion
         informal: Pass --informal flag to Aristotle
-        formal_input_context: Pass --formal-input-context flag to Aristotle
+        formal_input_context: Path to Lean file with formal context (optional)
 
     Returns:
         CLIOutput with execution details
@@ -126,12 +126,14 @@ def register(app: typer.Typer) -> None:
             typer.Option("--informal", help="Pass --informal flag to Aristotle."),
         ] = False,
         formal_input_context: Annotated[
-            bool,
+            Path | None,
             typer.Option(
                 "--formal-input-context",
-                help="Pass --formal-input-context flag to Aristotle.",
+                help="Path to Lean file with formal context for Aristotle.",
+                exists=True,
+                readable=True,
             ),
-        ] = False,
+        ] = None,
     ) -> None:
         """
         Run Aristotle prove-from-file on a Lean file.

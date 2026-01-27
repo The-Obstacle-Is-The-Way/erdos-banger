@@ -1,8 +1,9 @@
 # BUG-042: Aristotle CLI Integration Friction
 
-**Status:** Open
+**Status:** Fixed
 **Severity:** Medium (blocks Aristotle usage)
 **Discovered:** 2026-01-27
+**Fixed:** 2026-01-27
 **Component:** `erdos lean prove`, Aristotle integration
 
 ## Summary
@@ -231,12 +232,12 @@ uv run aristotle prove-from-file \
 
 ## Acceptance Criteria
 
-- [ ] `uv sync --extra aristotle` installs aristotlelib (add to pyproject.toml)
-- [ ] `erdos lean prove --formal-input-context <path>` works correctly (change flag type)
-- [ ] `erdos lean prove` reads ARISTOTLE_API_KEY from `.env` automatically (already works!)
-- [ ] Skills mention Aristotle as fallback option
-- [ ] `.env.example` updated with `export` or documents `set -a` pattern
-- [ ] README mentions the shell vs env var distinction
+- [x] `uv sync --extra aristotle` installs aristotlelib (add to pyproject.toml)
+- [x] `erdos lean prove --formal-input-context <path>` works correctly (change flag type)
+- [x] `erdos lean prove` reads ARISTOTLE_API_KEY from `.env` automatically (already works!)
+- [x] Skills mention Aristotle as fallback option
+- [x] `.env.example` updated with `export` and documents the pattern
+- [ ] README mentions the shell vs env var distinction (OPTIONAL: info already in .env.example)
 - [ ] This friction report is archived after fixes
 
 ## Related: Previous "Fixes" That Didn't Stick
