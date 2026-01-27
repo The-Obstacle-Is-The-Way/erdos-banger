@@ -213,6 +213,7 @@ def update_submodule(
     Raises:
         SubmoduleNotInitializedError: If submodule not initialized
         SubmoduleFetchError: If fetch/update fails
+        SubmoduleTimeoutError: If a git operation times out
     """
     if not _is_submodule_initialized(submodule_path):
         raise SubmoduleNotInitializedError(

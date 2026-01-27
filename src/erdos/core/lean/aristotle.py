@@ -258,6 +258,23 @@ def run_aristotle_prove_from_file(
             f"Input file not found: {input_file}",
             error_type="NotFoundError",
         )
+    if not input_file.is_file():
+        raise AristotleError(
+            f"Input file must be a file: {input_file}",
+            error_type="UsageError",
+        )
+
+    if formal_input_context is not None:
+        if not formal_input_context.exists():
+            raise AristotleError(
+                f"Formal input context not found: {formal_input_context}",
+                error_type="NotFoundError",
+            )
+        if not formal_input_context.is_file():
+            raise AristotleError(
+                f"Formal input context must be a file: {formal_input_context}",
+                error_type="UsageError",
+            )
 
     # Validate output file is different from input
     resolved_input = input_file.resolve()

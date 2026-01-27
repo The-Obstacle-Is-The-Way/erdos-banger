@@ -103,6 +103,9 @@ def register(app: typer.Typer) -> None:
                 help="Lean file to prove.",
                 exists=True,
                 readable=True,
+                file_okay=True,
+                dir_okay=False,
+                resolve_path=True,
             ),
         ],
         output: Annotated[
@@ -132,6 +135,9 @@ def register(app: typer.Typer) -> None:
                 help="Path to Lean file with formal context for Aristotle.",
                 exists=True,
                 readable=True,
+                file_okay=True,
+                dir_okay=False,
+                resolve_path=True,
             ),
         ] = None,
     ) -> None:

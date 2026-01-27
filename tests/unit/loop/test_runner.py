@@ -403,6 +403,8 @@ class TestRunLoop:
         # And it should end with logs/loop/<run_id>.jsonl
         assert result.run_log_path.parent.name == "loop"
         assert result.run_log_path.parent.parent.name == "logs"
+        # Verify the log file was actually created
+        assert result.run_log_path.exists()
 
     def test_applies_patch_and_checks(
         self,
