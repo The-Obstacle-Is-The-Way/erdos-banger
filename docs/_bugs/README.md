@@ -99,7 +99,7 @@ All bugs below have been fixed and archived to `docs/_archive/bugs/`.
 | BUG-042 | Exa API returns empty titles | P2 | Fixed | 8ba6e32 |
 | BUG-038 | BM25 search doesn't escape FTS5 special characters | P1 | Fixed | 8c55500 |
 | GH-035 | Crossref/S2 clients missing JSONDecodeError handling | P1 | Fixed | json_response.py |
-| GH-036 | Hardcoded `logs/loop` path breaks outside repo root | P2 | Open | GH#36 |
+| GH-036 | Hardcoded `logs/loop` path breaks outside repo root | P2 | Fixed (PR#40) | 3575563 |
 | BUG-044 | Environment variables not auto-loaded in Python scripts | P2 | Fixed | b43c3a7 |
 | BUG-041 | Exa not exposed in CLI | N/A | Invalidated | f5557d7 |
 | BUG-043 | pdfplumber not installed | N/A | Invalidated | f5557d7 |

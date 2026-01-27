@@ -14,7 +14,13 @@ This directory contains technical-debt writeups: spec drift, missing fixtures, i
 
 ## Active Debt
 
-**None.** All technical debt has been resolved or archived.
+| ID | Title | Priority | Status |
+|----|-------|----------|--------|
+| DEBT-114 | Hardcoded relative paths across codebase | P2 | Open |
+
+### DEBT-114: Hardcoded Relative Paths
+
+GH-036/PR#40 fixed only ONE instance (`logs/loop` in runner.py). Audit found **13+ similar hardcoded relative paths** across the codebase that break when running from subdirectories. See `debt-114-hardcoded-relative-paths.md` for full analysis.
 
 ### Note on Audit False Positives (DEBT-068 through DEBT-071)
 
@@ -141,7 +147,7 @@ All debt below has been resolved and archived to `docs/_archive/debt/`.
 | DEBT-095 | zbMATH client LOC violation | P3 | Superseded | 9f10546 |
 | DEBT-110 | Add paper discovery mode to ingest | P2 | Superseded | SPEC-036 |
 
-**Next Debt ID:** DEBT-114
+**Next Debt ID:** DEBT-115
 
 ### Archived Debt Decks
 
