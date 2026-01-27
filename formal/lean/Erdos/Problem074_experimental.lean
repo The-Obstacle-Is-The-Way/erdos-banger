@@ -164,6 +164,9 @@ def erdos_74_sqrt : Prop :=
 - Lambie-Hanson (arXiv:1902.08177): Solved the CHROMATIC GROWTH question
   (different from edge-deletion to bipartite)
 - EHS82: Original paper defining maxSubgraphEdgeDistToBipartite
+  - In EHS82 notation this is `f_W^{(3)}(n)` (Section 3, “Omitting edges of a subgraph”)
+  - EHS82 also explicitly asks whether `f_W^{(3)}(n)` can grow “very slowly” for χ(G)=ω
+    (their Problem 3), which matches the modern Erdős Problems phrasing.
 
 ### Key Insight:
 The edge-deletion formulation is STRONGER than chromatic growth.

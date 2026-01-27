@@ -65,6 +65,38 @@ Location: `formal/lean/Upstream/FormalConjectures/ErdosProblems/74.lean`
 - **Open**: Even the case $f(n) = \sqrt{n}$ remains unresolved
 - **Negative**: The statement fails for graphs with chromatic number $\aleph_1$
 
+## EHS82: What the original paper actually proves (and what it asks)
+
+The defining function in [EHS82] is exactly the “edge-deletion distance to bipartite”
+maximized over all $n$-vertex induced subgraphs:
+
+> $$f^{(3)}_W(n) \;:=\; \max_{A\subseteq V,\ |A|=n}\ \min\{|E'|:\ (A,\ [A]^2\cap W\setminus E')\ \text{is bipartite}\}.$$
+
+This matches the Lean formalization:
+- `minEdgeDistToBipartite` is the inner “min |E'|”.
+- `maxSubgraphEdgeDistToBipartite` is the outer “max over |A|=n”.
+
+### Why the statement fails for $\chi(G)=\aleph_1$ (uncountable chromatic)
+
+EHS82 proves a qualitative dichotomy between countable vs uncountable chromatic number:
+if $\chi(G)>\omega$, then there is a fixed $\varepsilon>0$ such that **every** $n$-vertex
+induced subgraph needs $\ge \varepsilon n$ edge deletions to become bipartite (so
+$f^{(3)}(n)$ is **at least linear**). This is the core reason the “$f(n)\to\infty$ arbitrarily slowly”
+goal cannot hold at $\aleph_1$.
+
+### Best general upper bound they record (still far from the open target)
+
+They also give an explicit *construction* of a large-chromatic graph (based on an “ordered-edge”
+graph on $\omega$) where the bipartite edge-deletion number satisfies an upper bound of order
+$O(n^{3/2})$ for $n$-vertex subgraphs. This is a real theorem, but it is still extremely far from
+polylogarithmic (or “arbitrarily slowly growing”) bounds.
+
+### The real open problem (their Problem 3)
+
+EHS82 explicitly asks: for a graph of **countably infinite** chromatic number ($\chi(G)=\omega$),
+can $f^{(3)}(n)$ tend to infinity “very slowly” (e.g. $\log n$ or iterated logs)?
+This is essentially Erdős Problem #74 as stated on erdosproblems.com.
+
 ## Research Questions
 
 1. What techniques from Lambie-Hanson can be adapted to the edge-deletion formulation?
