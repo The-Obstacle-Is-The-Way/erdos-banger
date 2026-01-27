@@ -1,4 +1,4 @@
-# DEBT-116: Timeout Constants Fragmented Across Codebase
+# DEBT-116: Timeout Constants Not Consistently Used
 
 **Priority:** P3
 **Status:** Open
@@ -6,53 +6,65 @@
 
 ## Summary
 
-Timeout values are defined inconsistently across the codebase - some in constants.py, some hardcoded inline, some as class defaults. This makes it difficult to tune timeouts globally.
+`constants.py` already defines timeout constants (lines 17-35), but some modules define their own local constants or hardcode values instead of importing from the central location.
 
 ## Current State
 
-| Location | Constant | Value | Usage |
-|----------|----------|-------|-------|
-| `core/constants.py:19` | `DEFAULT_HTTP_TIMEOUT` | 30.0 | HTTP clients |
-| `core/sync/proofs.py:53` | `CLONE_TIMEOUT` | 120 | git clone |
-| `core/sync/proofs.py:54` | `BUILD_TIMEOUT` | 600 | lake build |
-| `core/sync/proofs.py:55` | `NO_SORRIES_TIMEOUT` | 120 | sorry check |
-| `core/sync/website.py:66,250,317` | inline | 30.0 | HTTP requests |
-| `core/clients/openalex.py:39` | inline | 30.0 | OpenAlex API |
-| `core/clients/*.py` | class default | 30.0 | Various clients |
+### Centralized (in `core/constants.py`)
+
+| Line | Constant | Value | Purpose |
+|------|----------|-------|---------|
+| 19 | `DEFAULT_HTTP_TIMEOUT` | 30.0 | HTTP requests |
+| 25 | `LEAN_COMPILE_TIMEOUT` | 120 | Lean compilation |
+| 28 | `LEAN_VERSION_TIMEOUT` | 10 | lean --version |
+| 31 | `LAKE_UPDATE_TIMEOUT` | 600 | lake update |
+| 34 | `LLM_COMMAND_TIMEOUT` | 300 | LLM commands |
+
+### Local Duplicates (should import from constants.py)
+
+| Location | Constant | Value | Duplicates |
+|----------|----------|-------|------------|
+| `core/sync/proofs.py:53` | `CLONE_TIMEOUT` | 120 | Same as `LEAN_COMPILE_TIMEOUT` |
+| `core/sync/proofs.py:54` | `BUILD_TIMEOUT` | 600 | Same as `LAKE_UPDATE_TIMEOUT` |
+| `core/sync/proofs.py:55` | `NO_SORRIES_TIMEOUT` | 120 | Same as `LEAN_COMPILE_TIMEOUT` |
+
+### Hardcoded Values (should use constants)
+
+| Location | Value | Should Use |
+|----------|-------|------------|
+| `core/sync/website.py:66,250,317` | `30.0` | `DEFAULT_HTTP_TIMEOUT` |
+| `core/clients/openalex.py:39` | `30.0` | `DEFAULT_HTTP_TIMEOUT` |
+| Various clients | `30.0` | `DEFAULT_HTTP_TIMEOUT` |
 
 ## Problems
 
-1. **Inconsistency**: Some use `DEFAULT_HTTP_TIMEOUT`, others hardcode `30.0`
-2. **No global override**: Can't tune all timeouts via config
-3. **Hidden magic numbers**: `30.0` appears 10+ times without context
-4. **Missing timeouts**: Some subprocess calls have no timeout at all (BUG-048)
+1. **Duplication**: `proofs.py` defines constants that duplicate `constants.py`
+2. **Hidden magic numbers**: `30.0` appears inline instead of using `DEFAULT_HTTP_TIMEOUT`
+3. **Missing timeouts**: `submodule.py` has no timeouts at all (BUG-048)
 
 ## Recommended Fix
 
 ```python
-# src/erdos/core/constants.py
-# HTTP and network timeouts
-DEFAULT_HTTP_TIMEOUT = 30.0  # seconds
-DEFAULT_API_TIMEOUT = 30.0   # seconds (alias for clarity)
+# In proofs.py, replace local constants:
+from erdos.core.constants import (
+    LEAN_COMPILE_TIMEOUT,  # replaces CLONE_TIMEOUT, NO_SORRIES_TIMEOUT
+    LAKE_UPDATE_TIMEOUT,   # replaces BUILD_TIMEOUT
+)
 
-# Git operations
-GIT_CLONE_TIMEOUT = 120     # seconds
-GIT_OP_TIMEOUT = 30         # seconds (rev-parse, status, etc.)
+# Add new constant to constants.py for git operations:
+GIT_OP_TIMEOUT = 30  # seconds (rev-parse, status, fetch)
 
-# Build operations
-LEAN_BUILD_TIMEOUT = 600    # seconds (lake build)
-LEAN_CHECK_TIMEOUT = 120    # seconds (sorry/admit checks)
-
-# Then update all modules to import from constants
+# In website.py and clients/*.py, replace inline 30.0:
+from erdos.core.constants import DEFAULT_HTTP_TIMEOUT
 ```
 
 ## Acceptance Criteria
 
-- [ ] All timeout values moved to `constants.py`
-- [ ] All inline `30.0` replaced with `DEFAULT_HTTP_TIMEOUT`
-- [ ] All `timeout=` parameters import from constants
-- [ ] Documentation of timeout values in constants.py
+- [ ] `proofs.py` imports from `constants.py` instead of defining local constants
+- [ ] Inline `30.0` in `website.py` replaced with `DEFAULT_HTTP_TIMEOUT`
+- [ ] Inline `30.0` in clients replaced with `DEFAULT_HTTP_TIMEOUT`
+- [ ] Add `GIT_OP_TIMEOUT = 30` to `constants.py` for use in `submodule.py` (BUG-048)
 
 ## Notes
 
-Low priority because current timeouts work, but maintenance burden grows with each new module.
+Low priority because current timeouts work. Main benefit is consistency and single source of truth for tuning.

@@ -1,35 +1,36 @@
-# BUG-048: Subprocess Calls Missing Timeouts
+# BUG-048: Subprocess Calls Missing Timeouts in submodule.py
 
 **Priority:** P2
 **Status:** Open
 **Found:** 2026-01-27
-**Component:** `src/erdos/core/sync/`
+**Component:** `src/erdos/core/sync/submodule.py`
 
 ## Description
 
-Multiple git subprocess calls in sync modules don't have explicit timeouts. These can hang indefinitely on network issues or large repositories.
+Multiple git subprocess calls in `sync/submodule.py` don't have explicit timeouts. These can hang indefinitely on network issues or large repositories.
+
+**Note:** `sync/proofs.py` is NOT affected - all its subprocess calls already have timeouts.
 
 ## Affected Files
 
 | File | Lines | Description |
 |------|-------|-------------|
-| `sync/proofs.py` | 153-159 | `git rev-parse HEAD` no timeout |
-| `sync/submodule.py` | 118 | `git status` no timeout |
-| `sync/submodule.py` | 154 | `git init` no timeout |
-| `sync/submodule.py` | 163 | `git remote add` no timeout |
-| `sync/submodule.py` | 225 | `git fetch` no timeout |
-| `sync/submodule.py` | 235 | `git checkout` no timeout |
+| `sync/submodule.py` | 118-125 | `git rev-parse HEAD` no timeout |
+| `sync/submodule.py` | 154-160 | `git fetch origin` no timeout |
+| `sync/submodule.py` | 163-169 | `git rev-list --count` no timeout |
+| `sync/submodule.py` | 225-231 | `git fetch origin` no timeout |
+| `sync/submodule.py` | 234-240 | `git checkout origin/main` no timeout |
 
 ## Evidence
 
 ```python
-# src/erdos/core/sync/proofs.py:153-159
-commit_result = subprocess.run(
-    ["git", "rev-parse", "HEAD"],
-    cwd=dest,
+# src/erdos/core/sync/submodule.py:118-125
+result = subprocess.run(
+    ["git", "rev-parse", "HEAD"],  # noqa: S607
+    cwd=submodule_path,
     capture_output=True,
     text=True,
-    check=False,
+    check=True,
     # NO TIMEOUT!
 )
 ```
@@ -43,24 +44,30 @@ commit_result = subprocess.run(
 ## Recommended Fix
 
 ```python
-# Use constants from proofs.py or create new constant
-GIT_OP_TIMEOUT = 30  # seconds
+# Import from constants.py (already has DEFAULT_HTTP_TIMEOUT = 30.0)
+from erdos.core.constants import DEFAULT_HTTP_TIMEOUT
 
-commit_result = subprocess.run(
-    ["git", "rev-parse", "HEAD"],
-    cwd=dest,
+GIT_OP_TIMEOUT = 30  # seconds (or use DEFAULT_HTTP_TIMEOUT)
+
+result = subprocess.run(
+    ["git", "rev-parse", "HEAD"],  # noqa: S607
+    cwd=submodule_path,
     capture_output=True,
     text=True,
-    check=False,
-    timeout=GIT_OP_TIMEOUT,
+    check=True,
+    timeout=GIT_OP_TIMEOUT,  # ADD THIS
 )
 ```
 
+## Files to Modify
+
+1. `src/erdos/core/sync/submodule.py` - Add `timeout=` to all 5 subprocess.run calls
+
 ## Note
 
-`sync/proofs.py` already defines `CLONE_TIMEOUT=120` and `BUILD_TIMEOUT=600` but doesn't use them consistently for all git operations.
+`sync/proofs.py` already handles timeouts correctly (all 4 subprocess calls have timeout parameters).
 
 ## Related
 
 - DEBT-114: Hardcoded relative paths (same modules)
-- AUDIT-009: Subprocess timeout not always enforced
+- DEBT-116: Timeout constants fragmented across codebase
