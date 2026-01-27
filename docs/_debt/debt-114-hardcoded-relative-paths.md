@@ -84,6 +84,7 @@ def _get_default_data_path() -> Path:
 ## Recommended Fix
 
 1. **Add helper to `repo_root.py`:**
+
    ```python
    def repo_path(*parts: str) -> Path:
        """Get absolute path relative to repo root."""

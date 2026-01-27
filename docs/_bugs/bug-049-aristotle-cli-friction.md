@@ -1,4 +1,4 @@
-# BUG-042: Aristotle CLI Integration Friction
+# BUG-049: Aristotle CLI Integration Friction
 
 **Status:** Fixed
 **Severity:** Medium (blocks Aristotle usage)
@@ -171,7 +171,7 @@ export ARISTOTLE_API_KEY=arstl-xxx
 
 ### 4. Skill Documentation Gap
 
-**File:** `.claude/skills/erdos-prove/skill.md`
+**File:** `.claude/skills/erdos-prove/SKILL.md`
 
 **Issue:** The `/erdos-prove` skill is explicitly for the subscription-first workflow. It doesn't mention Aristotle at all. This is correct by design, but causes confusion.
 
@@ -227,8 +227,8 @@ uv run aristotle prove-from-file \
 | `pyproject.toml` | Add `aristotlelib` to optional deps |
 | `src/erdos/core/lean/aristotle.py` | Fix `--formal-input-context` to accept Path |
 | `src/erdos/commands/lean/prove_cmd.py` | Update flag type from bool to Path |
-| `.claude/skills/erdos-prove/skill.md` | Add Aristotle fallback section |
-| `.codex/skills/erdos-prove/skill.md` | Same (if exists) |
+| `.claude/skills/erdos-prove/SKILL.md` | Add Aristotle fallback section |
+| `.codex/skills/erdos-prove/SKILL.md` | Same (if exists) |
 
 ## Acceptance Criteria
 

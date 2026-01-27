@@ -19,6 +19,8 @@
 | 28 | `LEAN_VERSION_TIMEOUT` | 10 | lean --version |
 | 31 | `LAKE_UPDATE_TIMEOUT` | 600 | lake update |
 | 34 | `LLM_COMMAND_TIMEOUT` | 300 | LLM commands |
+| 37 | `GIT_OP_TIMEOUT` | 30 | Git operations |
+| 40 | `GIT_FETCH_TIMEOUT` | 120 | Git network operations |
 
 ### Local Duplicates (should import from constants.py)
 
@@ -40,7 +42,7 @@
 
 1. **Duplication**: `proofs.py` defines constants that duplicate `constants.py`
 2. **Hidden magic numbers**: `30.0` appears inline instead of using `DEFAULT_HTTP_TIMEOUT`
-3. **Missing timeouts**: `submodule.py` has no timeouts at all (BUG-048)
+3. **Inconsistent git timeouts**: use `GIT_OP_TIMEOUT` / `GIT_FETCH_TIMEOUT` for git subprocess calls (BUG-048 fixed in PR #42)
 
 ## Recommended Fix
 
@@ -51,8 +53,8 @@ from erdos.core.constants import (
     LAKE_UPDATE_TIMEOUT,   # replaces BUILD_TIMEOUT
 )
 
-# Add new constant to constants.py for git operations:
-GIT_OP_TIMEOUT = 30  # seconds (rev-parse, status, fetch)
+# For git subprocess calls, prefer these centralized constants:
+from erdos.core.constants import GIT_FETCH_TIMEOUT, GIT_OP_TIMEOUT
 
 # In website.py and clients/*.py, replace inline 30.0:
 from erdos.core.constants import DEFAULT_HTTP_TIMEOUT
@@ -63,7 +65,7 @@ from erdos.core.constants import DEFAULT_HTTP_TIMEOUT
 - [ ] `proofs.py` imports from `constants.py` instead of defining local constants
 - [ ] Inline `30.0` in `website.py` replaced with `DEFAULT_HTTP_TIMEOUT`
 - [ ] Inline `30.0` in clients replaced with `DEFAULT_HTTP_TIMEOUT`
-- [ ] Add `GIT_OP_TIMEOUT = 30` to `constants.py` for use in `submodule.py` (BUG-048)
+- [x] Add `GIT_OP_TIMEOUT` / `GIT_FETCH_TIMEOUT` to `constants.py` for `submodule.py` (BUG-048)
 
 ## Notes
 

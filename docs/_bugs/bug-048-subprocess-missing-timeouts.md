@@ -45,10 +45,8 @@ result = subprocess.run(
 ## Recommended Fix
 
 ```python
-# Import from constants.py (already has DEFAULT_HTTP_TIMEOUT = 30.0)
-from erdos.core.constants import DEFAULT_HTTP_TIMEOUT
-
-GIT_OP_TIMEOUT = 30  # seconds (or use DEFAULT_HTTP_TIMEOUT)
+# Import from constants.py (centralized timeouts)
+from erdos.core.constants import GIT_FETCH_TIMEOUT, GIT_OP_TIMEOUT
 
 result = subprocess.run(
     ["git", "rev-parse", "HEAD"],  # noqa: S607
@@ -57,6 +55,15 @@ result = subprocess.run(
     text=True,
     check=True,
     timeout=GIT_OP_TIMEOUT,  # ADD THIS
+)
+
+subprocess.run(
+    ["git", "fetch", "origin"],  # noqa: S607
+    cwd=submodule_path,
+    capture_output=True,
+    text=True,
+    check=True,
+    timeout=GIT_FETCH_TIMEOUT,  # ADD THIS
 )
 ```
 
