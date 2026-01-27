@@ -21,6 +21,7 @@ This directory contains bug reports, adversarial code reviews, and quality audit
 | ID | Title | Priority | Status | Component |
 |----|-------|----------|--------|-----------|
 | BUG-039 | Ingest cannot discover papers - only fetches pre-defined refs | P2 | Phase 1 Fixed | `erdos ingest` |
+| BUG-042 | Aristotle CLI integration friction | P2 | Open | `erdos lean prove` |
 | BUG-047 | PDF converter thread-unsafe env mutation | P1 | Open | `erdos convert` |
 | BUG-048 | Subprocess calls missing timeouts | P2 | Fixed | `erdos sync` |
 
@@ -115,6 +116,7 @@ All bugs below have been fixed and archived to `docs/_archive/bugs/`.
 ### Active Bug Decks
 
 - `docs/_bugs/bug-039-ingest-no-search-discovery.md` (BUG-039)
+- `docs/_bugs/bug-042-aristotle-cli-friction.md` (BUG-042)
 - `docs/_bugs/bug-047-pdf-converter-thread-unsafe-env.md` (BUG-047)
 - `docs/_bugs/bug-048-subprocess-missing-timeouts.md` (BUG-048)
 
