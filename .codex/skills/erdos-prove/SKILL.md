@@ -48,7 +48,7 @@ Gather context from existing references without making API calls.
 - `literature/manifests/$(printf '%04d' $ARGUMENTS).yaml` - Reference metadata (IDs are zero-padded, e.g. 6 → 0006.yaml)
 - `literature/cache/` - Downloaded papers and sources
 - `research/problems/$(printf '%04d' $ARGUMENTS)/` - Research workspace (leads, hypotheses, tasks)
-- Search index: `uv run erdos search "relevant terms"`
+- Search index: `uv run erdos search "relevant terms" --problem $ARGUMENTS` (omit `--problem` to search globally)
 
 **Optional API sources (rate-limited, mostly free):**
 - `uv run erdos refs zbmath --msc <relevant-code>` - zbMATH (free)
@@ -136,7 +136,7 @@ uv run erdos lean check "formal/lean/Erdos/Problem${PROBLEM3}.lean"
 uv run erdos show $ARGUMENTS
 
 # Search related literature
-uv run erdos search "relevant terms" --problem $ARGUMENTS
+uv run erdos search "relevant terms" --problem $ARGUMENTS  # omit --problem to search globally
 
 # Check formalization status
 uv run erdos lean status $ARGUMENTS
@@ -207,6 +207,29 @@ Try again: uv run erdos lean check formal/lean/Erdos/Problem006.lean
 | ~$0.50-5.00 per run | $0 (subscription) |
 | Automated but costly | Interactive but free |
 | Limited iterations | Unlimited iterations |
+
+## Alternative: Aristotle API (Paid)
+
+If you prefer hands-off automated proving via Harmonic's Aristotle API:
+
+```bash
+# 1. Install aristotlelib
+uv sync --extra aristotle
+
+# 2. Set API key (use export for direct CLI calls)
+export ARISTOTLE_API_KEY=arstl-your-key
+
+# 3. Run via erdos wrapper (recommended - auto-loads .env)
+uv run erdos lean prove formal/lean/Erdos/Problem006.lean \
+    --output formal/lean/Erdos/Problem006_aristotle.lean
+
+# Or direct CLI (requires exported env var)
+uv run aristotle prove-from-file \
+    formal/lean/Erdos/Problem006.lean \
+    --output-file formal/lean/Erdos/Problem006_aristotle.lean
+```
+
+**Cost:** Paid per-problem. Use the subscription workflow above for unlimited iterations.
 
 ## Ready to Begin?
 
